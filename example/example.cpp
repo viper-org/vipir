@@ -1,3 +1,4 @@
+#include "vipir/IR/BasicBlock.h"
 #include "vipir/IR/Function.h"
 #include "vipir/Module.h"
 
@@ -7,7 +8,9 @@ int main()
 {
     vipir::Module mod ("test.tst");
 
-    vipir::Function::Create(mod, "test");
+    auto fn = vipir::Function::Create(mod, "test");
+
+    auto bb = vipir::BasicBlock::Create("", fn);
 
     mod.print(std::cout);
     

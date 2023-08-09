@@ -10,6 +10,7 @@ file(GLOB vipir_sources
     src/vipir/Module.cpp
 
     src/vipir/IR/Function.cpp
+    src/vipir/IR/BasicBlock.cpp
 )
 
 add_library(vipir SHARED ${vipir_sources})
