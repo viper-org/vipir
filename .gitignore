@@ -1,0 +1,12 @@
+.cache/
+CMakeFiles/
+
+*.cmake
+*.o
+*.exe
+*.so
+*.vir
+Makefile
+
+CMakeCache.txt
+compile_commands.json
