@@ -46,12 +46,11 @@ namespace vipir
 
     void Function::print(std::ostream& stream) const
     {
-        stream << std::format("define pub void @{}() {{\n", mName);
+        stream << std::format("define pub void @{}() {{\n   ", mName);
 
         for (const BasicBlockPtr& basicBlock : mBasicBlockList)
         {
             basicBlock->print(stream);
-            stream << "\n";
         }
 
         stream << "}";
@@ -70,7 +69,6 @@ namespace vipir
         for (const BasicBlockPtr& basicBlock : mBasicBlockList)
         {
             basicBlock->emit(stream);
-            stream << "\n";
         }
     }
 

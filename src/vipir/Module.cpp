@@ -37,7 +37,6 @@ namespace vipir
         for (const GlobalPtr& global : mGlobals)
         {
             global->print(stream);
-            stream << "\n\n";
         }
     }
 
@@ -46,7 +45,6 @@ namespace vipir
         for (const GlobalPtr& global : mGlobals)
         {
             global->emit(stream);
-            stream << "\n";
         }
     }
 }

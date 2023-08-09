@@ -9,8 +9,11 @@ set(CMAKE_BUILD_TYPE Debug)
 file(GLOB vipir_sources
     src/vipir/Module.cpp
 
+    src/vipir/IR/Builder.cpp
     src/vipir/IR/Function.cpp
     src/vipir/IR/BasicBlock.cpp
+
+    src/vipir/IR/Instruction/RetInst.cpp
 )
 
 add_library(vipir SHARED ${vipir_sources})

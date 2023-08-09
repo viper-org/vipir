@@ -4,8 +4,8 @@
  * Function declaration or definition
 */
 
-#ifndef MIDAS_IR_FUNCTION_H
-#define MIDAS_IR_FUNCTION_H 1
+#ifndef VIPIR_IR_FUNCTION_H
+#define VIPIR_IR_FUNCTION_H 1
 
 #include "vipir/IR/Global.h"
 
@@ -45,4 +45,4 @@ namespace vipir
     };
 }
 
-#endif // MIDAS_IR_FUNCTION_H
+#endif // VIPIR_IR_FUNCTION_H

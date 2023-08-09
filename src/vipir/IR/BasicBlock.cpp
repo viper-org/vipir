@@ -4,6 +4,8 @@
 #include "vipir/IR/BasicBlock.h"
 #include "vipir/IR/Function.h"
 
+#include "vipir/IR/Instruction/Instruction.h"
+
 #include "vipir/Module.h"
 
 #include <format>
@@ -37,9 +39,25 @@ namespace vipir
         return mBranches;
     }
 
+    const std::vector<InstructionPtr>& BasicBlock::getInstructionList() const
+    {
+        return mInstructionList;
+    }
+
+    void BasicBlock::insertInstruction(Instruction* instruction)
+    {
+        mInstructionList.push_back(InstructionPtr(instruction));
+    }
+
     void BasicBlock::print(std::ostream& stream) const
     {
         stream << std::format("{}:\n", mName);
+        for (const InstructionPtr& instruction : mInstructionList)
+        {
+            stream << "\t";
+            instruction->print(stream);
+            stream << "\n";
+        }
     }
 
     std::string BasicBlock::ident() const
@@ -50,9 +68,12 @@ namespace vipir
 
     void BasicBlock::emit(std::ostream& stream) const
     {
-        if (mBranches)
+        stream << std::format(".L{}:\n", mName);
+        for (const InstructionPtr& instruction : mInstructionList)
         {
-            stream << std::format(".L{}:", mName);
+            stream << "\t";
+            instruction->emit(stream);
+            stream << "\n";
         }
     }
 

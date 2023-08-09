@@ -1,5 +1,6 @@
 #include "vipir/IR/BasicBlock.h"
 #include "vipir/IR/Function.h"
+#include "vipir/IR/Builder.h"
 #include "vipir/Module.h"
 
 #include <iostream>
@@ -11,6 +12,10 @@ int main()
     auto fn = vipir::Function::Create(mod, "test");
 
     auto bb = vipir::BasicBlock::Create("", fn);
+
+    auto builder = vipir::Builder();
+    builder.setInsertPoint(bb);
+    builder.CreateRet();
 
     mod.print(std::cout);
     
