@@ -3,8 +3,11 @@
 
 #include "vipir/IR/Builder.h"
 #include "vipir/IR/BasicBlock.h"
+#include "vipir/IR/Function.h"
 
 #include "vipir/IR/Instruction/RetInst.h"
+
+#include "vipir/IR/Constant/ConstantInt.h"
 
 namespace vipir
 {
@@ -24,5 +27,15 @@ namespace vipir
         mInsertPoint->insertInstruction(ret);
 
         return ret;
+    }
+
+    ConstantInt* Builder::CreateConstantInt(uint64_t value, Type* type, std::string name)
+    {
+        if (name.empty())
+        {
+            name = std::to_string(mInsertPoint->getParent()->getInstructionCount()++);
+        }
+
+        return new ConstantInt(mInsertPoint, value, type, name);
     }
 }

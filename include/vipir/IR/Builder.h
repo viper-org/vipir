@@ -8,13 +8,17 @@
 #ifndef VIPIR_IR_BUILDER_H
 #define VIPIR_IR_BUILDER_H 1
 
+#include "vipir/IR/Value.h"
+
+#include <cstdint>
+
 namespace vipir
 {
-    class Value;
-
     class BasicBlock;
 
     class RetInst;
+
+    class ConstantInt;
 
     class Builder
     {
@@ -24,6 +28,8 @@ namespace vipir
         void setInsertPoint(BasicBlock* newInsertPoint);
 
         RetInst* CreateRet(Value* returnValue);
+
+        ConstantInt* CreateConstantInt(uint64_t value, Type* type, std::string name = "");
 
     private:
         BasicBlock* mInsertPoint;

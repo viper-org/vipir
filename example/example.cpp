@@ -1,6 +1,7 @@
 #include "vipir/IR/BasicBlock.h"
 #include "vipir/IR/Function.h"
 #include "vipir/IR/Builder.h"
+#include "vipir/IR/Constant/ConstantInt.h"
 #include "vipir/Module.h"
 
 #include <iostream>
@@ -15,7 +16,10 @@ int main()
 
     auto builder = vipir::Builder();
     builder.setInsertPoint(bb);
-    builder.CreateRet(nullptr);
+
+    auto val = builder.CreateConstantInt(64, vipir::Type::GetIntegerType(32));
+
+    builder.CreateRet(val);
 
     mod.print(std::cout);
     

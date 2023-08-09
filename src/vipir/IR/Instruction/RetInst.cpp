@@ -44,6 +44,11 @@ namespace vipir
 
     void RetInst::emit(std::ostream& stream) const
     {
+        if (mReturnValue)
+        {
+            mReturnValue->emit(stream);
+            stream << "\n\t";
+        }
         stream << "ret";
     }
 

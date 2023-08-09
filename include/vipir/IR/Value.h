@@ -16,13 +16,17 @@ namespace vipir
 {
     class Module;
 
+    class RetInst;
+
     class Value
     {
+    friend class RetInst;
     public:
         Value(Module& module) : mModule(module) {}
         virtual ~Value() {}
 
         Type* getType() const { return mType; }
+        void setType(Type* newType) { mType = newType; }
 
         virtual void print(std::ostream& stream) const = 0;
         virtual std::string ident() const = 0;

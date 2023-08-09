@@ -14,8 +14,10 @@ namespace vipir
 {
     BasicBlock* BasicBlock::Create(std::string name, Function* parent)
     {
-        if(name.empty())
+        if (name.empty())
+        {
             name = std::to_string(parent->getInstructionCount()++);
+        }
 
         BasicBlock* bb = new BasicBlock(std::move(name), parent);
 

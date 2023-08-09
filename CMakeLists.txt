@@ -13,6 +13,8 @@ file(GLOB vipir_sources
     src/vipir/IR/Function.cpp
     src/vipir/IR/BasicBlock.cpp
 
+    src/vipir/IR/Constant/ConstantInt.cpp
+
     src/vipir/IR/Instruction/RetInst.cpp
 
     src/vipir/Type/Type.cpp
