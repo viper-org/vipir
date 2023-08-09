@@ -17,6 +17,7 @@ file(GLOB vipir_sources
 
     src/vipir/Type/Type.cpp
     src/vipir/Type/VoidType.cpp
+    src/vipir/Type/IntegerType.cpp
 )
 
 add_library(vipir SHARED ${vipir_sources})

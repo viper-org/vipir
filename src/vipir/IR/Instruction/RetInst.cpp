@@ -5,6 +5,8 @@
 #include "vipir/IR/BasicBlock.h"
 #include "vipir/IR/Function.h"
 
+#include <format>
+
 namespace vipir
 {
     Value* RetInst::getReturnValue() const
@@ -23,7 +25,15 @@ namespace vipir
 
     void RetInst::print(std::ostream& stream) const
     {
-        stream << "ret void\n";
+        if (mReturnValue)
+        {
+            mReturnValue->print(stream);
+            stream << std::format("ret {}\n", mReturnValue->ident());
+        }
+        else
+        {
+            stream << "ret void\n";
+        }
     }
 
     std::string RetInst::ident() const

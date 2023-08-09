@@ -16,13 +16,6 @@ namespace vipir
     {
     public:
         VoidType();
-
-        std::size_t getSize() const;
-        std::string_view getName() const;
-    
-    protected:
-        std::size_t mSize;
-        std::string mName;
     };
 }
 

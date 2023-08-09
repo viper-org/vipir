@@ -17,10 +17,11 @@ namespace vipir
     public:
         virtual ~Type() { }
 
-        std::size_t getSize() const { return mSize; }
+        std::size_t getSizeInBits() const { return mSize; }
         std::string_view getName() const { return mName; }
 
         static Type* GetVoidType();
+        static Type* GetIntegerType(int bits);
     
     protected:
         Type(std::size_t size, std::string name)

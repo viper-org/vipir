@@ -6,7 +6,7 @@
 namespace vipir
 {
     VoidType::VoidType()
-        :Type(0, "void")
+        : Type(0, "void")
     {
     }
 }
