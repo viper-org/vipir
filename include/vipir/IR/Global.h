@@ -7,14 +7,19 @@
 
 #ifndef VIPIR_IR_GLOBAL_H
 #define VIPIR_IR_GLOBAL_H 1
+
 #include "vipir/IR/Value.h"
 
 namespace vipir
 {
     class Global : public Value
     {
+    friend class Module;
     public:
         Global(Module& module) : Value(module) {}
+
+    protected:
+        virtual void emit(std::ostream& stream) const = 0;
     };
 }
 

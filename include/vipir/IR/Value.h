@@ -24,6 +24,8 @@ namespace vipir
         virtual std::string ident() const = 0;
     protected:
         Module& mModule;
+
+        virtual void emit(std::ostream& stream) const = 0;
     };
 }
 

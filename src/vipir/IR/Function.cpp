@@ -37,6 +37,13 @@ namespace vipir
         return std::format("@{}", mName);
     }
 
+
+    void Function::emit(std::ostream& stream) const
+    {
+        stream << std::format("{}:", mName);
+    }
+
+
     Function::Function(Module& module, std::string name)
         :Global(module), mName(std::move(name))
     {

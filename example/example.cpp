@@ -10,4 +10,8 @@ int main()
     vipir::Function::Create(mod, "test");
 
     mod.print(std::cout);
+    
+    std::cout << "\n";
+
+    mod.emit(std::cout);
 }

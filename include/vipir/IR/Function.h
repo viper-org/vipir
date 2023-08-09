@@ -23,6 +23,10 @@ namespace vipir
 
         void print(std::ostream& stream) const override;
         std::string ident() const override;
+
+    protected:
+        void emit(std::ostream& stream) const final;
+
     private:
         Function(Module& module, std::string name);
 

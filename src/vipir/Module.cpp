@@ -32,16 +32,21 @@ namespace vipir
 
     void Module::print(std::ostream& stream) const
     {
-        std::stringstream buffer;
+        stream << std::format("file \"{}\"\n\n", mName);
 
-        buffer << std::format("file \"{}\"\n\n", mName);
-
-        for(const GlobalPtr& global : mGlobals)
+        for (const GlobalPtr& global : mGlobals)
         {
-            global->print(buffer);
-            buffer << "\n\n";
+            global->print(stream);
+            stream << "\n\n";
         }
+    }
 
-        stream << buffer.view();
+    void Module::emit(std::ostream& stream) const
+    {
+        for (const GlobalPtr& global : mGlobals)
+        {
+            global->emit(stream);
+            stream << "\n";
+        }
     }
 }

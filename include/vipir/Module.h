@@ -28,6 +28,8 @@ namespace vipir
         void insertGlobal(Global* global);
 
         void print(std::ostream& stream) const;
+
+        void emit(std::ostream& stream) const;
     private:
         std::string mName;
         std::vector<GlobalPtr> mGlobals;
