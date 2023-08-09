@@ -18,6 +18,9 @@ namespace vipir
     {
     friend class Builder;
     public:
+        Value* getReturnValue() const;
+        Type* getReturnType() const;
+
         void print(std::ostream& stream) const override;
         std::string ident() const override;
 
@@ -25,7 +28,9 @@ namespace vipir
         void emit(std::ostream& stream) const final;
 
     private:
-        RetInst(BasicBlock* parent);
+        RetInst(BasicBlock* parent, Value* returnValue);
+
+        Value* mReturnValue;
     };
 }
 

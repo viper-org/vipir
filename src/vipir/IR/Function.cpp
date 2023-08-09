@@ -74,7 +74,8 @@ namespace vipir
 
 
     Function::Function(Module& module, std::string name)
-        :Global(module), mName(std::move(name))
+        : Global(module)
+        , mName(std::move(name))
     {
     }
 }

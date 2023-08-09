@@ -79,7 +79,10 @@ namespace vipir
 
 
     BasicBlock::BasicBlock(std::string name, Function* parent)
-        :Value(parent->getModule()), mName(std::move(name)), mParent(parent), mBranches(0)
+        : Value(parent->getModule())
+        , mName(std::move(name))
+        , mParent(parent)
+        , mBranches(0)
     {
     }
 }

@@ -15,7 +15,7 @@ int main()
 
     auto builder = vipir::Builder();
     builder.setInsertPoint(bb);
-    builder.CreateRet();
+    builder.CreateRet(nullptr);
 
     mod.print(std::cout);
     

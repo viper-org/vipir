@@ -7,6 +7,20 @@
 
 namespace vipir
 {
+    Value* RetInst::getReturnValue() const
+    {
+        return mReturnValue;
+    }
+
+    Type* RetInst::getReturnType() const
+    {
+        if (!mReturnValue)
+        {
+            
+        }
+        return mReturnValue->getType();
+    }
+
     void RetInst::print(std::ostream& stream) const
     {
         stream << "ret void\n";
@@ -24,8 +38,9 @@ namespace vipir
     }
 
 
-    RetInst::RetInst(BasicBlock* parent)
-        :Instruction(parent->getParent()->getModule())
+    RetInst::RetInst(BasicBlock* parent, Value* returnValue)
+        : Instruction(parent->getParent()->getModule())
+        , mReturnValue(returnValue)
     {
     }
 }

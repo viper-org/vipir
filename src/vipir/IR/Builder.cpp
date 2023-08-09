@@ -17,9 +17,9 @@ namespace vipir
         mInsertPoint = newInsertPoint;
     }
 
-    RetInst* Builder::CreateRet()
+    RetInst* Builder::CreateRet(Value* returnValue)
     {
-        RetInst* ret = new RetInst(mInsertPoint);
+        RetInst* ret = new RetInst(mInsertPoint, returnValue);
 
         mInsertPoint->insertInstruction(ret);
 

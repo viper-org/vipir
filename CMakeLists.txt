@@ -14,6 +14,9 @@ file(GLOB vipir_sources
     src/vipir/IR/BasicBlock.cpp
 
     src/vipir/IR/Instruction/RetInst.cpp
+
+    src/vipir/Type/Type.cpp
+    src/vipir/Type/VoidType.cpp
 )
 
 add_library(vipir SHARED ${vipir_sources})

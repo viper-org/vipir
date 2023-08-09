@@ -23,7 +23,7 @@ namespace vipir
 
         void setInsertPoint(BasicBlock* newInsertPoint);
 
-        RetInst* CreateRet();
+        RetInst* CreateRet(Value* returnValue);
 
     private:
         BasicBlock* mInsertPoint;
