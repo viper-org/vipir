@@ -10,7 +10,11 @@
 
 #include "vipir/Type/Type.h"
 
+#include "vasm/instruction/Value.h"
+#include "vasm/instruction/Operand.h"
+
 #include <ostream>
+#include <vector>
 
 namespace vipir
 {
@@ -34,7 +38,7 @@ namespace vipir
         Module& mModule;
         Type* mType;
 
-        virtual void emit(std::ostream& stream) const = 0;
+        virtual instruction::OperandPtr emit(std::vector<instruction::ValuePtr>& values) const = 0;
     };
 }
 

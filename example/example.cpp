@@ -5,12 +5,13 @@
 #include "vipir/Module.h"
 
 #include <iostream>
+#include <fstream>
 
 int main()
 {
     vipir::Module mod ("test.tst");
 
-    auto fn = vipir::Function::Create(mod, "test");
+    auto fn = vipir::Function::Create(mod, "main");
 
     auto bb = vipir::BasicBlock::Create("", fn);
 
@@ -21,9 +22,10 @@ int main()
 
     builder.CreateRet(val);
 
+    std::ofstream f("file.out");
     mod.print(std::cout);
     
     std::cout << "\n";
 
-    mod.emit(std::cout);
+    mod.emit(f);
 }

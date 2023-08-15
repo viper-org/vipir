@@ -34,7 +34,7 @@ namespace vipir
         std::string ident() const override;
 
     protected:
-        void emit(std::ostream& stream) const final;
+        instruction::OperandPtr emit(std::vector<instruction::ValuePtr>& values) const override;
 
     private:
         Function(Module& module, std::string name);

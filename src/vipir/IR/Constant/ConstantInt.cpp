@@ -6,6 +6,8 @@
 #include "vipir/IR/BasicBlock.h"
 #include "vipir/IR/Function.h"
 
+#include "vasm/instruction/operand/Immediate.h"
+
 #include <format>
 
 namespace vipir
@@ -26,7 +28,7 @@ namespace vipir
     }
 
 
-    void ConstantInt::emit(std::ostream& stream) const
+    instruction::OperandPtr ConstantInt::emit(std::vector<instruction::ValuePtr>& values) const
     {
         std::string regName;
         switch(mType->getSizeInBits())
@@ -44,7 +46,7 @@ namespace vipir
                 regName = "rax";
                 break;
         }
-        stream << std::format("mov {}, {}", regName, mValue);
+        return std::make_unique<instruction::Immediate>(mValue);
     }
 
 

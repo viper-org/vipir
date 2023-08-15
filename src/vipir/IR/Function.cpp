@@ -6,6 +6,8 @@
 
 #include "vipir/Module.h"
 
+#include "vasm/instruction/Label.h"
+
 #include <format>
 
 namespace vipir
@@ -62,20 +64,24 @@ namespace vipir
     }
 
 
-    void Function::emit(std::ostream& stream) const
+    instruction::OperandPtr Function::emit(std::vector<instruction::ValuePtr>& values) const
     {
-        stream << std::format("{}:\n", mName);
+        //stream << std::format("{}:\n", mName);
+        values.emplace_back(std::make_unique<instruction::Label>(mName));
 
         for (const BasicBlockPtr& basicBlock : mBasicBlockList)
         {
-            basicBlock->emit(stream);
+            //basicBlock->emit(stream);
+            basicBlock->emit(values);
         }
+        return nullptr;
     }
 
 
     Function::Function(Module& module, std::string name)
         : Global(module)
         , mName(std::move(name))
+        , mInstructionCount(0)
     {
     }
 }

@@ -5,13 +5,18 @@
 #include "vipir/IR/BasicBlock.h"
 #include "vipir/IR/Function.h"
 
+#include "vasm/instruction/operand/Register.h"
+#include "vasm/instruction/NoOperandInstruction.h"
+#include "vasm/instruction/twoOperandInstruction/MovInstruction.h"
+#include "vasm/codegen/Opcodes.h"
+
 #include <format>
 
 namespace vipir
 {
     Value* RetInst::getReturnValue() const
     {
-        return mReturnValue;
+        return mReturnValue.get();
     }
 
     Type* RetInst::getReturnType() const
@@ -42,14 +47,29 @@ namespace vipir
     }
 
 
-    void RetInst::emit(std::ostream& stream) const
+    instruction::OperandPtr RetInst::emit(std::vector<instruction::ValuePtr>& values) const
     {
         if (mReturnValue)
         {
-            mReturnValue->emit(stream);
-            stream << "\n\t";
+            instruction::OperandPtr returnValue = mReturnValue->emit(values);
+            if (returnValue)
+            {
+                instruction::OperandPtr eax = std::make_unique<instruction::Register>(0, codegen::OperandSize::Long); // TODO: Get size properly
+                if (instruction::Register* reg = dynamic_cast<instruction::Register*>(returnValue.get()))
+                {
+                    if (reg->getID() != 0) // EAX
+                    {
+                        values.push_back(std::make_unique<instruction::MovInstruction>(std::move(eax), std::move(returnValue), codegen::OperandSize::None));
+                    }
+                }
+                else
+                {
+                    values.push_back(std::make_unique<instruction::MovInstruction>(std::move(eax), std::move(returnValue), codegen::OperandSize::None));
+                }
+            }
         }
-        stream << "ret";
+        values.emplace_back(std::make_unique<instruction::RetInstruction>());
+        return nullptr;
     }
 
 
