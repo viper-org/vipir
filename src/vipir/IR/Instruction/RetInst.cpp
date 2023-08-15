@@ -68,6 +68,7 @@ namespace vipir
                 }
             }
         }
+        values.emplace_back(std::make_unique<instruction::LeaveInstruction>());
         values.emplace_back(std::make_unique<instruction::RetInstruction>());
         return nullptr;
     }

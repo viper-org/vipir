@@ -72,13 +72,9 @@ namespace vipir
 
     instruction::OperandPtr BasicBlock::emit(std::vector<instruction::ValuePtr>& values) const
     {
-        //stream << std::format(".L{}:\n", mName);
         values.emplace_back(std::make_unique<instruction::Label>(mName));
         for (const InstructionPtr& instruction : mInstructionList)
         {
-            //stream << "\t";
-            //instruction->emit(stream);
-            //stream << "\n";
             instruction->emit(values);
         }
         return nullptr;

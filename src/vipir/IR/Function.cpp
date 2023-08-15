@@ -7,6 +7,9 @@
 #include "vipir/Module.h"
 
 #include "vasm/instruction/Label.h"
+#include "vasm/instruction/operand/Register.h"
+#include "vasm/instruction/singleOperandInstruction/PushInstruction.h"
+#include "vasm/instruction/twoOperandInstruction/MovInstruction.h"
 
 #include <format>
 
@@ -66,12 +69,13 @@ namespace vipir
 
     instruction::OperandPtr Function::emit(std::vector<instruction::ValuePtr>& values) const
     {
-        //stream << std::format("{}:\n", mName);
         values.emplace_back(std::make_unique<instruction::Label>(mName));
+
+        values.emplace_back(std::make_unique<instruction::PushInstruction>(instruction::Register::Get("rbp")));
+        values.emplace_back(std::make_unique<instruction::MovInstruction>(instruction::Register::Get("rbp"), instruction::Register::Get("rsp"), codegen::OperandSize::None));
 
         for (const BasicBlockPtr& basicBlock : mBasicBlockList)
         {
-            //basicBlock->emit(stream);
             basicBlock->emit(values);
         }
         return nullptr;
