@@ -6,6 +6,7 @@
 #include "vipir/IR/Function.h"
 
 #include "vipir/IR/Instruction/RetInst.h"
+#include "vipir/IR/Instruction/AllocaInst.h"
 
 #include "vipir/IR/Constant/ConstantInt.h"
 
@@ -27,6 +28,20 @@ namespace vipir
         mInsertPoint->insertInstruction(ret);
 
         return ret;
+    }
+
+    AllocaInst* Builder::CreateAlloca(Type* allocatedType, std::string name)
+    {
+        if (name.empty())
+        {
+            name = std::to_string(mInsertPoint->getParent()->getInstructionCount()++);
+        }
+
+        AllocaInst* alloca = new AllocaInst(mInsertPoint, allocatedType, name);
+
+        mInsertPoint->insertInstruction(alloca);
+
+        return alloca;
     }
 
     ConstantInt* Builder::CreateConstantInt(uint64_t value, Type* type, std::string name)

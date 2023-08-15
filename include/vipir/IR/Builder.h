@@ -17,6 +17,7 @@ namespace vipir
     class BasicBlock;
 
     class RetInst;
+    class AllocaInst;
 
     class ConstantInt;
 
@@ -28,6 +29,8 @@ namespace vipir
         void setInsertPoint(BasicBlock* newInsertPoint);
 
         RetInst* CreateRet(Value* returnValue);
+
+        AllocaInst* CreateAlloca(Type* allocatedType, std::string name = "");
 
         ConstantInt* CreateConstantInt(uint64_t value, Type* type, std::string name = "");
 

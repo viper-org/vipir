@@ -24,7 +24,7 @@ namespace vipir
     
     std::string ConstantInt::ident() const
     {
-        return std::format("%{}", mName);
+        return std::format("{} %{}", mType->getName(), mName);
     }
 
 

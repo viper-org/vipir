@@ -5,31 +5,32 @@
 #include "vipir/Type/IntegerType.h"
 #include "vipir/Type/VoidType.h"
 
+#include <memory>
 #include <vector>
 
 namespace vipir
 {
-    std::vector<vipir::Type> types;
+    std::vector<std::unique_ptr<vipir::Type>> types;
 
     Type* Type::GetVoidType()
     {
-        for (Type& type : types)
+        for (const auto& type : types)
         {
-            if (dynamic_cast<VoidType*>(&type))
+            if (dynamic_cast<VoidType*>(type.get()))
             {
-                return &type;
+                return type.get();
             }
         }
 
-        types.push_back(VoidType());
-        return &types.back();
+        types.push_back(std::make_unique<VoidType>());
+        return types.back().get();
     }
 
     Type* Type::GetIntegerType(int bits)
     {
-        for (Type& type : types)
+        for (const auto& type : types)
         {
-            if (IntegerType* integerType = dynamic_cast<IntegerType*>(&type))
+            if (IntegerType* integerType = dynamic_cast<IntegerType*>(type.get()))
             {
                 if (integerType->getSizeInBits() == bits)
                 {
@@ -38,7 +39,7 @@ namespace vipir
             }
         }
 
-        types.push_back(IntegerType(bits));
-        return &types.back();
+        types.push_back(std::make_unique<IntegerType>(bits));
+        return types.back().get();
     }
 }

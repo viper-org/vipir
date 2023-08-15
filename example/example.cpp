@@ -18,6 +18,8 @@ int main()
     auto builder = vipir::Builder();
     builder.setInsertPoint(bb);
 
+    auto alloca = builder.CreateAlloca(vipir::Type::GetIntegerType(32));
+
     auto val = builder.CreateConstantInt(64, vipir::Type::GetIntegerType(32));
 
     builder.CreateRet(val);

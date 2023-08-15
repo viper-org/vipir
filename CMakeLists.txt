@@ -22,6 +22,7 @@ file(GLOB vipir_sources
     src/vipir/IR/Constant/ConstantInt.cpp
 
     src/vipir/IR/Instruction/RetInst.cpp
+    src/vipir/IR/Instruction/AllocaInst.cpp
 
     src/vipir/Type/Type.cpp
     src/vipir/Type/VoidType.cpp
