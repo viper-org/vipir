@@ -21,10 +21,12 @@ namespace vipir
     class Module;
 
     class RetInst;
+    class StoreInst;
 
     class Value
     {
     friend class RetInst;
+    friend class StoreInst;
     public:
         Value(Module& module) : mModule(module) {}
         virtual ~Value() {}

@@ -29,7 +29,7 @@ namespace vipir
 
     instruction::OperandPtr AllocaInst::emit(std::vector<instruction::ValuePtr>& values)
     {
-        return std::make_unique<instruction::Memory>(instruction::Register::Get("rbp"), mStackOffset);
+        return std::make_unique<instruction::Memory>(instruction::Register::Get("rbp"), -mStackOffset);
     }
 
     AllocaInst::AllocaInst(BasicBlock* parent, Type* allocatedType, std::string name)

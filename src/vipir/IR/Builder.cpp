@@ -7,6 +7,7 @@
 
 #include "vipir/IR/Instruction/RetInst.h"
 #include "vipir/IR/Instruction/AllocaInst.h"
+#include "vipir/IR/Instruction/StoreInst.h"
 
 #include "vipir/IR/Constant/ConstantInt.h"
 
@@ -42,6 +43,15 @@ namespace vipir
         mInsertPoint->insertInstruction(alloca);
 
         return alloca;
+    }
+
+    StoreInst* Builder::CreateStore(Value* ptr, Value* value)
+    {
+        StoreInst* store = new StoreInst(mInsertPoint, ptr, value);
+
+        mInsertPoint->insertInstruction(store);
+
+        return store;
     }
 
     ConstantInt* Builder::CreateConstantInt(uint64_t value, Type* type, std::string name)
