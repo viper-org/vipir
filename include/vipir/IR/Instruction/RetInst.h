@@ -25,7 +25,7 @@ namespace vipir
         std::string ident() const override;
 
     protected:
-        instruction::OperandPtr emit(std::vector<instruction::ValuePtr>& values) const override;
+        instruction::OperandPtr emit(std::vector<instruction::ValuePtr>& values) override;
 
     private:
         RetInst(BasicBlock* parent, Value* returnValue);

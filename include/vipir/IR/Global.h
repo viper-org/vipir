@@ -19,7 +19,7 @@ namespace vipir
         Global(Module& module) : Value(module) {}
 
     protected:
-        virtual instruction::OperandPtr emit(std::vector<instruction::ValuePtr>& values) const = 0;
+        virtual instruction::OperandPtr emit(std::vector<instruction::ValuePtr>& values) = 0;
     };
 }
 

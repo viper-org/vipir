@@ -28,7 +28,7 @@ namespace vipir
     }
 
 
-    instruction::OperandPtr ConstantInt::emit(std::vector<instruction::ValuePtr>& values) const
+    instruction::OperandPtr ConstantInt::emit(std::vector<instruction::ValuePtr>& values)
     {
         std::string regName;
         switch(mType->getSizeInBits())

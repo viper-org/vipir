@@ -38,7 +38,7 @@ namespace vipir
         Module& mModule;
         Type* mType;
 
-        virtual instruction::OperandPtr emit(std::vector<instruction::ValuePtr>& values) const = 0;
+        virtual instruction::OperandPtr emit(std::vector<instruction::ValuePtr>& values) = 0;
     };
 }
 

@@ -4,13 +4,18 @@
 #include "vipir/IR/Function.h"
 #include "vipir/IR/BasicBlock.h"
 
+#include "vipir/IR/Instruction/AllocaInst.h"
+
 #include "vipir/Module.h"
 
 #include "vasm/instruction/Label.h"
 #include "vasm/instruction/operand/Register.h"
+#include "vasm/instruction/operand/Immediate.h"
 #include "vasm/instruction/singleOperandInstruction/PushInstruction.h"
 #include "vasm/instruction/twoOperandInstruction/MovInstruction.h"
+#include "vasm/instruction/twoOperandInstruction/LogicalInstruction.h"
 
+#include <algorithm>
 #include <format>
 
 namespace vipir
@@ -67,12 +72,19 @@ namespace vipir
     }
 
 
-    instruction::OperandPtr Function::emit(std::vector<instruction::ValuePtr>& values) const
+    instruction::OperandPtr Function::emit(std::vector<instruction::ValuePtr>& values)
     {
+        sortAllocas();
+
         values.emplace_back(std::make_unique<instruction::Label>(mName));
 
         values.emplace_back(std::make_unique<instruction::PushInstruction>(instruction::Register::Get("rbp")));
         values.emplace_back(std::make_unique<instruction::MovInstruction>(instruction::Register::Get("rbp"), instruction::Register::Get("rsp"), codegen::OperandSize::None));
+        if (mTotalStackOffset)
+        {
+            instruction::OperandPtr offset = std::make_unique<instruction::Immediate>(mTotalStackOffset);
+            values.emplace_back(std::make_unique<instruction::SubInstruction>(instruction::Register::Get("rsp"), std::move(offset), codegen::OperandSize::None));
+        }
 
         for (const BasicBlockPtr& basicBlock : mBasicBlockList)
         {
@@ -87,5 +99,34 @@ namespace vipir
         , mName(std::move(name))
         , mInstructionCount(0)
     {
+    }
+
+    void Function::sortAllocas()
+    {
+        std::vector<AllocaInst*> temp;
+
+        for (const auto& basicBlock : mBasicBlockList)
+        {
+            for (const auto& instruction : basicBlock->getInstructionList())
+            {
+                if (AllocaInst* alloca = dynamic_cast<AllocaInst*>(instruction.get()))
+                {
+                    temp.push_back(alloca);
+                }
+            }
+        }
+
+        std::sort(temp.begin(), temp.end(), [](AllocaInst* lhs, AllocaInst* rhs) {
+            return lhs->getAllocatedType()->getSizeInBits() > rhs->getAllocatedType()->getSizeInBits();
+        });
+
+        int offset = 0;
+        for (auto alloca : temp)
+        {
+            offset += alloca->getAllocatedType()->getSizeInBits() / 8;
+            alloca->mStackOffset = offset;
+        }
+        
+        mTotalStackOffset = (offset + 15) & ~15; // Align to 16 bytes
     }
 }

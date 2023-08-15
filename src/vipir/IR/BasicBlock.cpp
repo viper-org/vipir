@@ -70,7 +70,7 @@ namespace vipir
     }
 
 
-    instruction::OperandPtr BasicBlock::emit(std::vector<instruction::ValuePtr>& values) const
+    instruction::OperandPtr BasicBlock::emit(std::vector<instruction::ValuePtr>& values)
     {
         values.emplace_back(std::make_unique<instruction::Label>(mName));
         for (const InstructionPtr& instruction : mInstructionList)

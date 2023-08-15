@@ -34,14 +34,18 @@ namespace vipir
         std::string ident() const override;
 
     protected:
-        instruction::OperandPtr emit(std::vector<instruction::ValuePtr>& values) const override;
+        instruction::OperandPtr emit(std::vector<instruction::ValuePtr>& values) override;
 
     private:
         Function(Module& module, std::string name);
 
+        void sortAllocas();
+
         std::string mName;
         std::vector<BasicBlockPtr> mBasicBlockList;
         int mInstructionCount;
+
+        int mTotalStackOffset;
     };
 }
 

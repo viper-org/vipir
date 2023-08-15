@@ -13,10 +13,12 @@
 namespace vipir
 {
     class Builder;
+    class Function;
 
     class AllocaInst : public Instruction
     {
     friend class Builder;
+    friend class Function;
     public:
         Type* getAllocatedType() const;
 
@@ -24,13 +26,15 @@ namespace vipir
         std::string ident() const override;
 
     protected:
-        instruction::OperandPtr emit(std::vector<instruction::ValuePtr>& values) const override;
+        instruction::OperandPtr emit(std::vector<instruction::ValuePtr>& values) override;
 
     private:
         AllocaInst(BasicBlock* parent, Type* allocatedType, std::string name);
 
         std::string mName;
         Type* mAllocatedType;
+
+        int mStackOffset;
     };
 }
 

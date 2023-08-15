@@ -47,7 +47,7 @@ namespace vipir
     }
 
 
-    instruction::OperandPtr RetInst::emit(std::vector<instruction::ValuePtr>& values) const
+    instruction::OperandPtr RetInst::emit(std::vector<instruction::ValuePtr>& values)
     {
         if (mReturnValue)
         {
