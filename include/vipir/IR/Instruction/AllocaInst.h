@@ -24,7 +24,7 @@ namespace vipir
 
         void print(std::ostream& stream) const override;
         std::string ident() const override;
-        
+
         bool requiresRegister() const override;
         std::vector<ValueId> getOperands() override;
 
@@ -33,6 +33,8 @@ namespace vipir
 
     private:
         AllocaInst(BasicBlock* parent, ValueId id, Type* allocatedType, std::string name);
+
+        instruction::OperandPtr getEmittedValue() override;
 
         std::string mName;
         Type* mAllocatedType;

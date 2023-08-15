@@ -1,9 +1,12 @@
 #include "vipir/IR/BasicBlock.h"
 #include "vipir/IR/Function.h"
 #include "vipir/IR/Builder.h"
-#include "vipir/IR/Constant/ConstantInt.h"
+
 #include "vipir/Module.h"
+
+#include "vipir/IR/Constant/ConstantInt.h"
 #include "vipir/IR/Instruction/AllocaInst.h"
+#include "vipir/IR/Instruction/LoadInst.h"
 
 #include <iostream>
 #include <fstream>
@@ -23,7 +26,7 @@ int main()
     auto val = builder.CreateConstantInt(20, vipir::Type::GetIntegerType(32));
     builder.CreateStore(alloca, val);
 
-    auto retVal = builder.CreateConstantInt(64, vipir::Type::GetIntegerType(32));
+    auto retVal = builder.CreateLoad(alloca);
 
     builder.CreateRet(retVal);
 

@@ -8,6 +8,7 @@
 #include "vipir/IR/Instruction/RetInst.h"
 #include "vipir/IR/Instruction/AllocaInst.h"
 #include "vipir/IR/Instruction/StoreInst.h"
+#include "vipir/IR/Instruction/LoadInst.h"
 
 #include "vipir/IR/Constant/ConstantInt.h"
 
@@ -58,6 +59,22 @@ namespace vipir
         mInsertPoint->getParent()->addValue(store);
 
         return store;
+    }
+
+    LoadInst* Builder::CreateLoad(Value* ptr, std::string name)
+    {
+        ValueId id = mInsertPoint->getParent()->getNumValues();
+        if (name.empty())
+        {
+            name = std::to_string(id);
+        }
+
+        LoadInst* load = new LoadInst(mInsertPoint, id, ptr, name);
+
+        mInsertPoint->insertValue(load);
+        mInsertPoint->getParent()->addValue(load);
+
+        return load;
     }
 
     ConstantInt* Builder::CreateConstantInt(uint64_t value, Type* type, std::string name)

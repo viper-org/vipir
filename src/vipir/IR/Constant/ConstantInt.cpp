@@ -21,7 +21,6 @@ namespace vipir
     void ConstantInt::print(std::ostream& stream) const
     {
         stream << std::format("%{} = {} {}", mName, mType->getName(), mValue);
-        std::cout << mRegister << "\n";
     }
     
     std::string ConstantInt::ident() const

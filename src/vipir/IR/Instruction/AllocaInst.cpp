@@ -9,6 +9,7 @@
 #include "vasm/instruction/operand/Memory.h"
 
 #include <format>
+#include <iostream>
 
 namespace vipir
 {
@@ -24,7 +25,7 @@ namespace vipir
 
     std::string AllocaInst::ident() const
     {
-        return std::format("{}* {}", mAllocatedType->getName(), mName); // TODO: Use proper pointer type
+        return std::format("{}* %{}", mAllocatedType->getName(), mName); // TODO: Use proper pointer type
     }
 
     void AllocaInst::emit(std::vector<instruction::ValuePtr>& values)
@@ -48,5 +49,10 @@ namespace vipir
         , mName(name)
         , mAllocatedType(allocatedType)
     {
+    }
+
+    instruction::OperandPtr AllocaInst::getEmittedValue()
+    {
+        return mEmittedValue->clone();
     }
 }

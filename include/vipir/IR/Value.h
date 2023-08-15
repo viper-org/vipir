@@ -58,7 +58,7 @@ namespace vipir
         std::string mRegister;
 
         virtual void emit(std::vector<instruction::ValuePtr>& values) = 0;
-        instruction::OperandPtr getEmittedValue()
+        virtual instruction::OperandPtr getEmittedValue()
         {
             assert(mEmittedValue != nullptr);
             return std::move(mEmittedValue);

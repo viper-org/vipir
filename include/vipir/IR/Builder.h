@@ -19,6 +19,7 @@ namespace vipir
     class RetInst;
     class AllocaInst;
     class StoreInst;
+    class LoadInst;
 
     class ConstantInt;
 
@@ -33,6 +34,7 @@ namespace vipir
 
         AllocaInst* CreateAlloca(Type* allocatedType, std::string name = "");
         StoreInst* CreateStore(Value* ptr, Value* value);
+        LoadInst* CreateLoad(Value* ptr, std::string name = "");
 
         ConstantInt* CreateConstantInt(uint64_t value, Type* type, std::string name = "");
 
