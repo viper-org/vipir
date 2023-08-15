@@ -25,12 +25,14 @@ namespace vipir
     class StoreInst;
 
     class BasicBlock;
+    class Function;
     
     using ValueId = int;
 
     class Value
     {
     friend class BasicBlock;
+    friend class Function;
     friend class RetInst;
     friend class StoreInst;
     public:
@@ -41,6 +43,10 @@ namespace vipir
         ValueId getID() const { return mId; }
         void setType(Type* newType) { mType = newType; }
 
+        void setRegister(std::string regName) { mRegister = regName; }
+        virtual bool requiresRegister() const = 0;
+        virtual std::vector<ValueId> getOperands() = 0;
+
         virtual void print(std::ostream& stream) const = 0;
         virtual std::string ident() const = 0;
 
@@ -49,6 +55,7 @@ namespace vipir
         Type* mType;
         ValueId mId;
         instruction::OperandPtr mEmittedValue;
+        std::string mRegister;
 
         virtual void emit(std::vector<instruction::ValuePtr>& values) = 0;
         instruction::OperandPtr getEmittedValue()

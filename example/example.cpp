@@ -25,7 +25,7 @@ int main()
 
     auto retVal = builder.CreateConstantInt(64, vipir::Type::GetIntegerType(32));
 
-    builder.CreateRet(val);
+    builder.CreateRet(retVal);
 
     std::ofstream f("file.out");
     mod.print(std::cout);

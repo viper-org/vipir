@@ -45,6 +45,16 @@ namespace vipir
         return "%undef";
     }
 
+    bool RetInst::requiresRegister() const
+    {
+        return false;
+    }
+
+    std::vector<ValueId> RetInst::getOperands()
+    {
+        return {mReturnValue};
+    }
+
 
     void RetInst::emit(std::vector<instruction::ValuePtr>& values)
     {

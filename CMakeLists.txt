@@ -2,7 +2,6 @@ cmake_minimum_required (VERSION 3.26)
 
 project (vipir)
 
-
 include(FetchContent)
 FetchContent_Declare(vasm
 GIT_REPOSITORY https://github.com/viper-org/vasm.git

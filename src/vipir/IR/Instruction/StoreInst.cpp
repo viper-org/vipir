@@ -22,6 +22,16 @@ namespace vipir
         return "%undef";
     }
 
+    bool StoreInst::requiresRegister() const
+    {
+        return false;
+    }
+
+    std::vector<ValueId> StoreInst::getOperands()
+    {
+        return {mPtr, mValue};
+    }
+
     void StoreInst::emit(std::vector<instruction::ValuePtr>& values)
     {
         instruction::OperandPtr ptrOperand   = mParent->getEmittedValue(mPtr);

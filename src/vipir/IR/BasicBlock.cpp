@@ -68,6 +68,16 @@ namespace vipir
         }
     }
 
+    bool BasicBlock::requiresRegister() const
+    {
+        return false;
+    }
+
+    std::vector<ValueId> BasicBlock::getOperands()
+    {
+        return {};
+    }
+
     std::string BasicBlock::ident() const
     {
         return std::format("%{}", mName);

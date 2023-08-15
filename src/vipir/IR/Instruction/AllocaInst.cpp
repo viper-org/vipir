@@ -32,6 +32,17 @@ namespace vipir
         mEmittedValue = std::make_unique<instruction::Memory>(instruction::Register::Get("rbp"), -mStackOffset);
     }
 
+    bool AllocaInst::requiresRegister() const
+    {
+        return false;
+    }
+
+    std::vector<ValueId> AllocaInst::getOperands()
+    {
+        return {};
+    }
+
+
     AllocaInst::AllocaInst(BasicBlock* parent, ValueId id, Type* allocatedType, std::string name)
         : Instruction(parent->getParent()->getModule(), parent, id)
         , mName(name)

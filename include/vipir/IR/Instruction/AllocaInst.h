@@ -24,6 +24,9 @@ namespace vipir
 
         void print(std::ostream& stream) const override;
         std::string ident() const override;
+        
+        bool requiresRegister() const override;
+        std::vector<ValueId> getOperands() override;
 
     protected:
         void emit(std::vector<instruction::ValuePtr>& values) override;

@@ -8,6 +8,7 @@
 
 #include "vasm/instruction/operand/Immediate.h"
 
+#include <iostream>
 #include <format>
 
 namespace vipir
@@ -20,11 +21,22 @@ namespace vipir
     void ConstantInt::print(std::ostream& stream) const
     {
         stream << std::format("%{} = {} {}", mName, mType->getName(), mValue);
+        std::cout << mRegister << "\n";
     }
     
     std::string ConstantInt::ident() const
     {
         return std::format("{} %{}", mType->getName(), mName);
+    }
+
+    bool ConstantInt::requiresRegister() const
+    {
+        return false;
+    }
+
+    std::vector<ValueId> ConstantInt::getOperands()
+    {
+        return {};
     }
 
 
