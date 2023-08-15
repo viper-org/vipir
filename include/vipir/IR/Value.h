@@ -13,6 +13,7 @@
 #include "vasm/instruction/Value.h"
 #include "vasm/instruction/Operand.h"
 
+#include <cassert>
 #include <ostream>
 #include <vector>
 
@@ -50,7 +51,11 @@ namespace vipir
         instruction::OperandPtr mEmittedValue;
 
         virtual void emit(std::vector<instruction::ValuePtr>& values) = 0;
-        instruction::OperandPtr getEmittedValue() { return std::move(mEmittedValue); }
+        instruction::OperandPtr getEmittedValue()
+        {
+            assert(mEmittedValue != nullptr);
+            return std::move(mEmittedValue);
+        }
     };
 }
 
