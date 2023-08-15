@@ -4,13 +4,12 @@
 #include "vipir/IR/BasicBlock.h"
 #include "vipir/IR/Function.h"
 
-#include "vipir/IR/Instruction/Instruction.h"
-
 #include "vipir/Module.h"
 
 #include "vasm/instruction/Label.h"
 
 #include <format>
+#include <iostream>
 
 namespace vipir
 {
@@ -43,23 +42,28 @@ namespace vipir
         return mBranches;
     }
 
-    const std::vector<InstructionPtr>& BasicBlock::getInstructionList() const
+    const std::vector<ValueId>& BasicBlock::getInstructionList() const
     {
-        return mInstructionList;
+        return mValueList;
     }
 
-    void BasicBlock::insertInstruction(Instruction* instruction)
+    instruction::OperandPtr BasicBlock::getEmittedValue(ValueId id)
     {
-        mInstructionList.push_back(InstructionPtr(instruction));
+        return mParent->getValue(id)->getEmittedValue();
+    }
+
+    void BasicBlock::insertValue(Value* value)
+    {
+        mValueList.push_back(value->getID());
     }
 
     void BasicBlock::print(std::ostream& stream) const
     {
         stream << std::format("{}:\n", mName);
-        for (const InstructionPtr& instruction : mInstructionList)
+        for (ValueId instruction : mValueList)
         {
             stream << "\t";
-            instruction->print(stream);
+            mParent->getValue(instruction)->print(stream);
             stream << "\n";
         }
     }
@@ -70,19 +74,18 @@ namespace vipir
     }
 
 
-    instruction::OperandPtr BasicBlock::emit(std::vector<instruction::ValuePtr>& values)
+    void BasicBlock::emit(std::vector<instruction::ValuePtr>& values)
     {
         values.emplace_back(std::make_unique<instruction::Label>(mName));
-        for (const InstructionPtr& instruction : mInstructionList)
+        for (ValueId instruction : mValueList)
         {
-            instruction->emit(values);
+            mParent->getValue(instruction)->emit(values);
         }
-        return nullptr;
     }
 
 
     BasicBlock::BasicBlock(std::string name, Function* parent)
-        : Value(parent->getModule())
+        : Value(parent->getModule(), parent->getInstructionCount()++)
         , mName(std::move(name))
         , mParent(parent)
         , mBranches(0)

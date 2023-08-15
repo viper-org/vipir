@@ -8,12 +8,13 @@
 #include "vasm/instruction/twoOperandInstruction/MovInstruction.h"
 
 #include <format>
+#include <iostream>
 
 namespace vipir
 {
     void StoreInst::print(std::ostream& stream) const
     {
-        stream << std::format("store {}, {}", mPtr->ident(), mValue->ident());
+        stream << std::format("store {}, {}", mParent->getParent()->getValue(mPtr)->ident(), mParent->getParent()->getValue(mValue)->ident());
     }
 
     std::string StoreInst::ident() const
@@ -21,20 +22,18 @@ namespace vipir
         return "%undef";
     }
 
-    instruction::OperandPtr StoreInst::emit(std::vector<instruction::ValuePtr>& values)
+    void StoreInst::emit(std::vector<instruction::ValuePtr>& values)
     {
-        instruction::OperandPtr ptrOperand   = mPtr->emit(values);
-        instruction::OperandPtr valueOperand = mValue->emit(values);
+        instruction::OperandPtr ptrOperand   = mParent->getEmittedValue(mPtr);
+        instruction::OperandPtr valueOperand = mParent->getEmittedValue(mValue);
 
         values.push_back(std::make_unique<instruction::MovInstruction>(std::move(ptrOperand), std::move(valueOperand), codegen::OperandSize::Long)); // TODO: Get size properly
-
-        return nullptr;
     }
 
-    StoreInst::StoreInst(BasicBlock* parent, Value* ptr, Value* value)
-        : Instruction(parent->getParent()->getModule())
-        , mPtr(ptr)
-        , mValue(value)
+    StoreInst::StoreInst(BasicBlock* parent, ValueId id, Value* ptr, Value* value)
+        : Instruction(parent->getParent()->getModule(), parent, id)
+        , mPtr(ptr->getID())
+        , mValue(value->getID())
     {
     }
 }

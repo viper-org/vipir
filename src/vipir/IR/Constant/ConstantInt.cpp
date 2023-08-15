@@ -19,7 +19,7 @@ namespace vipir
 
     void ConstantInt::print(std::ostream& stream) const
     {
-        stream << std::format("%{} = {} {}\n\t", mName, mType->getName(), mValue);
+        stream << std::format("%{} = {} {}", mName, mType->getName(), mValue);
     }
     
     std::string ConstantInt::ident() const
@@ -28,7 +28,7 @@ namespace vipir
     }
 
 
-    instruction::OperandPtr ConstantInt::emit(std::vector<instruction::ValuePtr>& values)
+    void ConstantInt::emit(std::vector<instruction::ValuePtr>& values)
     {
         std::string regName;
         switch(mType->getSizeInBits())
@@ -46,12 +46,12 @@ namespace vipir
                 regName = "rax";
                 break;
         }
-        return std::make_unique<instruction::Immediate>(mValue);
+        mEmittedValue = std::make_unique<instruction::Immediate>(mValue);
     }
 
 
-    ConstantInt::ConstantInt(BasicBlock* parent, uint64_t value, Type* type, std::string name)
-        : Constant(parent->getParent()->getModule())
+    ConstantInt::ConstantInt(BasicBlock* parent, ValueId id, uint64_t value, Type* type, std::string name)
+        : Constant(parent->getParent()->getModule(), id)
         , mValue(value)
         , mName(name)
     {

@@ -22,13 +22,13 @@ namespace vipir
         std::string ident() const override;
 
     protected:
-        instruction::OperandPtr emit(std::vector<instruction::ValuePtr>& values) override;
+        void emit(std::vector<instruction::ValuePtr>& values) override;
 
     private:
-        StoreInst(BasicBlock* parent, Value* ptr, Value* value);
+        StoreInst(BasicBlock* parent, ValueId id, Value* ptr, Value* value);
 
-        Value* mPtr;
-        std::unique_ptr<Value> mValue;
+        ValueId mPtr;
+        ValueId mValue;
     };
 }
 

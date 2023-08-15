@@ -24,43 +24,55 @@ namespace vipir
 
     RetInst* Builder::CreateRet(Value* returnValue)
     {
-        RetInst* ret = new RetInst(mInsertPoint, returnValue);
+        ValueId id = mInsertPoint->getParent()->getNumValues();
+        RetInst* ret = new RetInst(mInsertPoint, id, returnValue);
 
-        mInsertPoint->insertInstruction(ret);
+        mInsertPoint->insertValue(ret);
+        mInsertPoint->getParent()->addValue(ret);
 
         return ret;
     }
 
     AllocaInst* Builder::CreateAlloca(Type* allocatedType, std::string name)
     {
+        ValueId id = mInsertPoint->getParent()->getNumValues();
         if (name.empty())
         {
-            name = std::to_string(mInsertPoint->getParent()->getInstructionCount()++);
+            name = std::to_string(id);
         }
 
-        AllocaInst* alloca = new AllocaInst(mInsertPoint, allocatedType, name);
+        AllocaInst* alloca = new AllocaInst(mInsertPoint, id, allocatedType, name);
 
-        mInsertPoint->insertInstruction(alloca);
+        mInsertPoint->insertValue(alloca);
+        mInsertPoint->getParent()->addValue(alloca);
 
         return alloca;
     }
 
     StoreInst* Builder::CreateStore(Value* ptr, Value* value)
     {
-        StoreInst* store = new StoreInst(mInsertPoint, ptr, value);
+        ValueId id = mInsertPoint->getParent()->getNumValues();
+        StoreInst* store = new StoreInst(mInsertPoint, id, ptr, value);
 
-        mInsertPoint->insertInstruction(store);
+        mInsertPoint->insertValue(store);
+        mInsertPoint->getParent()->addValue(store);
 
         return store;
     }
 
     ConstantInt* Builder::CreateConstantInt(uint64_t value, Type* type, std::string name)
     {
+        ValueId id = mInsertPoint->getParent()->getNumValues();
         if (name.empty())
         {
-            name = std::to_string(mInsertPoint->getParent()->getInstructionCount()++);
+            name = std::to_string(id);
         }
 
-        return new ConstantInt(mInsertPoint, value, type, name);
+        ConstantInt* constant = new ConstantInt(mInsertPoint, id, value, type, name);
+
+        mInsertPoint->insertValue(constant);
+        mInsertPoint->getParent()->addValue(constant);
+
+        return constant;
     }
 }

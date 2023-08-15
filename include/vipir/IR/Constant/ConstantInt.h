@@ -25,10 +25,10 @@ namespace vipir
         std::string ident() const override;
 
     protected:
-        instruction::OperandPtr emit(std::vector<instruction::ValuePtr>& values) final;
+        void emit(std::vector<instruction::ValuePtr>& values) final;
 
     private:
-        ConstantInt(BasicBlock* parent, uint64_t value, Type* type, std::string name);
+        ConstantInt(BasicBlock* parent, ValueId id, uint64_t value, Type* type, std::string name);
 
         uint64_t mValue;
         std::string mName;

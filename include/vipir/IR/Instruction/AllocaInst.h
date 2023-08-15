@@ -26,10 +26,10 @@ namespace vipir
         std::string ident() const override;
 
     protected:
-        instruction::OperandPtr emit(std::vector<instruction::ValuePtr>& values) override;
+        void emit(std::vector<instruction::ValuePtr>& values) override;
 
     private:
-        AllocaInst(BasicBlock* parent, Type* allocatedType, std::string name);
+        AllocaInst(BasicBlock* parent, ValueId id, Type* allocatedType, std::string name);
 
         std::string mName;
         Type* mAllocatedType;

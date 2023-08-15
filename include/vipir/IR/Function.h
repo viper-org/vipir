@@ -27,14 +27,17 @@ namespace vipir
         int& getInstructionCount();
         std::string_view getName() const;
         const std::vector<BasicBlockPtr>& getBasicBlockList() const;
+        Value* getValue(ValueId index) const;
+        int getNumValues() const;
 
         void insertBasicBlock(BasicBlock* basicBlock);
+        void addValue(Value* value);
 
         void print(std::ostream& stream) const override;
         std::string ident() const override;
 
     protected:
-        instruction::OperandPtr emit(std::vector<instruction::ValuePtr>& values) override;
+        void emit(std::vector<instruction::ValuePtr>& values) override;
 
     private:
         Function(Module& module, std::string name);
@@ -43,6 +46,7 @@ namespace vipir
 
         std::string mName;
         std::vector<BasicBlockPtr> mBasicBlockList;
+        std::vector<std::unique_ptr<Value>> mValues;
         int mInstructionCount;
 
         int mTotalStackOffset;

@@ -16,7 +16,7 @@ namespace vipir
 {
     Value* RetInst::getReturnValue() const
     {
-        return mReturnValue.get();
+        return mParent->getParent()->getValue(mReturnValue);
     }
 
     Type* RetInst::getReturnType() const
@@ -25,15 +25,14 @@ namespace vipir
         {
             
         }
-        return mReturnValue->getType();
+        return mParent->getParent()->getValue(mReturnValue)->getType();
     }
 
     void RetInst::print(std::ostream& stream) const
     {
         if (mReturnValue)
         {
-            mReturnValue->print(stream);
-            stream << std::format("ret {}\n", mReturnValue->ident());
+            stream << std::format("ret {}", mParent->getParent()->getValue(mReturnValue)->ident());
         }
         else
         {
@@ -47,11 +46,11 @@ namespace vipir
     }
 
 
-    instruction::OperandPtr RetInst::emit(std::vector<instruction::ValuePtr>& values)
+    void RetInst::emit(std::vector<instruction::ValuePtr>& values)
     {
         if (mReturnValue)
         {
-            instruction::OperandPtr returnValue = mReturnValue->emit(values);
+            instruction::OperandPtr returnValue = mParent->getEmittedValue(mReturnValue);
             if (returnValue)
             {
                 instruction::OperandPtr eax = std::make_unique<instruction::Register>(0, codegen::OperandSize::Long); // TODO: Get size properly
@@ -70,13 +69,12 @@ namespace vipir
         }
         values.emplace_back(std::make_unique<instruction::LeaveInstruction>());
         values.emplace_back(std::make_unique<instruction::RetInstruction>());
-        return nullptr;
     }
 
 
-    RetInst::RetInst(BasicBlock* parent, Value* returnValue)
-        : Instruction(parent->getParent()->getModule())
-        , mReturnValue(returnValue)
+    RetInst::RetInst(BasicBlock* parent, ValueId id, Value* returnValue)
+        : Instruction(parent->getParent()->getModule(), parent, id)
+        , mReturnValue(returnValue->getID())
     {
     }
 }

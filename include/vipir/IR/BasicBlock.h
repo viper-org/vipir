@@ -10,16 +10,12 @@
 
 #include "vipir/IR/Value.h"
 
-#include "vipir/IR/Instruction/Instruction.h"
-
 #include <memory>
 #include <vector>
 
 namespace vipir
 {
     class Function;
-
-    using InstructionPtr = std::unique_ptr<Instruction>;
     
     class BasicBlock : public Value
     {
@@ -30,21 +26,23 @@ namespace vipir
         Function* getParent() const;
         std::string_view getName() const;
         int getNoBranches() const;
-        const std::vector<InstructionPtr>& getInstructionList() const;
+        const std::vector<ValueId>& getInstructionList() const;
 
-        void insertInstruction(Instruction* instruction);
+        instruction::OperandPtr getEmittedValue(ValueId id);
+
+        void insertValue(Value* value);
 
         void print(std::ostream& stream) const override;
         std::string ident() const override;
 
     protected:
-        instruction::OperandPtr emit(std::vector<instruction::ValuePtr>& values) final;
+        void emit(std::vector<instruction::ValuePtr>& values) final;
 
     private:
         BasicBlock(std::string name, Function* parent);
 
         std::string mName;
-        std::vector<InstructionPtr> mInstructionList;
+        std::vector<ValueId> mValueList;
         Function* mParent;
         int mBranches;
     };

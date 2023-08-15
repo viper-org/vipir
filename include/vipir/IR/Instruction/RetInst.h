@@ -25,12 +25,12 @@ namespace vipir
         std::string ident() const override;
 
     protected:
-        instruction::OperandPtr emit(std::vector<instruction::ValuePtr>& values) override;
+        void emit(std::vector<instruction::ValuePtr>& values) override;
 
     private:
-        RetInst(BasicBlock* parent, Value* returnValue);
+        RetInst(BasicBlock* parent, ValueId id, Value* returnValue);
 
-        std::unique_ptr<Value> mReturnValue;
+        ValueId mReturnValue;
     };
 }
 

@@ -49,9 +49,24 @@ namespace vipir
         return mBasicBlockList;
     }
 
+    Value* Function::getValue(ValueId index) const
+    {
+        return mValues[index].get();
+    }
+
     void Function::insertBasicBlock(BasicBlock* basicBlock)
     {
         mBasicBlockList.push_back(BasicBlockPtr(basicBlock));
+    }
+
+    int Function::getNumValues() const
+    {
+        return mValues.size();
+    }
+
+    void Function::addValue(Value* value)
+    {
+        mValues.push_back(std::unique_ptr<Value>(value));
     }
 
     void Function::print(std::ostream& stream) const
@@ -72,7 +87,7 @@ namespace vipir
     }
 
 
-    instruction::OperandPtr Function::emit(std::vector<instruction::ValuePtr>& values)
+    void Function::emit(std::vector<instruction::ValuePtr>& values)
     {
         sortAllocas();
 
@@ -90,7 +105,6 @@ namespace vipir
         {
             basicBlock->emit(values);
         }
-        return nullptr;
     }
 
 
@@ -109,7 +123,7 @@ namespace vipir
         {
             for (const auto& instruction : basicBlock->getInstructionList())
             {
-                if (AllocaInst* alloca = dynamic_cast<AllocaInst*>(instruction.get()))
+                if (AllocaInst* alloca = dynamic_cast<AllocaInst*>(mValues[instruction].get()))
                 {
                     temp.push_back(alloca);
                 }

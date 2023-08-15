@@ -14,7 +14,7 @@ namespace vipir
     class Constant : public Value
     {
     public:
-        Constant(Module& module) : Value(module) {}
+        Constant(Module& module, ValueId id) : Value(module, id) {}
     };
 }
 

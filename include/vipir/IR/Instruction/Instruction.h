@@ -15,12 +15,11 @@ namespace vipir
     class BasicBlock;
     class Instruction : public Value
     {
-    friend class BasicBlock;
     public:
-        Instruction(Module& module) : Value(module) {}
+        Instruction(Module& module, BasicBlock* parent, ValueId id) : Value(module, id), mParent(parent) {}
 
     protected:
-        virtual instruction::OperandPtr emit(std::vector<instruction::ValuePtr>& values) = 0;
+        BasicBlock* mParent;
     };
 }
 

@@ -16,10 +16,7 @@ namespace vipir
     {
     friend class Module;
     public:
-        Global(Module& module) : Value(module) {}
-
-    protected:
-        virtual instruction::OperandPtr emit(std::vector<instruction::ValuePtr>& values) = 0;
+        Global(Module& module) : Value(module, 0) {}
     };
 }
 

@@ -27,13 +27,13 @@ namespace vipir
         return std::format("{}* {}", mAllocatedType->getName(), mName); // TODO: Use proper pointer type
     }
 
-    instruction::OperandPtr AllocaInst::emit(std::vector<instruction::ValuePtr>& values)
+    void AllocaInst::emit(std::vector<instruction::ValuePtr>& values)
     {
-        return std::make_unique<instruction::Memory>(instruction::Register::Get("rbp"), -mStackOffset);
+        mEmittedValue = std::make_unique<instruction::Memory>(instruction::Register::Get("rbp"), -mStackOffset);
     }
 
-    AllocaInst::AllocaInst(BasicBlock* parent, Type* allocatedType, std::string name)
-        : Instruction(parent->getParent()->getModule())
+    AllocaInst::AllocaInst(BasicBlock* parent, ValueId id, Type* allocatedType, std::string name)
+        : Instruction(parent->getParent()->getModule(), parent, id)
         , mName(name)
         , mAllocatedType(allocatedType)
     {
