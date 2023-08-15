@@ -18,6 +18,12 @@ namespace vipir
     public:
         Instruction(Module& module, BasicBlock* parent, ValueId id) : Value(module, id), mParent(parent) {}
 
+        enum BinaryOperators
+        {
+            ADD,
+            SUB,
+        };
+
     protected:
         BasicBlock* mParent;
     };

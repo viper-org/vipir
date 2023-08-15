@@ -11,7 +11,6 @@
 #include "vipir/IR/Instruction/Instruction.h"
 #include "vasm/instruction/operand/Memory.h"
 
-#include <iostream>
 #include <format>
 
 namespace vipir

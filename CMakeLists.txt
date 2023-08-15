@@ -21,6 +21,7 @@ file(GLOB vipir_sources
     src/vipir/IR/Instruction/AllocaInst.cpp
     src/vipir/IR/Instruction/StoreInst.cpp
     src/vipir/IR/Instruction/LoadInst.cpp
+    src/vipir/IR/Instruction/BinOpInst.cpp
 
     src/vipir/Type/Type.cpp
     src/vipir/Type/VoidType.cpp

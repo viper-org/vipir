@@ -9,6 +9,7 @@
 #include "vipir/IR/Instruction/AllocaInst.h"
 #include "vipir/IR/Instruction/StoreInst.h"
 #include "vipir/IR/Instruction/LoadInst.h"
+#include "vipir/IR/Instruction/BinOpInst.h"
 
 #include "vipir/IR/Constant/ConstantInt.h"
 
@@ -75,6 +76,22 @@ namespace vipir
         mInsertPoint->getParent()->addValue(load);
 
         return load;
+    }
+    
+    BinOpInst* Builder::CreateAdd(Value* left, Value* right, std::string name)
+    {
+        ValueId id = mInsertPoint->getParent()->getNumValues();
+        if (name.empty())
+        {
+            name = std::to_string(id);
+        }
+
+        BinOpInst* binOp = new BinOpInst(mInsertPoint, id, left, Instruction::ADD, right, name);
+
+        mInsertPoint->insertValue(binOp);
+        mInsertPoint->getParent()->addValue(binOp);
+
+        return binOp;
     }
 
     ConstantInt* Builder::CreateConstantInt(uint64_t value, Type* type, std::string name)
