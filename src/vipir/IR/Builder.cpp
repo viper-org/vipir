@@ -94,6 +94,22 @@ namespace vipir
         return binOp;
     }
 
+    BinOpInst* Builder::CreateSub(Value* left, Value* right, std::string name)
+    {
+        ValueId id = mInsertPoint->getParent()->getNumValues();
+        if (name.empty())
+        {
+            name = std::to_string(id);
+        }
+
+        BinOpInst* binOp = new BinOpInst(mInsertPoint, id, left, Instruction::SUB, right, name);
+
+        mInsertPoint->insertValue(binOp);
+        mInsertPoint->getParent()->addValue(binOp);
+
+        return binOp;
+    }
+
     ConstantInt* Builder::CreateConstantInt(uint64_t value, Type* type, std::string name)
     {
         ValueId id = mInsertPoint->getParent()->getNumValues();

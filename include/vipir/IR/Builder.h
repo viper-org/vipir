@@ -38,6 +38,8 @@ namespace vipir
         LoadInst* CreateLoad(Value* ptr, std::string name = "");
 
         BinOpInst* CreateAdd(Value* left, Value* right, std::string name = "");
+        BinOpInst* CreateSub(Value* left, Value* right, std::string name = "");
+
 
         ConstantInt* CreateConstantInt(uint64_t value, Type* type, std::string name = "");
 

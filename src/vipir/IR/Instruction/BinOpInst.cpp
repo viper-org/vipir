@@ -55,6 +55,7 @@ namespace vipir
             }
             case Instruction::SUB:
             {
+                values.push_back(std::make_unique<instruction::SubInstruction>(left->clone(), std::move(right), codegen::OperandSize::None));
                 break;
             }
         }

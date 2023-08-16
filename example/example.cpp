@@ -31,7 +31,7 @@ int main()
     auto val2 = builder.CreateConstantInt(60, vipir::Type::GetIntegerType(32));
     auto val3 = builder.CreateAdd(loadVal, val2);
     auto val4 = builder.CreateConstantInt(40, vipir::Type::GetIntegerType(32));
-    auto retVal = builder.CreateAdd(val3, val4);
+    auto retVal = builder.CreateSub(val3, val4);
 
     builder.CreateRet(retVal);
 
