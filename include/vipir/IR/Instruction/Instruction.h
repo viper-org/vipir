@@ -22,6 +22,9 @@ namespace vipir
         {
             ADD,
             SUB,
+
+            EQ,
+            NE,
         };
 
     protected:

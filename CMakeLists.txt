@@ -11,6 +11,7 @@ FetchContent_MakeAvailable(vasm)
 file(GLOB vipir_sources
     src/vipir/Module.cpp
 
+
     src/vipir/IR/Builder.cpp
     src/vipir/IR/Function.cpp
     src/vipir/IR/BasicBlock.cpp
@@ -23,9 +24,13 @@ file(GLOB vipir_sources
     src/vipir/IR/Instruction/LoadInst.cpp
     src/vipir/IR/Instruction/BinOpInst.cpp
 
+
     src/vipir/Type/Type.cpp
     src/vipir/Type/VoidType.cpp
     src/vipir/Type/IntegerType.cpp
+
+
+    src/vipir/MC/CmpOperand.cpp
 )
 
 add_library(vipir SHARED ${vipir_sources})

@@ -27,12 +27,11 @@ int main()
     auto val = builder.CreateConstantInt(20, vipir::Type::GetIntegerType(32));
     builder.CreateStore(alloca, val);
 
-    auto loadVal = builder.CreateLoad(alloca);
-    auto val2 = builder.CreateConstantInt(60, vipir::Type::GetIntegerType(32));
-    auto val3 = builder.CreateAdd(loadVal, val2);
-    auto val4 = builder.CreateConstantInt(40, vipir::Type::GetIntegerType(32));
-    auto retVal = builder.CreateSub(val3, val4);
+    auto lhs = builder.CreateLoad(alloca);
+    auto rhs = builder.CreateConstantInt(20, vipir::Type::GetIntegerType(32));
+    builder.CreateICmpEQ(lhs, rhs);
 
+    auto retVal = builder.CreateLoad(alloca);
     builder.CreateRet(retVal);
 
     std::ofstream f("file.out");

@@ -39,6 +39,8 @@ namespace vipir
 
         BinOpInst* CreateAdd(Value* left, Value* right, std::string name = "");
         BinOpInst* CreateSub(Value* left, Value* right, std::string name = "");
+        BinOpInst* CreateICmpEQ(Value* left, Value* right, std::string name = "");
+        BinOpInst* CreateICmpNE(Value* left, Value* right, std::string name = "");
 
 
         ConstantInt* CreateConstantInt(uint64_t value, Type* type, std::string name = "");

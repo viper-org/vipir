@@ -22,7 +22,7 @@ namespace vipir
 
     std::string LoadInst::ident() const
     {
-        return std::format("%{}", mName);
+        return std::format("{} %{}", mType->getName(), mName);
     }
 
     bool LoadInst::requiresRegister() const
