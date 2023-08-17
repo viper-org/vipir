@@ -8,6 +8,7 @@
 
 #include "vasm/instruction/Label.h"
 
+#include <algorithm>
 #include <format>
 #include <iostream>
 
@@ -55,6 +56,16 @@ namespace vipir
     void BasicBlock::insertValue(Value* value)
     {
         mValueList.push_back(value->getID());
+    }
+
+    void BasicBlock::eraseValue(ValueId value)
+    {
+        auto it = std::find(mValueList.begin(), mValueList.end(), value);
+
+        if (it != mValueList.end())
+        {
+            mValueList.erase(it);
+        }
     }
 
     void BasicBlock::print(std::ostream& stream) const

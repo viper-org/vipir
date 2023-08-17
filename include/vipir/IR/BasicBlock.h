@@ -31,6 +31,7 @@ namespace vipir
         instruction::OperandPtr getEmittedValue(ValueId id);
 
         void insertValue(Value* value);
+        void eraseValue(ValueId value);
 
         void print(std::ostream& stream) const override;
         std::string ident() const override;

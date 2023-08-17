@@ -19,6 +19,7 @@ set(SOURCES
 
     "src/vipir/IR/Constant/ConstantInt.cpp"
 
+    "src/vipir/IR/Instruction/Instruction.cpp"
     "src/vipir/IR/Instruction/RetInst.cpp"
     "src/vipir/IR/Instruction/AllocaInst.cpp"
     "src/vipir/IR/Instruction/StoreInst.cpp"

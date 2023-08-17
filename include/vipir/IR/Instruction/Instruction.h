@@ -27,6 +27,8 @@ namespace vipir
             NE,
         };
 
+        void eraseFromParent();
+
     protected:
         BasicBlock* mParent;
     };
