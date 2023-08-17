@@ -18,6 +18,8 @@
 #include <algorithm>
 #include <cmath>
 #include <format>
+#include <fstream>
+#include <iostream>
 #include <stack>
 
 namespace vipir
@@ -230,10 +232,23 @@ namespace vipir
             "", "di", "edi", "rdi",
         };
 
+        constexpr std::array colors = {
+            "red", "blue", "green",
+            "yellow", "purple", "orange"
+        };
+
+        std::ofstream graphout("vipir.dot");
+        graphout<< "\n\nstrict graph {";
+
         while (!stack.empty())
         {
             auto id = stack.top();
             stack.pop();
+
+            for (auto edge : mValues[id]->mEdges)
+            {
+                graphout << "\n\tN" << id << " -- N" << edge.first;
+            }
 
             int currentColor = 0;
             while (currentColor < k)
@@ -249,6 +264,10 @@ namespace vipir
             }
             mValues[id]->mColor = currentColor;
             mValues[id]->mRegister = registers[currentColor][std::log(mValues[id]->getType()->getSizeInBits() / 8) / std::log(2)];
+
+            graphout << "\n\tN" << id << " [color=" << colors[currentColor] << "]";
         }
+
+        graphout << "\n}";
     }
 }
