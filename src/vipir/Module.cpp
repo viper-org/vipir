@@ -8,6 +8,7 @@
 #include "vasm/codegen/Elf.h"
 #include "vasm/codegen/IOutputFormat.h"
 #include "vasm/codegen/builder/OpcodeBuilder.h"
+#include "vipir/IR/Instruction/LoadInst.h"
 
 #include <sstream>
 #include <format>
@@ -61,5 +62,14 @@ namespace vipir
         }
 
         outputFormat->print(stream);
+    }
+
+    Value* getPointerOperand(Value* value)
+    {
+        if (LoadInst* load = dynamic_cast<LoadInst*>(value))
+        {
+            return load->getPointer();
+        }
+        return nullptr;
     }
 }

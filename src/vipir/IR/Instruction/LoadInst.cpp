@@ -34,6 +34,11 @@ namespace vipir
     {
         return {mPtr};
     }
+    
+    Value* LoadInst::getPointer() const
+    {
+        return mParent->getParent()->getValue(mPtr);
+    }
 
     void LoadInst::emit(std::vector<instruction::ValuePtr>& values)
     {

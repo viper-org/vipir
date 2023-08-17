@@ -24,6 +24,8 @@ namespace vipir
         bool requiresRegister() const override;
         std::vector<ValueId> getOperands() override;
 
+        Value* getPointer() const;
+
     protected:
         void emit(std::vector<instruction::ValuePtr>& values) override;
 
