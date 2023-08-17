@@ -86,7 +86,7 @@ namespace vipir
 
     void BasicBlock::emit(std::vector<instruction::ValuePtr>& values)
     {
-        values.emplace_back(std::make_unique<instruction::Label>(mName));
+        values.emplace_back(std::make_unique<instruction::Label>(".L" + mName));
         for (ValueId instruction : mValueList)
         {
             mParent->getValue(instruction)->emit(values);
