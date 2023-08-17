@@ -6,6 +6,7 @@ _deps/
 *.o
 *.exe
 *.so
+*.a
 *.vir
 Makefile
 
