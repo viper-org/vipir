@@ -8,15 +8,14 @@
 #ifndef VIPIR_MODULE_H
 #define VIPIR_MODULE_H 1
 
+#include "vipir/IR/Global.h"
+
 #include <memory>
 #include <string>
 #include <vector>
 
 namespace vipir
 {
-    class Global;
-    using GlobalPtr = std::unique_ptr<Global>;
-
     class Module
     {
     public:

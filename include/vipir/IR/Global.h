@@ -18,6 +18,7 @@ namespace vipir
     public:
         Global(Module& module) : Value(module, 0) {}
     };
+    using GlobalPtr = std::unique_ptr<Global>;
 }
 
 #endif // VIPIR_IR_GLOBAL_H
