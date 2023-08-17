@@ -18,7 +18,7 @@
 #include <algorithm>
 #include <cmath>
 #include <format>
-#include <queue>
+#include <stack>
 
 namespace vipir
 {
@@ -126,13 +126,6 @@ namespace vipir
         , mName(std::move(name))
         , mInstructionCount(0)
     {
-        // TODO: Add dil and sil
-        mRegisters.push_back({"al", "ax", "eax", "rax"});
-        mRegisters.push_back({"cl", "cx", "ecx", "rcx"});
-        mRegisters.push_back({"dl", "dx", "edx", "rdx"});
-        mRegisters.push_back({"bl", "bx", "ebx", "rbx"});
-        mRegisters.push_back({"asdasdasd", "si", "esi", "rsi"});
-        mRegisters.push_back({"asdadasd", "di", "edi", "rdi"});
     }
 
     void Function::sortAllocas()
@@ -164,29 +157,10 @@ namespace vipir
         mTotalStackOffset = (offset + 15) & ~15; // Align to 16 bytes
     }
 
-    static inline std::array<std::string_view, 4> GetAllRegisterNames(std::string_view regName)
-    {
-        constexpr std::array<std::array<std::string_view, 4>, 6> registers = {
-            "", "di", "edi", "rdi",
-            "", "si", "esi", "rsi",
-            "bl", "bx", "ebx", "rbx",
-            "dl", "dx", "edx", "rdx",
-            "cl", "cx", "ecx", "rcx",
-            "al", "ax", "eax", "rax",
-        };
-
-        auto it = std::find_if(registers.begin(), registers.end(), [&regName](const auto& reg) {
-            return std::find_if(reg.begin(), reg.end(), [&regName](const auto& innerReg) {
-                return innerReg == regName;
-            }) != reg.end();
-        });
-
-        return *it;
-    }
-
     void Function::allocateRegisters()
     {
-        std::vector<ValueId> temp;
+        std::vector<std::pair<ValueId, bool>> allNodes;
+        std::vector<ValueId> liveNodes;
 
         for (const auto& basicBlock : mBasicBlockList)
         {
@@ -194,24 +168,87 @@ namespace vipir
             {
                 if (mValues[instruction]->requiresRegister())
                 {
-                    const auto reg = mRegisters.front();
-                    mRegisters.pop_front();
-
-                    auto regName = reg[std::log(mValues[instruction]->getType()->getSizeInBits() / 8) / std::log(2)]; // log2 gives us the index we want
-                    mValues[instruction]->setRegister(regName.data());
-
-                    temp.push_back(instruction); // Save it so we can pop the register later
+                    for (ValueId id : liveNodes)
+                    {
+                        mValues[instruction]->mEdges.emplace_back(id, true);
+                        mValues[id]->mEdges.emplace_back(instruction, true);
+                    }
+                    liveNodes.push_back(instruction);
+                    allNodes.emplace_back(instruction, true);
                 }
+
                 for (auto operand : mValues[instruction]->getOperands())
                 {
-                    auto it = std::find(temp.begin(), temp.end(), operand);
+                    auto it = std::find(liveNodes.begin(), liveNodes.end(), operand);
 
-                    if (it != temp.end())
+                    if (it != liveNodes.end())
                     {
-                        mRegisters.push_front(GetAllRegisterNames(mValues[*it]->mRegister)); // Restore all the registers from the operands as we no longer need them
+                        liveNodes.erase(it);
                     }
                 }
             }
+        }
+
+        std::stack<ValueId> stack;
+        constexpr int k = 6;
+
+        int count = allNodes.size();
+        while (count)
+        {
+            for (auto it = allNodes.begin(); it != allNodes.end(); it++)
+            {
+                if (it->second && mValues[it->first]->mEdges.size() < k)
+                {
+                    stack.push(it->first);
+                    for (auto node : allNodes)
+                    {
+                        // Erase nodes that share an edge
+                        if (node != *it)
+                        {
+                            auto edge = std::find_if(mValues[node.first]->mEdges.begin(), mValues[node.first]->mEdges.end(), [this, &it](auto& node) {
+                                return mValues[node.first]->mId == it->first;
+                            });
+
+                            if (edge != mValues[node.first]->mEdges.end())
+                            {
+                                edge->second = false;
+                            }
+                        }
+                    }
+                    it->second = false;
+                    count -= 1;
+                }
+            }
+        }
+
+        constexpr std::array<std::array<std::string_view, 4>, 6> registers = {
+            "al", "ax", "eax", "rax",
+            "cl", "cx", "ecx", "rcx",
+            "dl", "dx", "edx", "rdx",
+            "bl", "bx", "ebx", "rbx",
+            "", "si", "esi", "rsi",
+            "", "di", "edi", "rdi",
+        };
+
+        while (!stack.empty())
+        {
+            auto id = stack.top();
+            stack.pop();
+
+            int currentColor = 0;
+            while (currentColor < k)
+            {
+                auto it = std::find_if(mValues[id]->mEdges.begin(), mValues[id]->mEdges.end(), [this, currentColor](auto edge) {
+                    return mValues[edge.first]->mColor == currentColor;
+                });
+                if (it == mValues[id]->mEdges.end())
+                {
+                    break;
+                }
+                currentColor++;
+            }
+            mValues[id]->mColor = currentColor;
+            mValues[id]->mRegister = registers[currentColor][std::log(mValues[id]->getType()->getSizeInBits() / 8) / std::log(2)];
         }
     }
 }

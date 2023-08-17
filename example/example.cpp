@@ -28,10 +28,11 @@ int main()
     builder.CreateStore(alloca, val);
 
     auto lhs = builder.CreateLoad(alloca);
+    auto retVal = builder.CreateLoad(alloca);
+    
     auto rhs = builder.CreateConstantInt(20, vipir::Type::GetIntegerType(32));
     builder.CreateICmpEQ(lhs, rhs);
 
-    auto retVal = builder.CreateLoad(alloca);
     builder.CreateRet(retVal);
 
     std::ofstream f("file.out");

@@ -55,6 +55,9 @@ namespace vipir
         Type* mType;
         ValueId mId;
         instruction::OperandPtr mEmittedValue;
+
+        std::vector<std::pair<ValueId, bool>> mEdges;
+        int mColor{-1};
         std::string mRegister;
 
         virtual void emit(std::vector<instruction::ValuePtr>& values) = 0;

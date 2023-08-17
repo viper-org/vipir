@@ -11,7 +11,6 @@
 
 #include <memory>
 #include <string>
-#include <deque>
 #include <vector>
 
 namespace vipir
@@ -55,7 +54,6 @@ namespace vipir
         int mInstructionCount;
 
         int mTotalStackOffset;
-        std::deque<std::array<std::string_view, 4>> mRegisters;
     };
 }
 
