@@ -58,7 +58,7 @@ namespace vipir
 
     void RetInst::emit(std::vector<instruction::ValuePtr>& values)
     {
-        if (mReturnValue)
+        if (mReturnValue != -1)
         {
             instruction::OperandPtr returnValue = mParent->getEmittedValue(mReturnValue);
             if (returnValue)
@@ -84,7 +84,7 @@ namespace vipir
 
     RetInst::RetInst(BasicBlock* parent, ValueId id, Value* returnValue)
         : Instruction(parent->getParent()->getModule(), parent, id)
-        , mReturnValue(returnValue->getID())
+        , mReturnValue(returnValue ? returnValue->getID() : -1)
     {
     }
 }
