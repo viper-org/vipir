@@ -4,8 +4,9 @@ project (vipir)
 
 include(FetchContent)
 FetchContent_Declare(vasm
-GIT_REPOSITORY https://github.com/viper-org/vasm.git
-GIT_TAG master)
+    GIT_REPOSITORY https://github.com/viper-org/vasm.git
+    GIT_TAG master
+)
 FetchContent_MakeAvailable(vasm)
 
 file(GLOB vipir_sources
@@ -34,8 +35,11 @@ file(GLOB vipir_sources
 )
 
 add_library(vipir SHARED ${vipir_sources})
-
 add_dependencies(vipir vasm::framework)
-
+target_include_directories(vipir
+    PUBLIC
+        include
+)
 target_compile_features(vipir PUBLIC cxx_std_20)
 target_include_directories(vipir PUBLIC include)
+target_link_libraries(vipir PUBLIC vasm-framework-vasm-framework)
