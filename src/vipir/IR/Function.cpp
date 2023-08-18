@@ -109,7 +109,6 @@ namespace vipir
             if ((*it)->getNoBranches() == 0)
             {
                 std::copy((*it)->getInstructionList().begin(), (*it)->getInstructionList().end(), std::back_inserter(temp));
-                //mBasicBlockList.erase(it);
                 unused.push_back(it);
             }
             else
@@ -179,6 +178,13 @@ namespace vipir
                 }
             }
         }
+        for (auto instruction : mValueList)
+        {
+            if (AllocaInst* alloca = dynamic_cast<AllocaInst*>(mValues[instruction].get()))
+            {
+                temp.push_back(alloca);
+            }
+        }
 
         std::sort(temp.begin(), temp.end(), [](AllocaInst* lhs, AllocaInst* rhs) {
             return lhs->getAllocatedType()->getSizeInBits() > rhs->getAllocatedType()->getSizeInBits();
@@ -222,6 +228,29 @@ namespace vipir
                     {
                         liveNodes.erase(it);
                     }
+                }
+            }
+        }
+        for (auto instruction : mValueList)
+        {
+            if (mValues[instruction]->requiresRegister())
+            {
+                for (ValueId id : liveNodes)
+                {
+                    mValues[instruction]->mEdges.emplace_back(id, true);
+                    mValues[id]->mEdges.emplace_back(instruction, true);
+                }
+                liveNodes.push_back(instruction);
+                allNodes.emplace_back(instruction, true);
+            }
+
+            for (auto operand : mValues[instruction]->getOperands())
+            {
+                auto it = std::find(liveNodes.begin(), liveNodes.end(), operand);
+
+                if (it != liveNodes.end())
+                {
+                    liveNodes.erase(it);
                 }
             }
         }
