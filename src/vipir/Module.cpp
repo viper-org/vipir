@@ -45,6 +45,19 @@ namespace vipir
         }
     }
 
+    void Module::optimize(OptimizationLevel level)
+    {
+        if (level == OptimizationLevel::None)
+        {
+            return;
+        }
+
+        for (auto& global : mGlobals)
+        {
+            global->optimize(level);
+        }
+    }
+
     void Module::emit(std::ostream& stream) const
     {
         std::vector<instruction::ValuePtr> values;

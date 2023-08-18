@@ -16,6 +16,14 @@
 
 namespace vipir
 {
+    enum class OptimizationLevel
+    {
+        None,
+        Low,
+        Medium,
+        High,
+    };
+
     class Module
     {
     public:
@@ -27,6 +35,8 @@ namespace vipir
         void insertGlobal(Global* global);
 
         void print(std::ostream& stream) const;
+
+        void optimize(OptimizationLevel level);
 
         void emit(std::ostream& stream) const;
     private:

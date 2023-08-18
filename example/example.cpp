@@ -37,6 +37,8 @@ int main()
 
     std::ofstream f("file.out");
     mod.print(std::cout);
+
+    mod.optimize(vipir::OptimizationLevel::High);
     
     std::cout << "\n";
 

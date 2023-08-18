@@ -12,11 +12,15 @@
 
 namespace vipir
 {
+    enum class OptimizationLevel;
+
     class Global : public Value
     {
     friend class Module;
     public:
         Global(Module& module) : Value(module, 0) {}
+
+        virtual void optimize(OptimizationLevel level) = 0;
     };
     using GlobalPtr = std::unique_ptr<Global>;
 }

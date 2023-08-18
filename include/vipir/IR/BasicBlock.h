@@ -16,6 +16,7 @@
 namespace vipir
 {
     class Function;
+    enum class OptimizationLevel;
     
     class BasicBlock : public Value
     {
@@ -26,7 +27,7 @@ namespace vipir
         Function* getParent() const;
         std::string_view getName() const;
         int getNoBranches() const;
-        const std::vector<ValueId>& getInstructionList() const;
+        std::vector<ValueId>& getInstructionList();
 
         instruction::OperandPtr getEmittedValue(ValueId id);
 
@@ -38,6 +39,8 @@ namespace vipir
         
         bool requiresRegister() const override;
         std::vector<ValueId> getOperands() override;
+
+        void optimize(OptimizationLevel level);
 
     protected:
         void emit(std::vector<instruction::ValuePtr>& values) final;

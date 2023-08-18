@@ -43,7 +43,7 @@ namespace vipir
         return mBranches;
     }
 
-    const std::vector<ValueId>& BasicBlock::getInstructionList() const
+    std::vector<ValueId>& BasicBlock::getInstructionList()
     {
         return mValueList;
     }

@@ -100,6 +100,36 @@ namespace vipir
         return {};
     }
 
+    void Function::optimize(OptimizationLevel level)
+    {
+        std::vector<ValueId> temp;
+        std::vector<decltype(mBasicBlockList.begin())> unused;
+        for (auto it = mBasicBlockList.begin(); it != mBasicBlockList.end(); it++)
+        {
+            if ((*it)->getNoBranches() == 0)
+            {
+                std::copy((*it)->getInstructionList().begin(), (*it)->getInstructionList().end(), std::back_inserter(temp));
+                //mBasicBlockList.erase(it);
+                unused.push_back(it);
+            }
+            else
+            {
+                std::copy(temp.begin(), temp.end(), (*it)->getInstructionList().end());
+                temp.clear();
+            }
+        }
+
+        for (auto unusedBasicBlock : unused)
+        {
+            mBasicBlockList.erase(unusedBasicBlock);
+        }
+
+        if (!temp.empty())
+        {
+            std::copy(temp.begin(), temp.end(), std::back_inserter(mValueList));
+        }
+    }
+
 
     void Function::emit(std::vector<instruction::ValuePtr>& values)
     {
@@ -119,6 +149,11 @@ namespace vipir
         for (const BasicBlockPtr& basicBlock : mBasicBlockList)
         {
             basicBlock->emit(values);
+        }
+
+        for (auto value : mValueList)
+        {
+            mValues[value]->emit(values);
         }
     }
 

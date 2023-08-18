@@ -39,6 +39,8 @@ namespace vipir
         bool requiresRegister() const override;
         std::vector<ValueId> getOperands() override;
 
+        void optimize(OptimizationLevel level) override;
+
     protected:
         void emit(std::vector<instruction::ValuePtr>& values) override;
 
@@ -51,6 +53,7 @@ namespace vipir
         std::string mName;
         std::vector<BasicBlockPtr> mBasicBlockList;
         std::vector<std::unique_ptr<Value>> mValues;
+        std::vector<ValueId> mValueList; // In case all BasicBlocks have no branches, store all values inside the function
         int mInstructionCount;
 
         int mTotalStackOffset;
