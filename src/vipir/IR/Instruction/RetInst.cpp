@@ -86,5 +86,6 @@ namespace vipir
         : Instruction(parent->getParent()->getModule(), parent, id)
         , mReturnValue(returnValue ? returnValue->getID() : -1)
     {
+        //mParent->getParent()->getValue(mReturnValue)->mColor = 0; // EAX
     }
 }

@@ -314,22 +314,26 @@ namespace vipir
                 graphout << "\n\tN" << id << " -- N" << edge.first;
             }
 
-            int currentColor = 0;
-            while (currentColor < k)
+            int color = mValues[id]->mColor;
+            if (color == -1)
             {
-                auto it = std::find_if(mValues[id]->mEdges.begin(), mValues[id]->mEdges.end(), [this, currentColor](auto edge) {
-                    return mValues[edge.first]->mColor == currentColor;
-                });
-                if (it == mValues[id]->mEdges.end())
+                color = 0;
+                while (color < k)
                 {
-                    break;
+                    auto it = std::find_if(mValues[id]->mEdges.begin(), mValues[id]->mEdges.end(), [this, color](auto edge) {
+                        return mValues[edge.first]->mColor == color;
+                    });
+                    if (it == mValues[id]->mEdges.end())
+                    {
+                        break;
+                    }
+                    color++;
                 }
-                currentColor++;
+                mValues[id]->mColor = color;
             }
-            mValues[id]->mColor = currentColor;
-            mValues[id]->mRegister = registers[currentColor][std::log(mValues[id]->getType()->getSizeInBits() / 8) / std::log(2)];
+            mValues[id]->mRegister = registers[color][std::log(mValues[id]->getType()->getSizeInBits() / 8) / std::log(2)];
 
-            graphout << "\n\tN" << id << " [color=" << colors[currentColor] << "]";
+            graphout << "\n\tN" << id << " [color=" << colors[color] << "]";
         }
 
         graphout << "\n}";
