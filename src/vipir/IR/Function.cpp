@@ -89,11 +89,27 @@ namespace vipir
     {
         if (mBasicBlockList.empty() && mValueList.empty())
         {
-            stream << std::format("\n\ndeclare pub {} @{}()", static_cast<FunctionType*>(mType)->getReturnType()->getName(), mName);
+            stream << std::format("\n\ndeclare pub {} @{}(", static_cast<FunctionType*>(mType)->getReturnType()->getName(), mName);
+            for (auto it = mArguments.begin(); it != mArguments.end(); it++)
+            {
+                stream << mValues[*it]->ident();
+                if ((it + 1) != mArguments.end())
+                {
+                    stream << ", ";
+                }
+            }
             return;
         }
-        stream << std::format("\n\ndefine pub {} @{}() {{\n   ", static_cast<FunctionType*>(mType)->getReturnType()->getName(), mName);
-
+        stream << std::format("\n\ndefine pub {} @{}(", static_cast<FunctionType*>(mType)->getReturnType()->getName(), mName);
+        for (auto it = mArguments.begin(); it != mArguments.end(); it++)
+        {
+            stream << mValues[*it]->ident();
+            if ((it + 1) != mArguments.end())
+            {
+                stream << ", ";
+            }
+        }
+        stream << ") {\n   ";
         for (const BasicBlockPtr& basicBlock : mBasicBlockList)
         {
             basicBlock->print(stream);
