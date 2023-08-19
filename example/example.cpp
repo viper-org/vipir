@@ -19,13 +19,13 @@ int main()
 
     vipir::Type* i32 = vipir::Type::GetIntegerType(32);
 
-    auto fn2 = vipir::Function::Create(vipir::FunctionType::Get(i32, {}), mod, "test");
+    auto fn2 = vipir::Function::Create(vipir::FunctionType::Get(i32, {i32}), mod, "test");
     auto bb2 = vipir::BasicBlock::Create("", fn2);
     builder.setInsertPoint(bb2);
-    auto retVal2 = builder.CreateConstantInt(33, vipir::Type::GetIntegerType(32));
+    auto retVal2 = fn2->getArgument(0);
     builder.CreateRet(retVal2);
 
-    auto fn = vipir::Function::Create(vipir::FunctionType::Get(i32, {i32}), mod, "main");
+    auto fn = vipir::Function::Create(vipir::FunctionType::Get(i32, {}), mod, "main");
     auto bb = vipir::BasicBlock::Create("", fn);
     builder.setInsertPoint(bb);
 
@@ -34,11 +34,12 @@ int main()
     auto val = builder.CreateConstantInt(20, vipir::Type::GetIntegerType(32));
     builder.CreateStore(alloca, val);
 
-    auto call = builder.CreateCall(fn2);
+    auto param = builder.CreateConstantInt(66, vipir::Type::GetIntegerType(32));
+    auto call = builder.CreateCall(fn2, {param});
 
     //auto retVal = builder.CreateLoad(alloca);
 
-    builder.CreateRet(fn->getArgument(0));
+    builder.CreateRet(call);
 
     std::ofstream f("file.out");
     mod.print(std::cout);

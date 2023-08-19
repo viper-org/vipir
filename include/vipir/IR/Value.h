@@ -23,6 +23,7 @@ namespace vipir
 
     class RetInst;
     class StoreInst;
+    class CallInst;
 
     class BasicBlock;
     class Function;
@@ -35,6 +36,7 @@ namespace vipir
     friend class Function;
     friend class RetInst;
     friend class StoreInst;
+    friend class CallInst;
     public:
         Value(Module& module, ValueId id) : mModule(module), mId(id) {}
         virtual ~Value() {}

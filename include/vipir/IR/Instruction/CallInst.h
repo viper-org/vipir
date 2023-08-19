@@ -28,10 +28,11 @@ namespace vipir
         void emit(std::vector<instruction::ValuePtr>& values) override;
 
     private:
-        CallInst(BasicBlock* parent, ValueId id, std::string name, Value* callee);
+        CallInst(BasicBlock* parent, ValueId id, std::string name, Value* callee, const std::vector<Value*>& parameters);
 
         std::string mName;
         ValueId mCallee;
+        std::vector<ValueId> mParameters;
     };
 }
 

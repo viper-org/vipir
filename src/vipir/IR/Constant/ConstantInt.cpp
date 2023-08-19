@@ -7,8 +7,9 @@
 #include "vipir/IR/Function.h"
 
 #include "vasm/instruction/operand/Immediate.h"
+#include "vasm/instruction/operand/Register.h"
+#include "vasm/instruction/twoOperandInstruction/MovInstruction.h"
 
-#include <iostream>
 #include <format>
 
 namespace vipir
@@ -30,7 +31,7 @@ namespace vipir
 
     bool ConstantInt::requiresRegister() const
     {
-        return false;
+        return mColor != -1; // We only need a register if one has been precolored(such as a parameter)
     }
 
     std::vector<ValueId> ConstantInt::getOperands()
@@ -41,23 +42,15 @@ namespace vipir
 
     void ConstantInt::emit(std::vector<instruction::ValuePtr>& values)
     {
-        std::string regName;
-        switch(mType->getSizeInBits())
+        if (!mRegister.empty())
         {
-            case 8:
-                regName = "al";
-                break;
-            case 16:
-                regName = "ax";
-                break;
-            case 32:
-                regName = "eax";
-                break;
-            case 64:
-                regName = "rax";
-                break;
+            values.push_back(std::make_unique<instruction::MovInstruction>(instruction::Register::Get(mRegister), std::make_unique<instruction::Immediate>(mValue), codegen::OperandSize::None));
+            mEmittedValue = instruction::Register::Get(mRegister);
         }
-        mEmittedValue = std::make_unique<instruction::Immediate>(mValue);
+        else
+        {
+            mEmittedValue = std::make_unique<instruction::Immediate>(mValue);
+        }
     }
 
 

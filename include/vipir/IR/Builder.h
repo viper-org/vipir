@@ -33,7 +33,7 @@ namespace vipir
         void setInsertPoint(BasicBlock* newInsertPoint);
 
         RetInst* CreateRet(Value* returnValue);
-        CallInst* CreateCall(Value* callee, std::string name = "");
+        CallInst* CreateCall(Value* callee, std::vector<Value*> parameters, std::string name = "");
 
         AllocaInst* CreateAlloca(Type* allocatedType, std::string name = "");
         StoreInst* CreateStore(Value* ptr, Value* value);

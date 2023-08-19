@@ -36,7 +36,7 @@ namespace vipir
         return ret;
     }
 
-    CallInst* Builder::CreateCall(Value* callee, std::string name)
+    CallInst* Builder::CreateCall(Value* callee, std::vector<Value*> parameters, std::string name)
     {
         ValueId id = mInsertPoint->getParent()->getNumValues();
         if (name.empty())
@@ -44,7 +44,7 @@ namespace vipir
             name = std::to_string(id);
         }
 
-        CallInst* call = new CallInst(mInsertPoint, id, name, callee);
+        CallInst* call = new CallInst(mInsertPoint, id, name, callee, parameters);
 
         mInsertPoint->insertValue(call);
         mInsertPoint->getParent()->addValue(call);
