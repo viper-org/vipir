@@ -11,6 +11,7 @@
 #include "vasm/instruction/Label.h"
 #include "vasm/instruction/operand/Register.h"
 #include "vasm/instruction/operand/Immediate.h"
+#include "vasm/instruction/operand/Label.h"
 #include "vasm/instruction/singleOperandInstruction/PushInstruction.h"
 #include "vasm/instruction/twoOperandInstruction/MovInstruction.h"
 #include "vasm/instruction/twoOperandInstruction/LogicalInstruction.h"
@@ -145,6 +146,8 @@ namespace vipir
             values.emplace_back(std::make_unique<instruction::SubInstruction>(instruction::Register::Get("rsp"), std::move(offset), codegen::OperandSize::None));
         }
 
+        mEmittedValue = std::make_unique<instruction::LabelOperand>(mName);
+
         for (const BasicBlockPtr& basicBlock : mBasicBlockList)
         {
             basicBlock->emit(values);
@@ -162,6 +165,12 @@ namespace vipir
         , mName(std::move(name))
         , mInstructionCount(0)
     {
+        mId = module.getGlobals().size();
+    }
+
+    instruction::OperandPtr Function::getEmittedValue()
+    {
+        return mEmittedValue->clone();
     }
 
     void Function::sortAllocas()
@@ -255,6 +264,21 @@ namespace vipir
             }
         }
 
+        for (auto liveNode : liveNodes) // Nodes are unused if they are still live at the end of the function
+        {
+            for (auto node : allNodes)
+            {
+                auto it = std::find_if(mValues[node.first]->mEdges.begin(), mValues[node.first]->mEdges.begin(), [liveNode] (auto edge) {
+                    return edge.first == liveNode;
+                });
+
+                if (it != mValues[node.first]->mEdges.end())
+                {
+                    mValues[node.first]->mEdges.erase(it);
+                }
+            }
+        }
+
         std::stack<ValueId> stack;
         constexpr int k = 6;
 
@@ -320,7 +344,9 @@ namespace vipir
                 color = 0;
                 while (color < k)
                 {
+                    std::cout << mValues[id]->mEdges.size() << "\n";
                     auto it = std::find_if(mValues[id]->mEdges.begin(), mValues[id]->mEdges.end(), [this, color](auto edge) {
+                        std::cout << mValues[edge.first]->mColor << "\n";
                         return mValues[edge.first]->mColor == color;
                     });
                     if (it == mValues[id]->mEdges.end())

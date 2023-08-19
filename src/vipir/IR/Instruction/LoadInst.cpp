@@ -44,7 +44,6 @@ namespace vipir
     void LoadInst::emit(std::vector<instruction::ValuePtr>& values)
     {
         instruction::OperandPtr ptrOperand = mParent->getEmittedValue(mPtr);
-        std::cout << static_cast<AllocaInst*>(mParent->getParent()->getValue(mPtr))->getAllocatedType()->getSizeInBits() << "\n";
 
         values.emplace_back(std::make_unique<instruction::MovInstruction>(instruction::Register::Get(mRegister), std::move(ptrOperand), codegen::OperandSize::None));
 

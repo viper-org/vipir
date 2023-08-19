@@ -20,6 +20,7 @@ namespace vipir
     
     class Function : public Global
     {
+    friend class Module;
     public:
         static Function* Create(Module& module, std::string name);
 
@@ -46,6 +47,8 @@ namespace vipir
 
     private:
         Function(Module& module, std::string name);
+
+        instruction::OperandPtr getEmittedValue() override;
 
         void sortAllocas();
         void allocateRegisters();

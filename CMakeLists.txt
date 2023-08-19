@@ -21,6 +21,7 @@ set(SOURCES
 
     "src/vipir/IR/Instruction/Instruction.cpp"
     "src/vipir/IR/Instruction/RetInst.cpp"
+    "src/vipir/IR/Instruction/CallInst.cpp"
     "src/vipir/IR/Instruction/AllocaInst.cpp"
     "src/vipir/IR/Instruction/StoreInst.cpp"
     "src/vipir/IR/Instruction/LoadInst.cpp"
@@ -50,6 +51,7 @@ set(HEADERS
 
     "include/vipir/IR/Instruction/Instruction.h"
     "include/vipir/IR/Instruction/RetInst.h"
+    "include/vipir/IR/Instruction/CallInst.h"
     "include/vipir/IR/Instruction/AllocaInst.h"
     "include/vipir/IR/Instruction/StoreInst.h"
     "include/vipir/IR/Instruction/LoadInst.h"

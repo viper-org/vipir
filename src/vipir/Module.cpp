@@ -35,6 +35,11 @@ namespace vipir
         mGlobals.push_back(GlobalPtr(global));
     }
 
+    instruction::OperandPtr Module::getGlobalEmittedValue(ValueId id)
+    {
+        return mGlobals.at(id)->getEmittedValue();
+    }
+
     void Module::print(std::ostream& stream) const
     {
         stream << std::format("file \"{}\"\n\n", mName);

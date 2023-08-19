@@ -49,7 +49,6 @@ namespace vipir
         , mName(name)
         , mAllocatedType(allocatedType)
     {
-        std::cout << mAllocatedType->getName() << "\n";
     }
 
     instruction::OperandPtr AllocaInst::getEmittedValue()

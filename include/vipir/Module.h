@@ -33,6 +33,7 @@ namespace vipir
         const std::vector<GlobalPtr>& getGlobals() const;
         
         void insertGlobal(Global* global);
+        instruction::OperandPtr getGlobalEmittedValue(ValueId id);
 
         void print(std::ostream& stream) const;
 

@@ -7,7 +7,7 @@
 #include "vipir/IR/Constant/ConstantInt.h"
 #include "vipir/IR/Instruction/AllocaInst.h"
 #include "vipir/IR/Instruction/LoadInst.h"
-#include "vipir/IR/Instruction/BinOpInst.h"
+#include "vipir/IR/Instruction/CallInst.h"
 
 #include <iostream>
 #include <fstream>
@@ -15,25 +15,27 @@
 int main()
 {
     vipir::Module mod ("test.tst");
-
-    auto fn = vipir::Function::Create(mod, "main");
-
-    auto bb = vipir::BasicBlock::Create("", fn);
-
     auto builder = vipir::Builder();
+
+    auto fn2 = vipir::Function::Create(mod, "test");
+    auto bb2 = vipir::BasicBlock::Create("", fn2);
+    builder.setInsertPoint(bb2);
+    auto retVal2 = builder.CreateConstantInt(33, vipir::Type::GetIntegerType(32));
+    builder.CreateRet(retVal2);
+    
+    auto fn = vipir::Function::Create(mod, "main");
+    auto bb = vipir::BasicBlock::Create("", fn);
     builder.setInsertPoint(bb);
 
     auto alloca = builder.CreateAlloca(vipir::Type::GetIntegerType(32));
     auto val = builder.CreateConstantInt(20, vipir::Type::GetIntegerType(32));
     builder.CreateStore(alloca, val);
 
-    auto lhs = builder.CreateLoad(alloca);
-    auto retVal = builder.CreateLoad(alloca);
-    
-    auto rhs = builder.CreateConstantInt(20, vipir::Type::GetIntegerType(32));
-    builder.CreateICmpEQ(lhs, rhs);
+    auto call = builder.CreateCall(fn2);
 
-    builder.CreateRet(retVal);
+    //auto retVal = builder.CreateLoad(alloca);
+
+    builder.CreateRet(call);
 
     std::ofstream f("file.out");
     mod.print(std::cout);

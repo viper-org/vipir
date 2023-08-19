@@ -6,6 +6,7 @@
 #include "vipir/IR/Function.h"
 
 #include "vipir/IR/Instruction/RetInst.h"
+#include "vipir/IR/Instruction/CallInst.h"
 #include "vipir/IR/Instruction/AllocaInst.h"
 #include "vipir/IR/Instruction/StoreInst.h"
 #include "vipir/IR/Instruction/LoadInst.h"
@@ -33,6 +34,22 @@ namespace vipir
         mInsertPoint->getParent()->addValue(ret);
 
         return ret;
+    }
+
+    CallInst* Builder::CreateCall(Value* callee, std::string name)
+    {
+        ValueId id = mInsertPoint->getParent()->getNumValues();
+        if (name.empty())
+        {
+            name = std::to_string(id);
+        }
+
+        CallInst* call = new CallInst(mInsertPoint, id, name, callee);
+
+        mInsertPoint->insertValue(call);
+        mInsertPoint->getParent()->addValue(call);
+
+        return call;
     }
 
     AllocaInst* Builder::CreateAlloca(Type* allocatedType, std::string name)

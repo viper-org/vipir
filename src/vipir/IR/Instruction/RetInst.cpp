@@ -21,16 +21,12 @@ namespace vipir
 
     Type* RetInst::getReturnType() const
     {
-        if (!mReturnValue)
-        {
-            
-        }
         return mParent->getParent()->getValue(mReturnValue)->getType();
     }
 
     void RetInst::print(std::ostream& stream) const
     {
-        if (mReturnValue)
+        if (mReturnValue != -1)
         {
             stream << std::format("ret {}", mParent->getParent()->getValue(mReturnValue)->ident());
         }
@@ -86,6 +82,9 @@ namespace vipir
         : Instruction(parent->getParent()->getModule(), parent, id)
         , mReturnValue(returnValue ? returnValue->getID() : -1)
     {
-        mParent->getParent()->getValue(mReturnValue)->mColor = 0; // EAX
+        if (mReturnValue != -1)
+        {
+            mParent->getParent()->getValue(mReturnValue)->mColor = 0; // EAX
+        }
     }
 }
