@@ -17,13 +17,15 @@ int main()
     vipir::Module mod ("test.tst");
     auto builder = vipir::Builder();
 
-    auto fn2 = vipir::Function::Create(mod, "test");
+    vipir::Type* i32 = vipir::Type::GetIntegerType(32);
+
+    auto fn2 = vipir::Function::Create(vipir::FunctionType::Get(i32), mod, "test");
     auto bb2 = vipir::BasicBlock::Create("", fn2);
     builder.setInsertPoint(bb2);
     auto retVal2 = builder.CreateConstantInt(33, vipir::Type::GetIntegerType(32));
     builder.CreateRet(retVal2);
     
-    auto fn = vipir::Function::Create(mod, "main");
+    auto fn = vipir::Function::Create(vipir::FunctionType::Get(i32), mod, "main");
     auto bb = vipir::BasicBlock::Create("", fn);
     builder.setInsertPoint(bb);
 

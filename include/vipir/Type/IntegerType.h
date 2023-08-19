@@ -19,4 +19,4 @@ namespace vipir
     };
 }
 
-#endif // VIPIR_TYPE_VOID_TYPE_H
+#endif // VIPIR_TYPE_INTEGER_TYPE_H

@@ -25,9 +25,9 @@
 
 namespace vipir
 {
-    Function* Function::Create(Module& module, std::string name)
+    Function* Function::Create(FunctionType* type, Module& module, std::string name)
     {
-        Function* func = new Function(module, std::move(name));
+        Function* func = new Function(type, module, std::move(name));
 
         module.insertGlobal(func);
 
@@ -42,6 +42,11 @@ namespace vipir
     int& Function::getInstructionCount()
     {
         return mInstructionCount;
+    }
+
+    Type* Function::getReturnType()
+    {
+        return static_cast<FunctionType*>(mType)->getReturnType();
     }
     
     std::string_view Function::getName() const
@@ -76,7 +81,7 @@ namespace vipir
 
     void Function::print(std::ostream& stream) const
     {
-        stream << std::format("define pub void @{}() {{\n   ", mName);
+        stream << std::format("define pub {} @{}() {{\n   ", static_cast<FunctionType*>(mType)->getReturnType()->getName(), mName);
 
         for (const BasicBlockPtr& basicBlock : mBasicBlockList)
         {
@@ -160,12 +165,13 @@ namespace vipir
     }
 
 
-    Function::Function(Module& module, std::string name)
+    Function::Function(FunctionType* type, Module& module, std::string name)
         : Global(module)
         , mName(std::move(name))
         , mInstructionCount(0)
     {
         mId = module.getGlobals().size();
+        mType = type;
     }
 
     instruction::OperandPtr Function::getEmittedValue()
@@ -344,9 +350,7 @@ namespace vipir
                 color = 0;
                 while (color < k)
                 {
-                    std::cout << mValues[id]->mEdges.size() << "\n";
                     auto it = std::find_if(mValues[id]->mEdges.begin(), mValues[id]->mEdges.end(), [this, color](auto edge) {
-                        std::cout << mValues[edge.first]->mColor << "\n";
                         return mValues[edge.first]->mColor == color;
                     });
                     if (it == mValues[id]->mEdges.end())

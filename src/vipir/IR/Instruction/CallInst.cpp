@@ -15,12 +15,12 @@ namespace vipir
 {
     void CallInst::print(std::ostream& stream) const
     {
-        stream << std::format("%{} = call {}()", mName, mModule.getGlobals().at(mCallee)->ident());
+        stream << std::format("%{} = call {} {}()", mName, mType->getName(), mModule.getGlobals().at(mCallee)->ident());
     }
 
     std::string CallInst::ident() const
     {
-        return std::format("%{}", mName);
+        return std::format("{} %{}", mType->getName(), mName);
     }
 
     bool CallInst::requiresRegister() const
@@ -47,7 +47,7 @@ namespace vipir
         , mName(name)
         , mCallee(callee->getID())
     {
-        mType = Type::GetIntegerType(32); // TODO: Get type from function properly
+        mType = static_cast<Function*>(mModule.getGlobals().at(mCallee).get())->getReturnType();
         mColor = 0; // EAX
     }
 }

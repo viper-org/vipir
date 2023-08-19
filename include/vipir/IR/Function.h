@@ -9,6 +9,8 @@
 
 #include "vipir/IR/Global.h"
 
+#include "vipir/Type/FunctionType.h"
+
 #include <memory>
 #include <string>
 #include <vector>
@@ -22,10 +24,11 @@ namespace vipir
     {
     friend class Module;
     public:
-        static Function* Create(Module& module, std::string name);
+        static Function* Create(FunctionType* type, Module& module, std::string name);
 
         Module& getModule() const;
         int& getInstructionCount();
+        Type* getReturnType();
         std::string_view getName() const;
         const std::vector<BasicBlockPtr>& getBasicBlockList() const;
         Value* getValue(ValueId index) const;
@@ -46,7 +49,7 @@ namespace vipir
         void emit(std::vector<instruction::ValuePtr>& values) override;
 
     private:
-        Function(Module& module, std::string name);
+        Function(FunctionType* type, Module& module, std::string name);
 
         instruction::OperandPtr getEmittedValue() override;
 
