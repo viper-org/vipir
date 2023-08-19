@@ -8,6 +8,7 @@
 #define VIPIR_IR_FUNCTION_H 1
 
 #include "vipir/IR/Global.h"
+#include "vipir/IR/Argument.h"
 
 #include "vipir/Type/FunctionType.h"
 
@@ -33,6 +34,7 @@ namespace vipir
         const std::vector<BasicBlockPtr>& getBasicBlockList() const;
         Value* getValue(ValueId index) const;
         int getNumValues() const;
+        Argument* getArgument(int index);
 
         void insertBasicBlock(BasicBlock* basicBlock);
         void addValue(Value* value);
@@ -59,6 +61,7 @@ namespace vipir
         std::string mName;
         std::vector<BasicBlockPtr> mBasicBlockList;
         std::vector<std::unique_ptr<Value>> mValues;
+        std::vector<ValueId> mArguments;
         std::vector<ValueId> mValueList; // In case all BasicBlocks have no branches, store all values inside the function
         int mInstructionCount;
 

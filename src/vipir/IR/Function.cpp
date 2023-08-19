@@ -3,6 +3,7 @@
 
 #include "vipir/IR/Function.h"
 #include "vipir/IR/BasicBlock.h"
+#include "vipir/IR/Argument.h"
 
 #include "vipir/IR/Instruction/AllocaInst.h"
 
@@ -72,6 +73,11 @@ namespace vipir
     int Function::getNumValues() const
     {
         return mValues.size();
+    }
+
+    Argument* Function::getArgument(int index)
+    {
+        return static_cast<Argument*>(mValues.at(mArguments.at(index)).get());
     }
 
     void Function::addValue(Value* value)
@@ -165,6 +171,11 @@ namespace vipir
 
         mEmittedValue = std::make_unique<instruction::LabelOperand>(mName);
 
+        for (auto argument : mArguments)
+        {
+            mValues.at(argument)->emit(values);
+        }
+
         for (const BasicBlockPtr& basicBlock : mBasicBlockList)
         {
             basicBlock->emit(values);
@@ -184,6 +195,17 @@ namespace vipir
     {
         mId = module.getGlobals().size();
         mType = type;
+
+        std::array argRegisters = { 5, 4, 2, 1 };
+
+        int i = 0;
+        for (auto argumentType : type->getArguments())
+        {
+            auto id = mInstructionCount++;
+            mValues.push_back(ArgumentPtr(new Argument(module, id, argumentType, std::to_string(id))));
+            mValues.back()->mColor = argRegisters.at(i++);
+            mArguments.push_back(id);
+        }
     }
 
     instruction::OperandPtr Function::getEmittedValue()
@@ -232,6 +254,16 @@ namespace vipir
         std::vector<std::pair<ValueId, bool>> allNodes;
         std::vector<ValueId> liveNodes;
 
+        for (auto argument : mArguments)
+        {
+            for (ValueId id : liveNodes)
+            {
+                mValues[argument]->mEdges.emplace_back(id, true);
+                mValues[id]->mEdges.emplace_back(argument, true);
+            }
+            liveNodes.push_back(argument);
+            allNodes.emplace_back(argument, true);
+        }
         for (const auto& basicBlock : mBasicBlockList)
         {
             for (auto instruction : basicBlock->getInstructionList())

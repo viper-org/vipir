@@ -86,7 +86,10 @@ namespace vipir
         assert(mParent->getParent()->getValue(mReturnValue)->getType() == mParent->getParent()->getReturnType());
         if (mReturnValue != -1)
         {
-            mParent->getParent()->getValue(mReturnValue)->mColor = 0; // EAX
+            if (mParent->getParent()->getValue(mReturnValue)->mColor == -1)
+            {
+                mParent->getParent()->getValue(mReturnValue)->mColor = 0; // EAX
+            }
         }
     }
 }

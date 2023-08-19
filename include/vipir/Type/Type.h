@@ -9,6 +9,7 @@
 #define VIPIR_TYPE_TYPE_H 1
 
 #include <string>
+#include <vector>
 
 namespace vipir
 {
@@ -22,7 +23,7 @@ namespace vipir
 
         static Type* GetVoidType();
         static Type* GetIntegerType(int bits);
-        static Type* GetFunctionType(Type* returnType);
+        static Type* GetFunctionType(Type* returnType, const std::vector<Type*>& arguments);
     
     protected:
         Type(std::size_t size, std::string name)

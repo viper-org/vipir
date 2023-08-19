@@ -15,6 +15,7 @@ set(SOURCES
 
     "src/vipir/IR/Builder.cpp"
     "src/vipir/IR/Function.cpp"
+    "src/vipir/IR/Argument.cpp"
     "src/vipir/IR/BasicBlock.cpp"
 
     "src/vipir/IR/Constant/ConstantInt.cpp"
@@ -43,6 +44,7 @@ set(HEADERS
 
     "include/vipir/IR/Builder.h"
     "include/vipir/IR/Function.h"
+    "include/vipir/IR/Argument.h"
     "include/vipir/IR/BasicBlock.h"
     "include/vipir/IR/Value.h"
     "include/vipir/IR/Global.h"

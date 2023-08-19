@@ -44,20 +44,20 @@ namespace vipir
         return types.back().get();
     }
 
-    Type* Type::GetFunctionType(Type* returnType)
+    Type* Type::GetFunctionType(Type* returnType, const std::vector<Type*>& arguments)
     {
         for (const auto& type : types)
         {
             if (FunctionType* functionType = dynamic_cast<FunctionType*>(type.get()))
             {
-                if (functionType->getReturnType() == returnType)
+                if (functionType->getReturnType() == returnType && functionType->getArguments() == arguments)
                 {
                     return functionType;
                 }
             }
         }
 
-        types.push_back(std::make_unique<FunctionType>(returnType));
+        types.push_back(std::make_unique<FunctionType>(returnType, arguments));
         return types.back().get();
     }
 }

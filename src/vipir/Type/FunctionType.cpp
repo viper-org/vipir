@@ -7,9 +7,10 @@ namespace vipir
 {
     using namespace std::literals;
 
-    FunctionType::FunctionType(Type* returnType)
+    FunctionType::FunctionType(Type* returnType, const std::vector<Type*>& arguments)
         : Type(0, returnType->getName().data() + "()"s)
         , mReturnType(returnType)
+        , mArguments(arguments)
     {
     }
 
@@ -18,8 +19,13 @@ namespace vipir
         return mReturnType;
     }
 
-    FunctionType* FunctionType::Get(Type* returnType)
+    const std::vector<Type*>& FunctionType::getArguments() const
     {
-        return static_cast<FunctionType*>(Type::GetFunctionType(returnType));
+        return mArguments;
+    }
+
+    FunctionType* FunctionType::Get(Type* returnType, const std::vector<Type*>& arguments)
+    {
+        return static_cast<FunctionType*>(Type::GetFunctionType(returnType, arguments));
     }
 }
