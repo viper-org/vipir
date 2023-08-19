@@ -9,6 +9,7 @@
 #include "vipir/Module.h"
 
 #include "vasm/instruction/Label.h"
+#include "vasm/instruction/Directive.h"
 #include "vasm/instruction/operand/Register.h"
 #include "vasm/instruction/operand/Immediate.h"
 #include "vasm/instruction/operand/Label.h"
@@ -20,7 +21,6 @@
 #include <cmath>
 #include <format>
 #include <fstream>
-#include <iostream>
 #include <stack>
 
 namespace vipir
@@ -81,7 +81,12 @@ namespace vipir
 
     void Function::print(std::ostream& stream) const
     {
-        stream << std::format("define pub {} @{}() {{\n   ", static_cast<FunctionType*>(mType)->getReturnType()->getName(), mName);
+        if (mBasicBlockList.empty() && mValueList.empty())
+        {
+            stream << std::format("\n\ndeclare pub {} @{}()", static_cast<FunctionType*>(mType)->getReturnType()->getName(), mName);
+            return;
+        }
+        stream << std::format("\n\ndefine pub {} @{}() {{\n   ", static_cast<FunctionType*>(mType)->getReturnType()->getName(), mName);
 
         for (const BasicBlockPtr& basicBlock : mBasicBlockList)
         {
@@ -138,6 +143,13 @@ namespace vipir
 
     void Function::emit(std::vector<instruction::ValuePtr>& values)
     {
+        if (mBasicBlockList.empty() && mValueList.empty())
+        {
+            values.emplace_back(std::make_unique<instruction::ExternDirective>(mName));
+            mEmittedValue = std::make_unique<instruction::LabelOperand>(mName);
+            return;
+        }
+
         allocateRegisters();
         sortAllocas();
 

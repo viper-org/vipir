@@ -24,10 +24,11 @@ int main()
     builder.setInsertPoint(bb2);
     auto retVal2 = builder.CreateConstantInt(33, vipir::Type::GetIntegerType(32));
     builder.CreateRet(retVal2);
-    
+
     auto fn = vipir::Function::Create(vipir::FunctionType::Get(i32), mod, "main");
     auto bb = vipir::BasicBlock::Create("", fn);
     builder.setInsertPoint(bb);
+
 
     auto alloca = builder.CreateAlloca(vipir::Type::GetIntegerType(32));
     auto val = builder.CreateConstantInt(20, vipir::Type::GetIntegerType(32));

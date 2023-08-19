@@ -42,7 +42,7 @@ namespace vipir
 
     void Module::print(std::ostream& stream) const
     {
-        stream << std::format("file \"{}\"\n\n", mName);
+        stream << std::format("file \"{}\"", mName);
 
         for (const GlobalPtr& global : mGlobals)
         {
