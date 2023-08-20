@@ -35,6 +35,7 @@ namespace vipir
         Value* getValue(ValueId index) const;
         int getNumValues() const;
         Argument* getArgument(int index);
+        instruction::OperandPtr getBasicBlockEmittedValue(BasicBlock* basicBlock) const;
 
         void insertBasicBlock(BasicBlock* basicBlock);
         void addValue(Value* value);
@@ -62,7 +63,6 @@ namespace vipir
         std::vector<BasicBlockPtr> mBasicBlockList;
         std::vector<std::unique_ptr<Value>> mValues;
         std::vector<ValueId> mArguments;
-        std::vector<ValueId> mValueList; // In case all BasicBlocks have no branches, store all values inside the function
         int mInstructionCount;
 
         int mTotalStackOffset;

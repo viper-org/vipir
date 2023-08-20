@@ -79,6 +79,8 @@ namespace vipir
             value->emit(builder, codegen::Section::Text);
         }
 
+        builder.patchForwardLabels();
+
         outputFormat->print(stream);
     }
 

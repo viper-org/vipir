@@ -6,11 +6,11 @@
 
 #include "vipir/Module.h"
 
+#include "vasm/instruction/operand/Label.h"
 #include "vasm/instruction/Label.h"
 
 #include <algorithm>
 #include <format>
-#include <iostream>
 
 namespace vipir
 {
@@ -91,11 +91,16 @@ namespace vipir
 
     std::string BasicBlock::ident() const
     {
-        return std::format("%{}", mName);
+        return std::format("label %{}", mName);
     }
 
 
     void BasicBlock::emit(std::vector<instruction::ValuePtr>& values)
+    {
+        mEmittedValue = std::make_unique<instruction::LabelOperand>(".L" + mName);
+    }
+
+    void BasicBlock::emitInstructions(std::vector<instruction::ValuePtr>& values)
     {
         values.emplace_back(std::make_unique<instruction::Label>(".L" + mName));
         for (ValueId instruction : mValueList)
@@ -111,5 +116,10 @@ namespace vipir
         , mParent(parent)
         , mBranches(0)
     {
+    }
+
+    instruction::OperandPtr BasicBlock::getEmittedValue()
+    {
+        return mEmittedValue->clone();
     }
 }

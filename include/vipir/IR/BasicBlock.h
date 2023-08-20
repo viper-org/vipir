@@ -44,9 +44,12 @@ namespace vipir
 
     protected:
         void emit(std::vector<instruction::ValuePtr>& values) final;
+        void emitInstructions(std::vector<instruction::ValuePtr>& values);
 
     private:
         BasicBlock(std::string name, Function* parent);
+
+        instruction::OperandPtr getEmittedValue() override;
 
         std::string mName;
         std::vector<ValueId> mValueList;

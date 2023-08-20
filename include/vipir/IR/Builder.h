@@ -22,6 +22,7 @@ namespace vipir
     class StoreInst;
     class LoadInst;
     class BinOpInst;
+    class BranchInst;
 
     class ConstantInt;
 
@@ -43,6 +44,8 @@ namespace vipir
         BinOpInst* CreateSub(Value* left, Value* right, std::string name = "");
         BinOpInst* CreateICmpEQ(Value* left, Value* right, std::string name = "");
         BinOpInst* CreateICmpNE(Value* left, Value* right, std::string name = "");
+
+        BranchInst* CreateBr(BasicBlock* destination);
 
 
         ConstantInt* CreateConstantInt(uint64_t value, Type* type, std::string name = "");

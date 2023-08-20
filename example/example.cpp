@@ -34,6 +34,10 @@ int main()
     auto val = builder.CreateConstantInt(20, vipir::Type::GetIntegerType(32));
     builder.CreateStore(alloca, val);
 
+    auto bb3 = vipir::BasicBlock::Create("", fn);
+    builder.CreateBr(bb3);
+    builder.setInsertPoint(bb3);
+
     auto param = builder.CreateConstantInt(66, vipir::Type::GetIntegerType(32));
     auto call = builder.CreateCall(fn2, {param});
 

@@ -85,9 +85,14 @@ namespace vipir
         mValues.push_back(std::unique_ptr<Value>(value));
     }
 
+    instruction::OperandPtr Function::getBasicBlockEmittedValue(BasicBlock* basicBlock) const
+    {
+        return basicBlock->getEmittedValue();
+    }
+
     void Function::print(std::ostream& stream) const
     {
-        if (mBasicBlockList.empty() && mValueList.empty())
+        if (mBasicBlockList.empty())
         {
             stream << std::format("\n\ndeclare pub {} @{}(", static_cast<FunctionType*>(mType)->getReturnType()->getName(), mName);
             for (auto it = mArguments.begin(); it != mArguments.end(); it++)
@@ -136,37 +141,12 @@ namespace vipir
 
     void Function::optimize(OptimizationLevel level)
     {
-        std::vector<ValueId> temp;
-        std::vector<decltype(mBasicBlockList.begin())> unused;
-        for (auto it = mBasicBlockList.begin(); it != mBasicBlockList.end(); it++)
-        {
-            if ((*it)->getNoBranches() == 0)
-            {
-                std::copy((*it)->getInstructionList().begin(), (*it)->getInstructionList().end(), std::back_inserter(temp));
-                unused.push_back(it);
-            }
-            else
-            {
-                std::copy(temp.begin(), temp.end(), (*it)->getInstructionList().end());
-                temp.clear();
-            }
-        }
-
-        for (auto unusedBasicBlock : unused)
-        {
-            mBasicBlockList.erase(unusedBasicBlock);
-        }
-
-        if (!temp.empty())
-        {
-            std::copy(temp.begin(), temp.end(), std::back_inserter(mValueList));
-        }
     }
 
 
     void Function::emit(std::vector<instruction::ValuePtr>& values)
     {
-        if (mBasicBlockList.empty() && mValueList.empty())
+        if (mBasicBlockList.empty())
         {
             values.emplace_back(std::make_unique<instruction::ExternDirective>(mName));
             mEmittedValue = std::make_unique<instruction::LabelOperand>(mName);
@@ -197,10 +177,9 @@ namespace vipir
         {
             basicBlock->emit(values);
         }
-
-        for (auto value : mValueList)
+        for (const BasicBlockPtr& basicBlock : mBasicBlockList)
         {
-            mValues[value]->emit(values);
+            basicBlock->emitInstructions(values);
         }
     }
 
@@ -242,13 +221,6 @@ namespace vipir
                 {
                     temp.push_back(alloca);
                 }
-            }
-        }
-        for (auto instruction : mValueList)
-        {
-            if (AllocaInst* alloca = dynamic_cast<AllocaInst*>(mValues[instruction].get()))
-            {
-                temp.push_back(alloca);
             }
         }
 
@@ -304,29 +276,6 @@ namespace vipir
                     {
                         liveNodes.erase(it);
                     }
-                }
-            }
-        }
-        for (auto instruction : mValueList)
-        {
-            if (mValues[instruction]->requiresRegister())
-            {
-                for (ValueId id : liveNodes)
-                {
-                    mValues[instruction]->mEdges.emplace_back(id, true);
-                    mValues[id]->mEdges.emplace_back(instruction, true);
-                }
-                liveNodes.push_back(instruction);
-                allNodes.emplace_back(instruction, true);
-            }
-
-            for (auto operand : mValues[instruction]->getOperands())
-            {
-                auto it = std::find(liveNodes.begin(), liveNodes.end(), operand);
-
-                if (it != liveNodes.end())
-                {
-                    liveNodes.erase(it);
                 }
             }
         }

@@ -5,6 +5,7 @@
 #include "vipir/IR/BasicBlock.h"
 #include "vipir/IR/Function.h"
 
+#include "vipir/IR/Instruction/BranchInst.h"
 #include "vipir/IR/Instruction/RetInst.h"
 #include "vipir/IR/Instruction/CallInst.h"
 #include "vipir/IR/Instruction/AllocaInst.h"
@@ -157,6 +158,18 @@ namespace vipir
         mInsertPoint->getParent()->addValue(binOp);
 
         return binOp;
+    }
+
+    BranchInst* Builder::CreateBr(BasicBlock* destination)
+    {
+        ValueId id = mInsertPoint->getParent()->getNumValues();
+
+        BranchInst* branch = new BranchInst(mInsertPoint, id, destination);
+
+        mInsertPoint->insertValue(branch);
+        mInsertPoint->getParent()->addValue(branch);
+
+        return branch;
     }
 
     ConstantInt* Builder::CreateConstantInt(uint64_t value, Type* type, std::string name)
