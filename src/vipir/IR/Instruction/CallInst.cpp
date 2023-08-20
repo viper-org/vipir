@@ -6,10 +6,12 @@
 #include "vipir/IR/Function.h"
 #include "vipir/Module.h"
 
-#include <algorithm>
+#include "vipir/Type/VoidType.h"
+
 #include <vasm/instruction/operand/Register.h>
 #include <vasm/instruction/singleOperandInstruction/CallInstruction.h>
 
+#include <algorithm>
 #include <format>
 
 namespace vipir
@@ -65,6 +67,9 @@ namespace vipir
         });
 
         mType = static_cast<Function*>(mModule.getGlobals().at(mCallee).get())->getReturnType();
-        mColor = 0; // EAX
+        if (!dynamic_cast<VoidType*>(mType))
+        {
+            mColor = 0; // EAX
+        }
     }
 }
