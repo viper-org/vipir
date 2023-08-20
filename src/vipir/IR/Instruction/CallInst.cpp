@@ -38,7 +38,7 @@ namespace vipir
 
     bool CallInst::requiresRegister() const
     {
-        return true;
+        return !dynamic_cast<VoidType*>(mType);
     }
 
     std::vector<ValueId> CallInst::getOperands()
