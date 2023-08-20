@@ -98,6 +98,7 @@ namespace vipir
                     stream << ", ";
                 }
             }
+            stream << ")";
             return;
         }
         stream << std::format("\n\ndefine pub {} @{}(", static_cast<FunctionType*>(mType)->getReturnType()->getName(), mName);
