@@ -8,6 +8,7 @@
 
 #include "vipir/Type/VoidType.h"
 
+#include <cassert>
 #include <vasm/instruction/operand/Register.h>
 #include <vasm/instruction/singleOperandInstruction/CallInstruction.h>
 
@@ -59,14 +60,17 @@ namespace vipir
         , mName(name)
         , mCallee(callee->getID())
     {
+        Function* function = static_cast<Function*>(mModule.getGlobals().at(mCallee).get());
+
         std::array paramRegisters = { 5, 4, 2, 1 };
         int index = 0;
-        std::transform(parameters.begin(), parameters.end(), std::back_inserter(mParameters), [&paramRegisters, &index](auto parameter) {
+        std::transform(parameters.begin(), parameters.end(), std::back_inserter(mParameters), [&paramRegisters, &index, function](auto parameter) {
+            assert(parameter->getType() == function->getArgument(index)->getType());
             parameter->mColor = paramRegisters[index++];
             return parameter->getID();
         });
 
-        mType = static_cast<Function*>(mModule.getGlobals().at(mCallee).get())->getReturnType();
+        mType = function->getReturnType();
         if (!dynamic_cast<VoidType*>(mType))
         {
             mColor = 0; // EAX

@@ -89,5 +89,6 @@ namespace vipir
         , mRight(right->getID())
         , mName(name)
     {
+        assert(left->getType() == right->getType());
     }
 }

@@ -2,13 +2,14 @@
 
 
 #include "vipir/IR/Instruction/StoreInst.h"
+#include "vipir/IR/Instruction/AllocaInst.h"
 #include "vipir/IR/BasicBlock.h"
 #include "vipir/IR/Function.h"
 
 #include "vasm/instruction/twoOperandInstruction/MovInstruction.h"
 
+#include <cassert>
 #include <format>
-#include <iostream>
 
 namespace vipir
 {
@@ -45,5 +46,6 @@ namespace vipir
         , mPtr(ptr->getID())
         , mValue(value->getID())
     {
+        assert(static_cast<AllocaInst*>(ptr)->getAllocatedType() == value->getType());
     }
 }
