@@ -12,6 +12,7 @@
 #include "vipir/IR/Instruction/StoreInst.h"
 #include "vipir/IR/Instruction/LoadInst.h"
 #include "vipir/IR/Instruction/BinOpInst.h"
+#include "vipir/IR/Instruction/AddrOfInst.h"
 
 #include "vipir/IR/Constant/ConstantInt.h"
 
@@ -187,6 +188,22 @@ namespace vipir
         mInsertPoint->getParent()->addValue(branch);
 
         return branch;
+    }
+
+    AddrOfInst* Builder::CreateAddrOf(AllocaInst* ptr, std::string name)
+    {
+        ValueId id = mInsertPoint->getParent()->getNumValues();
+        if (name.empty())
+        {
+            name = std::to_string(id);
+        }
+
+        AddrOfInst* addrOf = new AddrOfInst(mInsertPoint, id, ptr, name);
+
+        mInsertPoint->insertValue(addrOf);
+        mInsertPoint->getParent()->addValue(addrOf);
+
+        return addrOf;
     }
 
     ConstantInt* Builder::CreateConstantInt(uint64_t value, Type* type, std::string name)

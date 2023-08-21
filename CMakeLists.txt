@@ -28,6 +28,7 @@ set(SOURCES
     "src/vipir/IR/Instruction/LoadInst.cpp"
     "src/vipir/IR/Instruction/BinOpInst.cpp"
     "src/vipir/IR/Instruction/BranchInst.cpp"
+    "src/vipir/IR/Instruction/AddrOfInst.cpp"
 
 
     "src/vipir/Type/Type.cpp"
@@ -61,6 +62,7 @@ set(HEADERS
     "include/vipir/IR/Instruction/LoadInst.h"
     "include/vipir/IR/Instruction/BinOpInst.h"
     "include/vipir/IR/Instruction/BranchInst.h"
+    "include/vipir/IR/Instruction/AddrOfInst.h"
 
 
     "include/vipir/Type/Type.h"

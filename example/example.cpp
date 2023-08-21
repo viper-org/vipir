@@ -7,7 +7,7 @@
 #include "vipir/IR/Constant/ConstantInt.h"
 #include "vipir/IR/Instruction/AllocaInst.h"
 #include "vipir/IR/Instruction/LoadInst.h"
-#include "vipir/IR/Instruction/CallInst.h"
+#include "vipir/IR/Instruction/AddrOfInst.h"
 #include "vipir/IR/Instruction/BinOpInst.h"
 
 #include <iostream>
@@ -35,7 +35,7 @@ int main()
     auto val = builder.CreateConstantInt(20, vipir::Type::GetIntegerType(32));
     builder.CreateStore(alloca, val);
 
-    auto load = builder.CreateLoad(alloca);
+    auto load = builder.CreateAddrOf(alloca);
     auto constant = builder.CreateConstantInt(20, i32);
     auto cmp = builder.CreateICmpEQ(load, constant);
 
