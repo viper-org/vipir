@@ -7,6 +7,7 @@
 #include "vipir/IR/Function.h"
 
 #include "vasm/instruction/twoOperandInstruction/MovInstruction.h"
+#include "vipir/Type/PointerType.h"
 
 #include <cassert>
 #include <format>
@@ -38,7 +39,25 @@ namespace vipir
         instruction::OperandPtr ptrOperand   = mParent->getEmittedValue(mPtr);
         instruction::OperandPtr valueOperand = mParent->getEmittedValue(mValue);
 
-        values.push_back(std::make_unique<instruction::MovInstruction>(std::move(ptrOperand), std::move(valueOperand), codegen::OperandSize::Long)); // TODO: Get size properly
+        PointerType* ptrType = static_cast<PointerType*>(mParent->getParent()->getValue(mPtr)->getType());
+        codegen::OperandSize size = codegen::OperandSize::None;
+        switch (ptrType->getBaseType()->getSizeInBits())
+        {
+            case 8:
+                size = codegen::OperandSize::Byte;
+                break;
+            case 16:
+                size = codegen::OperandSize::Word;
+                break;
+            case 32:
+                size = codegen::OperandSize::Long;
+                break;
+            case 64:
+                size = codegen::OperandSize::Quad;
+                break;
+        }
+
+        values.push_back(std::make_unique<instruction::MovInstruction>(std::move(ptrOperand), std::move(valueOperand), size));
     }
 
     StoreInst::StoreInst(BasicBlock* parent, ValueId id, Value* ptr, Value* value)

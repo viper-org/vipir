@@ -5,6 +5,8 @@
 #include "vipir/IR/BasicBlock.h"
 #include "vipir/IR/Function.h"
 
+#include "vipir/Type/PointerType.h"
+
 #include "vasm/instruction/operand/Register.h"
 #include "vasm/instruction/operand/Memory.h"
 
@@ -49,6 +51,7 @@ namespace vipir
         , mName(name)
         , mAllocatedType(allocatedType)
     {
+        mType = PointerType::Get(allocatedType);
     }
 
     instruction::OperandPtr AllocaInst::getEmittedValue()
