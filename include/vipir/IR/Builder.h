@@ -46,6 +46,7 @@ namespace vipir
         BinOpInst* CreateICmpNE(Value* left, Value* right, std::string name = "");
 
         BranchInst* CreateBr(BasicBlock* destination);
+        BranchInst* CreateCondBr(Value* condition, BasicBlock* trueBranch, BasicBlock* falseBranch);
 
 
         ConstantInt* CreateConstantInt(uint64_t value, Type* type, std::string name = "");

@@ -8,6 +8,7 @@
 #include "vipir/IR/Instruction/AllocaInst.h"
 #include "vipir/IR/Instruction/LoadInst.h"
 #include "vipir/IR/Instruction/CallInst.h"
+#include "vipir/IR/Instruction/BinOpInst.h"
 
 #include <iostream>
 #include <fstream>
@@ -34,16 +35,19 @@ int main()
     auto val = builder.CreateConstantInt(20, vipir::Type::GetIntegerType(32));
     builder.CreateStore(alloca, val);
 
+    auto load = builder.CreateLoad(alloca);
+    auto constant = builder.CreateConstantInt(20, i32);
+    auto cmp = builder.CreateICmpEQ(load, constant);
+
     auto bb3 = vipir::BasicBlock::Create("", fn);
-    builder.CreateBr(bb3);
+    auto bb4 = vipir::BasicBlock::Create("", fn);
+    builder.CreateCondBr(cmp, bb3, bb4);
+    
     builder.setInsertPoint(bb3);
+    builder.CreateRet(nullptr);
 
-    auto param = builder.CreateConstantInt(66, vipir::Type::GetIntegerType(32));
-    auto call = builder.CreateCall(fn2, {param});
-
-    //auto retVal = builder.CreateLoad(alloca);
-
-    builder.CreateRet(call);
+    builder.setInsertPoint(bb4);
+    builder.CreateRet(nullptr);
 
     std::ofstream f("file.out");
     mod.print(std::cout);

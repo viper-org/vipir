@@ -23,9 +23,12 @@ namespace vipir
         void emit(std::vector<instruction::ValuePtr>& values) override;
 
     private:
-        BranchInst(BasicBlock* parent, ValueId id, BasicBlock* destination);
+        BranchInst(BasicBlock* parent, ValueId id, BasicBlock* destination); // Unconditional branch
+        BranchInst(BasicBlock* parent, ValueId id, Value* condition, BasicBlock* trueBranch, BasicBlock* falseBranch); // Conditional branch
 
-        BasicBlock* mDestination;
+        ValueId mCondition;
+        BasicBlock* mTrueBranch;
+        BasicBlock* mFalseBranch;
     };
 }
 

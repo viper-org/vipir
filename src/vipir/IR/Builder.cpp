@@ -172,6 +172,18 @@ namespace vipir
         return branch;
     }
 
+    BranchInst* Builder::CreateCondBr(Value* condition, BasicBlock* trueBranch, BasicBlock* falseBranch)
+    {
+        ValueId id = mInsertPoint->getParent()->getNumValues();
+
+        BranchInst* branch = new BranchInst(mInsertPoint, id, condition, trueBranch, falseBranch);
+
+        mInsertPoint->insertValue(branch);
+        mInsertPoint->getParent()->addValue(branch);
+
+        return branch;
+    }
+
     ConstantInt* Builder::CreateConstantInt(uint64_t value, Type* type, std::string name)
     {
         ValueId id = mInsertPoint->getParent()->getNumValues();

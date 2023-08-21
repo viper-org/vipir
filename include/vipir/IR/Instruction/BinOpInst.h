@@ -30,10 +30,14 @@ namespace vipir
     private:
         BinOpInst(BasicBlock* parent, ValueId id, Value* left, Instruction::BinaryOperators op, Value* right, std::string name);
 
+        instruction::OperandPtr getEmittedValue() override;
+
         ValueId mLeft;
         Instruction::BinaryOperators mOperator;
         ValueId mRight;
         std::string mName;
+
+        std::vector<instruction::ValuePtr>* mValues; // For comparison operations that are emit-on-use
     };
 }
 

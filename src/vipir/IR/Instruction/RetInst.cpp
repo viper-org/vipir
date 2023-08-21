@@ -83,9 +83,9 @@ namespace vipir
         : Instruction(parent->getParent()->getModule(), parent, id)
         , mReturnValue(returnValue ? returnValue->getID() : -1)
     {
-        assert(mParent->getParent()->getValue(mReturnValue)->getType() == mParent->getParent()->getReturnType());
         if (mReturnValue != -1)
         {
+            assert(mParent->getParent()->getValue(mReturnValue)->getType() == mParent->getParent()->getReturnType());
             if (mParent->getParent()->getValue(mReturnValue)->mColor == -1)
             {
                 mParent->getParent()->getValue(mReturnValue)->mColor = 0; // EAX
