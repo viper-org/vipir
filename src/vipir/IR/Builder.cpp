@@ -26,6 +26,11 @@ namespace vipir
         mInsertPoint = newInsertPoint;
     }
 
+    BasicBlock* Builder::getInsertPoint()
+    {
+        return mInsertPoint;
+    }
+
     RetInst* Builder::CreateRet(Value* returnValue)
     {
         ValueId id = mInsertPoint->getParent()->getNumValues();

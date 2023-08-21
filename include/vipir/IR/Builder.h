@@ -32,6 +32,7 @@ namespace vipir
         Builder();
 
         void setInsertPoint(BasicBlock* newInsertPoint);
+        BasicBlock* getInsertPoint();
 
         RetInst* CreateRet(Value* returnValue);
         CallInst* CreateCall(Value* callee, std::vector<Value*> parameters, std::string name = "");
