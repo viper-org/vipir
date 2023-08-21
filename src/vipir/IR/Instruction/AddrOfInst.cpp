@@ -2,10 +2,13 @@
 
 
 #include "vipir/IR/Instruction/AddrOfInst.h"
-#include "vasm/instruction/operand/Register.h"
-#include "vasm/instruction/twoOperandInstruction/LeaInstruction.h"
 #include "vipir/IR/BasicBlock.h"
 #include "vipir/IR/Function.h"
+
+#include "vipir/Type/PointerType.h"
+
+#include "vasm/instruction/operand/Register.h"
+#include "vasm/instruction/twoOperandInstruction/LeaInstruction.h"
 
 #include <format>
 
@@ -47,6 +50,6 @@ namespace vipir
         , mPtr(ptr->getID())
         , mName(name)
     {
-        mType = ptr->getAllocatedType(); // TODO: Get type properly
+        mType = PointerType::Get(ptr->getAllocatedType());
     }
 }

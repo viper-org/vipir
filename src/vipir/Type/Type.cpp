@@ -5,6 +5,7 @@
 #include "vipir/Type/IntegerType.h"
 #include "vipir/Type/VoidType.h"
 #include "vipir/Type/FunctionType.h"
+#include "vipir/Type/PointerType.h"
 
 #include <memory>
 #include <vector>
@@ -58,6 +59,23 @@ namespace vipir
         }
 
         types.push_back(std::make_unique<FunctionType>(returnType, arguments));
+        return types.back().get();
+    }
+
+    Type* Type::GetPointerType(Type* baseType)
+    {
+        for (const auto& type : types)
+        {
+            if (PointerType* pointerType = dynamic_cast<PointerType*>(type.get()))
+            {
+                if (pointerType->getBaseType() == baseType)
+                {
+                    return pointerType;
+                }
+            }
+        }
+
+        types.push_back(std::make_unique<PointerType>(baseType));
         return types.back().get();
     }
 }

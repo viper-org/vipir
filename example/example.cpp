@@ -9,6 +9,7 @@
 #include "vipir/IR/Instruction/LoadInst.h"
 #include "vipir/IR/Instruction/AddrOfInst.h"
 #include "vipir/IR/Instruction/BinOpInst.h"
+#include "vipir/Type/PointerType.h"
 
 #include <iostream>
 #include <fstream>
@@ -36,7 +37,7 @@ int main()
     builder.CreateStore(alloca, val);
 
     auto load = builder.CreateAddrOf(alloca);
-    auto constant = builder.CreateConstantInt(20, i32);
+    auto constant = builder.CreateConstantInt(20, vipir::PointerType::Get(i32));
     auto cmp = builder.CreateICmpEQ(load, constant);
 
     auto bb3 = vipir::BasicBlock::Create("", fn);

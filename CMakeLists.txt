@@ -35,6 +35,7 @@ set(SOURCES
     "src/vipir/Type/VoidType.cpp"
     "src/vipir/Type/IntegerType.cpp"
     "src/vipir/Type/FunctionType.cpp"
+    "src/vipir/Type/PointerType.cpp"
 
 
     "src/vipir/MC/CmpOperand.cpp"
@@ -69,6 +70,7 @@ set(HEADERS
     "include/vipir/Type/VoidType.h"
     "include/vipir/Type/IntegerType.h"
     "include/vipir/Type/FunctionType.h"
+    "include/vipir/Type/PointerType.h"
 
 
     "include/vipir/MC/CmpOperand.h"
