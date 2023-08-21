@@ -83,9 +83,5 @@ namespace vipir
         });
 
         mType = function->getReturnType();
-        if (!dynamic_cast<VoidType*>(mType))
-        {
-            mColor = 0; // EAX
-        }
     }
 }
