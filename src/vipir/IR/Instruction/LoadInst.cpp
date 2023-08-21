@@ -45,7 +45,18 @@ namespace vipir
     {
         instruction::OperandPtr ptrOperand = mParent->getEmittedValue(mPtr);
 
-        values.emplace_back(std::make_unique<instruction::MovInstruction>(instruction::Register::Get(mRegister), std::move(ptrOperand), codegen::OperandSize::None));
+        if (dynamic_cast<instruction::Memory*>(ptrOperand.get()))
+        {
+            values.emplace_back(std::make_unique<instruction::MovInstruction>(instruction::Register::Get(mRegister), std::move(ptrOperand), codegen::OperandSize::None));
+        }
+        else
+        {
+            instruction::Register* reg = static_cast<instruction::Register*>(ptrOperand.get());
+            instruction::RegisterPtr regPtr = std::make_unique<instruction::Register>(reg->getID(), reg->getSize());
+            instruction::OperandPtr memory = std::make_unique<instruction::Memory>(std::move(regPtr), std::nullopt);
+
+            values.emplace_back(std::make_unique<instruction::MovInstruction>(instruction::Register::Get(mRegister), std::move(memory), codegen::OperandSize::None));
+        }
 
         mEmittedValue = instruction::Register::Get(mRegister);
     }
