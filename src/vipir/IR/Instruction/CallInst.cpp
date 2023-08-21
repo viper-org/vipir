@@ -11,6 +11,7 @@
 #include <cassert>
 #include <vasm/instruction/operand/Register.h>
 #include <vasm/instruction/singleOperandInstruction/CallInstruction.h>
+#include <vasm/instruction/twoOperandInstruction/MovInstruction.h>
 
 #include <algorithm>
 #include <format>
@@ -57,6 +58,11 @@ namespace vipir
         instruction::OperandPtr callee = mModule.getGlobalEmittedValue(mCallee);
 
         values.push_back(std::make_unique<instruction::CallInstruction>(std::move(callee)));
+
+        if (mColor != 0) // EAX
+        {
+            values.push_back(std::make_unique<instruction::MovInstruction>(instruction::Register::Get(mRegister), instruction::Register::Get("eax"), codegen::OperandSize::None));
+        }
 
         mEmittedValue = instruction::Register::Get(mRegister);
     }
