@@ -6,6 +6,8 @@
 #include "vipir/IR/BasicBlock.h"
 #include "vipir/IR/Function.h"
 
+#include "vipir/Type/PointerType.h"
+
 #include "vasm/instruction/operand/Register.h"
 #include "vasm/instruction/twoOperandInstruction/MovInstruction.h"
 #include "vipir/IR/Instruction/Instruction.h"
@@ -66,6 +68,6 @@ namespace vipir
         , mPtr(ptr->getID())
         , mName(name)
     {
-        setType(static_cast<AllocaInst*>(mParent->getParent()->getValue(mPtr))->getAllocatedType());
+        mType = static_cast<PointerType*>(mParent->getParent()->getValue(mPtr)->getType())->getBaseType();
     }
 }
