@@ -2,7 +2,6 @@
 
 
 #include "vipir/IR/Instruction/LoadInst.h"
-#include "vipir/IR/Instruction/AllocaInst.h"
 #include "vipir/IR/BasicBlock.h"
 #include "vipir/IR/Function.h"
 

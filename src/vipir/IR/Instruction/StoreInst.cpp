@@ -2,7 +2,6 @@
 
 
 #include "vipir/IR/Instruction/StoreInst.h"
-#include "vipir/IR/Instruction/AllocaInst.h"
 #include "vipir/IR/BasicBlock.h"
 #include "vipir/IR/Function.h"
 
@@ -65,6 +64,7 @@ namespace vipir
         , mPtr(ptr->getID())
         , mValue(value->getID())
     {
-        assert(static_cast<AllocaInst*>(ptr)->getAllocatedType() == value->getType());
+        PointerType* ptrType = static_cast<PointerType*>(mParent->getParent()->getValue(mPtr)->getType());
+        assert(ptrType->getBaseType() == value->getType());
     }
 }
