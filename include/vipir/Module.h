@@ -24,6 +24,12 @@ namespace vipir
         High,
     };
 
+    enum class OutputFormat
+    {
+        ELF,
+        PE,
+    };
+
     class Module
     {
     public:
@@ -39,7 +45,7 @@ namespace vipir
 
         void optimize(OptimizationLevel level);
 
-        void emit(std::ostream& stream) const;
+        void emit(std::ostream& stream, OutputFormat outputFormat) const;
     private:
         std::string mName;
         std::vector<GlobalPtr> mGlobals;

@@ -57,5 +57,5 @@ int main()
     
     std::cout << "\n";
 
-    mod.emit(f);
+    mod.emit(f, vipir::OutputFormat::ELF);
 }

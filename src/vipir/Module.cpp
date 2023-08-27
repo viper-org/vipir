@@ -5,10 +5,12 @@
 
 #include "vipir/IR/Global.h"
 
+#include "vipir/IR/Instruction/LoadInst.h"
+
 #include "vasm/codegen/Elf.h"
+#include "vasm/codegen/Pe.h"
 #include "vasm/codegen/IOutputFormat.h"
 #include "vasm/codegen/builder/OpcodeBuilder.h"
-#include "vipir/IR/Instruction/LoadInst.h"
 
 #include <sstream>
 #include <format>
@@ -63,7 +65,7 @@ namespace vipir
         }
     }
 
-    void Module::emit(std::ostream& stream) const
+    void Module::emit(std::ostream& stream, OutputFormat format) const
     {
         std::vector<instruction::ValuePtr> values;
         for (const GlobalPtr& global : mGlobals)
@@ -71,7 +73,16 @@ namespace vipir
             global->emit(values);
         }
 
-        std::unique_ptr<codegen::IOutputFormat> outputFormat = std::make_unique<codegen::ELFFormat>(mName);
+        std::unique_ptr<codegen::IOutputFormat> outputFormat;
+        switch(format)
+        {
+            case OutputFormat::ELF:
+                outputFormat = std::make_unique<codegen::ELFFormat>(mName);
+                break;
+            case OutputFormat::PE:
+                outputFormat = std::make_unique<codegen::PEFormat>(mName);
+                break;
+        }
         codegen::OpcodeBuilder builder = codegen::OpcodeBuilder(outputFormat.get());
 
         for (const auto& value : values)
