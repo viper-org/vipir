@@ -47,7 +47,8 @@ namespace vipir
         std::vector<ValueId> operands = {mCallee};
         for (auto parameter : mParameters)
         {
-            std::copy(mParent->getParent()->getValue(parameter)->getOperands().begin(), mParent->getParent()->getValue(parameter)->getOperands().end(), std::back_inserter(operands)); // In case parameters have their own operands
+            auto parameterOperands = mParent->getParent()->getValue(parameter)->getOperands();
+            std::copy(parameterOperands.begin(), parameterOperands.end(), std::back_inserter(operands)); // In case parameters have their own operands
             operands.push_back(parameter);
         }
         return operands;
