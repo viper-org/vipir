@@ -7,9 +7,8 @@
 #include "vipir/IR/Constant/ConstantInt.h"
 #include "vipir/IR/Instruction/AllocaInst.h"
 #include "vipir/IR/Instruction/LoadInst.h"
-#include "vipir/IR/Instruction/AddrOfInst.h"
-#include "vipir/IR/Instruction/BinOpInst.h"
-#include "vipir/Type/PointerType.h"
+#include "vipir/IR/Instruction/CallInst.h"
+#include "vipir/IR/Instruction/SExtInst.h"
 
 #include <iostream>
 #include <fstream>
@@ -24,31 +23,23 @@ int main()
     auto fn2 = vipir::Function::Create(vipir::FunctionType::Get(i32, {i32}), mod, "test");
     auto bb2 = vipir::BasicBlock::Create("", fn2);
     builder.setInsertPoint(bb2);
-    auto retVal2 = fn2->getArgument(0);
-    builder.CreateRet(retVal2);
+    
+    auto alloca = builder.CreateAlloca(vipir::Type::GetIntegerType(16));
+    auto val = builder.CreateConstantInt(33, vipir::Type::GetIntegerType(16));
+    builder.CreateStore(alloca, val);
+
+    auto load = builder.CreateLoad(alloca);
+    auto retval = builder.CreateSExt(load, vipir::Type::GetIntegerType(32));
+    builder.CreateRet(retval);
 
     auto fn = vipir::Function::Create(vipir::FunctionType::Get(i32, {}), mod, "main");
     auto bb = vipir::BasicBlock::Create("", fn);
     builder.setInsertPoint(bb);
 
+    auto param = builder.CreateConstantInt(1, vipir::Type::GetIntegerType(32));
+    auto call = builder.CreateCall(fn2, {param});
+    builder.CreateRet(call);
 
-    auto alloca = builder.CreateAlloca(vipir::Type::GetIntegerType(32));
-    auto val = builder.CreateConstantInt(20, vipir::Type::GetIntegerType(32));
-    builder.CreateStore(alloca, val);
-
-    auto load = builder.CreateAddrOf(alloca);
-    auto constant = builder.CreateConstantInt(20, vipir::PointerType::Get(i32));
-    auto cmp = builder.CreateICmpEQ(load, constant);
-
-    auto bb3 = vipir::BasicBlock::Create("", fn);
-    auto bb4 = vipir::BasicBlock::Create("", fn);
-    builder.CreateCondBr(cmp, bb3, bb4);
-    
-    builder.setInsertPoint(bb3);
-    builder.CreateRet(nullptr);
-
-    builder.setInsertPoint(bb4);
-    builder.CreateRet(nullptr);
 
     std::ofstream f("file.out");
     mod.print(std::cout);

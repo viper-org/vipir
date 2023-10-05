@@ -24,6 +24,7 @@ namespace vipir
     class BinOpInst;
     class BranchInst;
     class AddrOfInst;
+    class SExtInst;
 
     class ConstantInt;
 
@@ -51,6 +52,8 @@ namespace vipir
         BranchInst* CreateCondBr(Value* condition, BasicBlock* trueBranch, BasicBlock* falseBranch);
 
         AddrOfInst* CreateAddrOf(AllocaInst* ptr, std::string name = "");
+
+        SExtInst* CreateSExt(Value* source, Type* dest, std::string name = "");
 
 
         ConstantInt* CreateConstantInt(uint64_t value, Type* type, std::string name = "");

@@ -9,6 +9,7 @@
 #include "vipir/IR/Instruction/RetInst.h"
 #include "vipir/IR/Instruction/CallInst.h"
 #include "vipir/IR/Instruction/AllocaInst.h"
+#include "vipir/IR/Instruction/SExtInst.h"
 #include "vipir/IR/Instruction/StoreInst.h"
 #include "vipir/IR/Instruction/LoadInst.h"
 #include "vipir/IR/Instruction/BinOpInst.h"
@@ -204,6 +205,22 @@ namespace vipir
         mInsertPoint->getParent()->addValue(addrOf);
 
         return addrOf;
+    }
+
+    SExtInst* Builder::CreateSExt(Value* source, Type* dest, std::string name)
+    {
+        ValueId id = mInsertPoint->getParent()->getNumValues();
+        if (name.empty())
+        {
+            name = std::to_string(id);
+        }
+
+        SExtInst* sext = new SExtInst(mInsertPoint, id, source, dest, name);
+
+        mInsertPoint->insertValue(sext);
+        mInsertPoint->getParent()->addValue(sext);
+
+        return sext;
     }
 
     ConstantInt* Builder::CreateConstantInt(uint64_t value, Type* type, std::string name)
