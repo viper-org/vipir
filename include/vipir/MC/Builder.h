@@ -5,6 +5,8 @@
 
 #include "vasm/instruction/Value.h"
 
+#include <memory>
+
 namespace vipir
 {
     namespace MC

@@ -19,16 +19,29 @@ namespace vipir
         return func;
     }
 
+    void Function::insertBasicBlock(BasicBlock* basicBlock)
+    {
+        mBasicBlockList.push_back(BasicBlockPtr(basicBlock));
+    }
+
     void Function::print(std::ostream& stream)
     {
-        stream << std::format("\n\nfunction @{}() -> i32 {{", mName);
-        stream << "\n\n";
+        stream << std::format("\n\nfunction @{}() -> i32 {{\n", mName);
+        for (auto& basicBlock : mBasicBlockList)
+        {
+            basicBlock->print(stream);
+        }
         stream << "}";
     }
 
     void Function::emit(MC::Builder& builder)
     {
         builder.addValue(std::make_unique<instruction::Label>(mName));
+
+        for (auto& basicBlock : mBasicBlockList)
+        {
+            basicBlock->emit(builder);
+        }
     }
 
     Function::Function(/*FunctionType* type, */Module& module, std::string_view name)

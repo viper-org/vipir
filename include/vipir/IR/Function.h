@@ -9,15 +9,19 @@
 #define VIPIR_IR_FUNCTION_H 1
 
 #include "vipir/IR/Global.h"
+#include "vipir/IR/BasicBlock.h"
+
+#include <memory>
 
 namespace vipir
 {
-    class Module;
-    
     class Function : public Global
     {
+    using BasicBlockPtr = std::unique_ptr<BasicBlock>;
     public:
         static Function* Create(/*FunctionType* type, */Module& module, std::string_view name);
+
+        void insertBasicBlock(BasicBlock* basicBlock);
 
         void print(std::ostream& stream) override;
 
@@ -28,6 +32,8 @@ namespace vipir
         Function(/*FunctionType* type, */Module& module, std::string_view name);
 
         std::string mName;
+
+        std::vector<BasicBlockPtr> mBasicBlockList;
     };
 }
 

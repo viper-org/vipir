@@ -22,6 +22,8 @@ namespace vipir
         Value(Module& module) : mModule(module) { }
         virtual ~Value() { }
 
+        Module& getModule() { return mModule; }
+
         virtual void print(std::ostream& stream) = 0;
     
     protected:
