@@ -38,6 +38,11 @@ namespace vipir
         stream << "}";
     }
 
+    std::string Function::ident() const
+    {
+        return "@" + mName;
+    }
+
     void Function::emit(MC::Builder& builder)
     {
         builder.addValue(std::make_unique<instruction::Label>(mName));

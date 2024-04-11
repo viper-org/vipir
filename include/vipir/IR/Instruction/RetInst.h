@@ -22,6 +22,7 @@ namespace vipir
 
     protected:
         void emit(MC::Builder& builder) override;
+        std::string ident() const override;
 
     private:
         RetInst(BasicBlock* parent, Value* returnValue);

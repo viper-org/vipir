@@ -11,8 +11,6 @@
 
 #include "vipir/IR/Value.h"
 
-#include "vipir/IR/Instruction/Instruction.h"
-
 #include <vector>
 
 namespace vipir
@@ -21,14 +19,15 @@ namespace vipir
     
     class BasicBlock : public Value
     {
-    using InstructionPtr = std::unique_ptr<Instruction>;
+    using ValuePtr = std::unique_ptr<Value>;
     friend class Function;
     public:
         static BasicBlock* Create(std::string_view name, Function* parent);
 
-        void insertInstruction(Instruction* instruction);
+        void insertValue(Value* value);
 
         void print(std::ostream& stream) override;
+        std::string ident() const override;
 
     protected:
         void emit(MC::Builder& builder) override;
@@ -39,7 +38,7 @@ namespace vipir
         std::string mName;
         Function* mParent;
 
-        std::vector<InstructionPtr> mInstructionList;
+        std::vector<ValuePtr> mValueList;
     };
 }
 

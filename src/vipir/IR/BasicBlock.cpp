@@ -26,28 +26,33 @@ namespace vipir
         return basicBlock;
     }
 
-    void BasicBlock::insertInstruction(Instruction* instruction)
+    void BasicBlock::insertValue(Value* value)
     {
-        mInstructionList.push_back(InstructionPtr(instruction));
+        mValueList.push_back(ValuePtr(value));
     }
 
     void BasicBlock::print(std::ostream& stream)
     {
         stream << std::format("{}:\n", mName);
-        for (auto& instruction : mInstructionList)
+        for (auto& value : mValueList)
         {
             stream << "\t";
-            instruction->print(stream);
+            value->print(stream);
             stream << "\n";
         }
+    }
+
+    std::string BasicBlock::ident() const
+    {
+        return std::format("label %{}", mName);
     }
 
     void BasicBlock::emit(MC::Builder& builder)
     {
         builder.addValue(std::make_unique<instruction::Label>(mName));
-        for (auto& instruction : mInstructionList)
+        for (auto& value : mValueList)
         {
-            instruction->emit(builder);
+            value->emit(builder);
         }
     }
 

@@ -5,6 +5,8 @@
 #include "vipir/IR/Function.h"
 #include "vipir/IR/BasicBlock.h"
 
+#include "vipir/IR/Constant/ConstantInt.h"
+
 #include <iostream>
 #include <fstream>
 
@@ -18,7 +20,10 @@ int main()
     auto bb2 = vipir::BasicBlock::Create("test2", func);
 
     builder.setInsertPoint(bb1);
-    builder.CreateRet(nullptr);
+
+    auto retVal = builder.CreateConstantInt(69);
+
+    builder.CreateRet(retVal);
 
     mod.emit(std::cout, vipir::OutputFormat::ELF);
 }

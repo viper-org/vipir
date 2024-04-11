@@ -4,6 +4,7 @@
 #include "vipir/IR/BasicBlock.h"
 
 #include "vipir/IR/Instruction/RetInst.h"
+#include "vipir/IR/Constant/ConstantInt.h"
 
 namespace vipir
 {
@@ -26,8 +27,18 @@ namespace vipir
     {
         RetInst* ret = new RetInst(mInsertPoint, returnValue);
 
-        mInsertPoint->insertInstruction(ret);
+        mInsertPoint->insertValue(ret);
 
         return ret;
+    }
+
+
+    ConstantInt* IRBuilder::CreateConstantInt(intmax_t value)
+    {
+        ConstantInt* constantInt = new ConstantInt(mInsertPoint, value);
+
+        mInsertPoint->insertValue(constantInt);
+
+        return constantInt;
     }
 }

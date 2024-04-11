@@ -17,7 +17,6 @@ namespace vipir
     class Instruction : public Value
     {
     friend class Module;
-    friend class BasicBlock;
     public:
         Instruction(Module& module, BasicBlock* parent) : Value(module), mParent(parent) { }
 

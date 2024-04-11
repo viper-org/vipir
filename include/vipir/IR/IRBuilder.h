@@ -18,6 +18,8 @@ namespace vipir
 
     class RetInst;
 
+    class ConstantInt;
+
     class IRBuilder
     {
     public:
@@ -27,6 +29,8 @@ namespace vipir
         BasicBlock* getInsertPoint();
 
         RetInst* CreateRet(Value* returnValue);
+
+        ConstantInt* CreateConstantInt(intmax_t value);
 
     private:
         BasicBlock* mInsertPoint;

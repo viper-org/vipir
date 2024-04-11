@@ -24,6 +24,7 @@ namespace vipir
         void insertBasicBlock(BasicBlock* basicBlock);
 
         void print(std::ostream& stream) override;
+        std::string ident() const override;
 
     protected:
         void emit(MC::Builder& builder) override;

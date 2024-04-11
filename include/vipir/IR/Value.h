@@ -10,6 +10,8 @@
 
 #include "vipir/MC/Builder.h"
 
+#include "vasm/instruction/Operand.h"
+
 #include <ostream>
 
 namespace vipir
@@ -18,6 +20,7 @@ namespace vipir
     
     class Value
     {
+    friend class BasicBlock;
     public:
         Value(Module& module) : mModule(module) { }
         virtual ~Value() { }
@@ -25,9 +28,13 @@ namespace vipir
         Module& getModule() { return mModule; }
 
         virtual void print(std::ostream& stream) = 0;
+        virtual std::string ident() const = 0;
+
+        virtual instruction::OperandPtr& getEmittedValue() { return mEmittedValue; }
     
     protected:
         Module& mModule;
+        instruction::OperandPtr mEmittedValue;
 
         virtual void emit(MC::Builder& builder) = 0;
     };

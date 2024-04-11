@@ -15,6 +15,9 @@ set(SOURCES
     "src/vipir/IR/Function.cpp"
     "src/vipir/IR/BasicBlock.cpp"
     "src/vipir/IR/IRBuilder.cpp"
+
+    "src/vipir/IR/Constant/ConstantInt.cpp"
+
     "src/vipir/IR/Instruction/RetInst.cpp"
 
     "src/vipir/MC/Builder.cpp"
@@ -28,6 +31,8 @@ set(HEADERS
     "include/vipir/IR/Function.h"
     "include/vipir/IR/BasicBlock.h"
     "include/vipir/IR/IRBuilder.h"
+
+    "include/vipir/IR/Constant/ConstantInt.h"
 
     "include/vipir/IR/Instruction/Instruction.h"
     "include/vipir/IR/Instruction/RetInst.h"
