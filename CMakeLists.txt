@@ -11,10 +11,20 @@ FetchContent_MakeAvailable(vasm)
 
 set(SOURCES
     "src/vipir/Module.cpp"
+
+    "src/vipir/IR/Function.cpp"
+
+    "src/vipir/MC/Builder.cpp"
 )
 
 set(HEADERS
     "include/vipir/Module.h"
+
+    "include/vipir/IR/Value.h"
+    "include/vipir/IR/Global.h"
+    "include/vipir/IR/Function.h"
+
+    "include/vipir/MC/Builder.h"
 )
 
 add_library(vipir ${SOURCES} ${HEADERS})

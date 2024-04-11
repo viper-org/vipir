@@ -1,4 +1,4 @@
-// Copyright 2023 solar-mist
+// Copyright 2024 solar-mist
 
 /*
  * A module represents a single translation unit(a file)
@@ -7,6 +7,8 @@
 
 #ifndef VIPIR_MODULE_H
 #define VIPIR_MODULE_H 1
+
+#include "vipir/IR/Global.h"
 
 #include <memory>
 #include <string>
@@ -22,16 +24,22 @@ namespace vipir
 
     class Module
     {
+    using GlobalPtr = std::unique_ptr<Global>;
+
     public:
         Module(std::string name);
 
         std::string_view getName() const;
 
+        void insertGlobal(Global* global);
+
         void print(std::ostream& stream) const;
 
         void emit(std::ostream& stream, OutputFormat outputFormat) const;
+
     private:
         std::string mName;
+        std::vector<GlobalPtr> mGlobals;
     };
 }
 
