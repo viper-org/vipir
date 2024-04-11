@@ -1,8 +1,8 @@
 // Copyright 2023 solar-mist
 
 /*
- * An instruction that executes a binary operation
- * such as adding or subtracting
+ * An instruction that sign extends a value to a larger
+ * integral type
 */
 
 #ifndef VIPIR_IR_INSTRUCTION_SEXT_INST_H
