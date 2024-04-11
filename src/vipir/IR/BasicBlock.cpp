@@ -1,8 +1,9 @@
 // Copyright 2024 solar-mist
 
 #include "vipir/IR/BasicBlock.h"
-#include "vasm/instruction/Label.h"
 #include "vipir/IR/Function.h"
+
+#include "vasm/instruction/Label.h"
 
 #include <format>
 
@@ -25,14 +26,29 @@ namespace vipir
         return basicBlock;
     }
 
+    void BasicBlock::insertInstruction(Instruction* instruction)
+    {
+        mInstructionList.push_back(InstructionPtr(instruction));
+    }
+
     void BasicBlock::print(std::ostream& stream)
     {
         stream << std::format("{}:\n", mName);
+        for (auto& instruction : mInstructionList)
+        {
+            stream << "\t";
+            instruction->print(stream);
+            stream << "\n";
+        }
     }
 
     void BasicBlock::emit(MC::Builder& builder)
     {
         builder.addValue(std::make_unique<instruction::Label>(mName));
+        for (auto& instruction : mInstructionList)
+        {
+            instruction->emit(builder);
+        }
     }
 
 
