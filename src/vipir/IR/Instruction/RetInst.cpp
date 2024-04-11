@@ -24,6 +24,11 @@ namespace vipir
         }
     }
 
+    std::vector<Value*> RetInst::getOperands()
+    {
+        return {mReturnValue};
+    }
+
     std::string RetInst::ident() const
     {
         return "%undef";

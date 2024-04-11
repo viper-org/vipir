@@ -15,6 +15,7 @@
 #include "vasm/instruction/twoOperandInstruction/LogicalInstruction.h"
 
 #include <algorithm>
+#include <deque>
 #include <format>
 
 namespace vipir
@@ -50,6 +51,7 @@ namespace vipir
 
     void Function::emit(MC::Builder& builder)
     {
+        allocateRegisters();
         setLocalStackOffsets();
 
         builder.addValue(std::make_unique<instruction::Label>(mName));
@@ -96,5 +98,70 @@ namespace vipir
         }
         
         mTotalStackOffset = (offset + 15) & ~15; // Align to 16 bytes
+    }
+
+
+    void Function::setLiveIntervals()
+    {
+        int index = 0;
+        for (auto& basicBlock : mBasicBlockList)
+        {
+            for (auto& value : basicBlock->mValueList)
+            {
+                value->mInterval.first = index;
+                index++;
+            }
+        }
+
+        for (auto bb = mBasicBlockList.rbegin(); bb != mBasicBlockList.rend(); ++bb)
+        {
+            for (auto it = (*bb)->mValueList.rbegin(); it != (*bb)->mValueList.rend(); ++it)
+            {
+                auto& value = *it;
+                for (auto operand : value->getOperands())
+                {
+                    // If we haven't set the last usage yet, this is it
+                    if (operand->mInterval.second == -1)
+                    {
+                        operand->mInterval.second = index;
+                    }
+                }
+                index--;
+            }
+        }
+    }
+
+    void Function::allocateRegisters()
+    {
+        setLiveIntervals();
+
+        std::deque<int> registerIDs { 0, 1, 2, 3, 4, 5 };
+        std::vector<Value*> activeValues;
+
+        auto ExpireOldIntervals = [&activeValues, &registerIDs](int i){
+            std::erase_if(activeValues, [i, &registerIDs](Value* value){
+                if (value->mInterval.second <= i)
+                {
+                    registerIDs.push_front(value->mRegisterID);
+                    return true;
+                }
+                return false;
+            });
+        };
+
+        for (auto& basicBlock : mBasicBlockList)
+        {
+            for (auto& value : basicBlock->mValueList)
+            {
+                ExpireOldIntervals(value->mInterval.first);
+                if (value->requiresRegister)
+                {
+                    activeValues.push_back(value.get());
+
+                    value->mRegisterID = registerIDs.front();
+                    registerIDs.pop_front();
+                }
+            }
+        }
     }
 }

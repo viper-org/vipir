@@ -42,6 +42,9 @@ namespace vipir
         int mTotalStackOffset;
         void insertAlloca(AllocaInst* alloca);
         void setLocalStackOffsets();
+
+        void setLiveIntervals();
+        void allocateRegisters();
     };
 }
 

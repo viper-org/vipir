@@ -7,6 +7,7 @@
 #include "vipir/IR/Instruction/RetInst.h"
 #include "vipir/IR/Instruction/AllocaInst.h"
 #include "vipir/IR/Instruction/StoreInst.h"
+#include "vipir/IR/Instruction/LoadInst.h"
 
 #include "vipir/IR/Constant/ConstantInt.h"
 
@@ -53,6 +54,15 @@ namespace vipir
         mInsertPoint->insertValue(store);
 
         return store;
+    }
+
+    LoadInst* IRBuilder::CreateLoad(Value* ptr)
+    {
+        LoadInst* load = new LoadInst(mInsertPoint, ptr);
+
+        mInsertPoint->insertValue(load);
+
+        return load;
     }
 
 

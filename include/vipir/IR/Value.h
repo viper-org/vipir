@@ -21,11 +21,13 @@ namespace vipir
     class Value
     {
     friend class BasicBlock;
+    friend class Function;
     public:
         Value(Module& module) : mModule(module) { }
         virtual ~Value() { }
 
         Module& getModule() { return mModule; }
+        virtual std::vector<Value*> getOperands() { return std::vector<Value*>(); }
 
         virtual void print(std::ostream& stream) = 0;
         virtual std::string ident() const = 0;
@@ -35,6 +37,10 @@ namespace vipir
     protected:
         Module& mModule;
         instruction::OperandPtr mEmittedValue;
+
+        bool requiresRegister{false};
+        std::pair<int, int> mInterval{-1,-1};
+        int mRegisterID;
 
         virtual void emit(MC::Builder& builder) = 0;
     };

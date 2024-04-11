@@ -21,6 +21,7 @@ set(SOURCES
     "src/vipir/IR/Instruction/RetInst.cpp"
     "src/vipir/IR/Instruction/AllocaInst.cpp"
     "src/vipir/IR/Instruction/StoreInst.cpp"
+    "src/vipir/IR/Instruction/LoadInst.cpp"
 
     "src/vipir/MC/Builder.cpp"
 )
@@ -40,6 +41,7 @@ set(HEADERS
     "include/vipir/IR/Instruction/RetInst.h"
     "include/vipir/IR/Instruction/AllocaInst.h"
     "include/vipir/IR/Instruction/StoreInst.h"
+    "include/vipir/IR/Instruction/LoadInst.h"
 
     "include/vipir/MC/Builder.h"
 )
