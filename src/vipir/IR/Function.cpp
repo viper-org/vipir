@@ -2,6 +2,9 @@
 
 #include "vipir/IR/Function.h"
 
+#include "vasm/instruction/operand/Immediate.h"
+#include "vipir/IR/Instruction/AllocaInst.h"
+
 #include "vipir/Module.h"
 
 #include "vasm/instruction/Label.h"
@@ -9,7 +12,9 @@
 
 #include "vasm/instruction/singleOperandInstruction/PushInstruction.h"
 #include "vasm/instruction/twoOperandInstruction/MovInstruction.h"
+#include "vasm/instruction/twoOperandInstruction/LogicalInstruction.h"
 
+#include <algorithm>
 #include <format>
 
 namespace vipir
@@ -45,10 +50,18 @@ namespace vipir
 
     void Function::emit(MC::Builder& builder)
     {
+        setLocalStackOffsets();
+
         builder.addValue(std::make_unique<instruction::Label>(mName));
 
         builder.addValue(std::make_unique<instruction::PushInstruction>(instruction::Register::Get("rbp")));
-        builder.addValue(std::make_unique<instruction::MovInstruction>(instruction::Register::Get("rbp"), instruction::Register::Get("rsp"), codegen::OperandSize::None));
+        builder.addValue(std::make_unique<instruction::MovInstruction>(instruction::Register::Get("rbp"), instruction::Register::Get("rsp")));
+        if (mTotalStackOffset > 0) // There are local variables
+        {
+            instruction::OperandPtr reg = instruction::Register::Get("rsp");
+            instruction::OperandPtr stackOffset = std::make_unique<instruction::Immediate>(mTotalStackOffset);
+            builder.addValue(std::make_unique<instruction::SubInstruction>(std::move(reg), std::move(stackOffset)));
+        }
 
         for (auto& basicBlock : mBasicBlockList)
         {
@@ -60,6 +73,28 @@ namespace vipir
         : Global(module)
         , mName(name)
         /*,mType(type)*/
+        , mTotalStackOffset(0)
     {
+    }
+
+    void Function::insertAlloca(AllocaInst* alloca)
+    {
+        mAllocaList.push_back(alloca);
+    }
+
+    void Function::setLocalStackOffsets()
+    {
+        std::sort(mAllocaList.begin(), mAllocaList.end(), [](AllocaInst* lhs, AllocaInst* rhs) {
+            return 32 > 32; // TODO: Use allocated type size
+        });
+
+        int offset = 0;
+        for (auto alloca : mAllocaList)
+        {
+            offset += 32 / 8; // TODO: Use allocated type size
+            alloca->mStackOffset = offset;
+        }
+        
+        mTotalStackOffset = (offset + 15) & ~15; // Align to 16 bytes
     }
 }

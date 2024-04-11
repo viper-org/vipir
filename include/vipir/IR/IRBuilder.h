@@ -17,6 +17,7 @@ namespace vipir
     class BasicBlock;
 
     class RetInst;
+    class AllocaInst;
 
     class ConstantInt;
 
@@ -29,6 +30,7 @@ namespace vipir
         BasicBlock* getInsertPoint();
 
         RetInst* CreateRet(Value* returnValue);
+        AllocaInst* CreateAlloca(std::string_view name);
 
         ConstantInt* CreateConstantInt(intmax_t value);
 

@@ -26,6 +26,11 @@ namespace vipir
         return basicBlock;
     }
 
+    Function* BasicBlock::getParent()
+    {
+        return mParent;
+    }
+
     void BasicBlock::insertValue(Value* value)
     {
         mValueList.push_back(ValuePtr(value));

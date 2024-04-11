@@ -22,6 +22,7 @@ int main()
     builder.setInsertPoint(bb1);
 
     auto retVal = builder.CreateConstantInt(69);
+    auto local1 = builder.CreateAlloca("testvar1");
 
     builder.CreateRet(retVal);
 

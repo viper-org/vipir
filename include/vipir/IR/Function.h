@@ -15,8 +15,10 @@
 
 namespace vipir
 {
+    class AllocaInst;
     class Function : public Global
     {
+    friend class IRBuilder;
     using BasicBlockPtr = std::unique_ptr<BasicBlock>;
     public:
         static Function* Create(/*FunctionType* type, */Module& module, std::string_view name);
@@ -35,6 +37,11 @@ namespace vipir
         std::string mName;
 
         std::vector<BasicBlockPtr> mBasicBlockList;
+        std::vector<AllocaInst*> mAllocaList;
+
+        int mTotalStackOffset;
+        void insertAlloca(AllocaInst* alloca);
+        void setLocalStackOffsets();
     };
 }
 

@@ -24,6 +24,8 @@ namespace vipir
     public:
         static BasicBlock* Create(std::string_view name, Function* parent);
 
+        Function* getParent();
+
         void insertValue(Value* value);
 
         void print(std::ostream& stream) override;
