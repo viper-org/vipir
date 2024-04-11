@@ -6,6 +6,7 @@
 #include "vipir/IR/BasicBlock.h"
 
 #include "vipir/IR/Constant/ConstantInt.h"
+#include "vipir/IR/Instruction/AllocaInst.h"
 
 #include <iostream>
 #include <fstream>
@@ -23,7 +24,9 @@ int main()
 
     auto retVal = builder.CreateConstantInt(69);
     auto local1 = builder.CreateAlloca("testvar1");
+    auto local1Value = builder.CreateConstantInt(123);
 
+    builder.CreateStore(local1, local1Value);
     builder.CreateRet(retVal);
 
     mod.emit(std::cout, vipir::OutputFormat::ELF);

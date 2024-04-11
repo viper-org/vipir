@@ -6,6 +6,7 @@
 
 #include "vipir/IR/Instruction/RetInst.h"
 #include "vipir/IR/Instruction/AllocaInst.h"
+#include "vipir/IR/Instruction/StoreInst.h"
 
 #include "vipir/IR/Constant/ConstantInt.h"
 
@@ -43,6 +44,15 @@ namespace vipir
         mInsertPoint->getParent()->insertAlloca(alloca);
 
         return alloca;
+    }
+
+    StoreInst* IRBuilder::CreateStore(Value* ptr, Value* value)
+    {
+        StoreInst* store = new StoreInst(mInsertPoint, ptr, value);
+
+        mInsertPoint->insertValue(store);
+
+        return store;
     }
 
 

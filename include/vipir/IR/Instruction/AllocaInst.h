@@ -34,4 +34,4 @@ namespace vipir
     };
 }
 
-#endif // VIPIR_IR_INSTRUCTION_RET_INST_H
+#endif // VIPIR_IR_INSTRUCTION_ALLOCA_INST_H

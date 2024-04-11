@@ -18,6 +18,7 @@ namespace vipir
 
     class RetInst;
     class AllocaInst;
+    class StoreInst;
 
     class ConstantInt;
 
@@ -31,6 +32,7 @@ namespace vipir
 
         RetInst* CreateRet(Value* returnValue);
         AllocaInst* CreateAlloca(std::string_view name);
+        StoreInst* CreateStore(Value* ptr, Value* value);
 
         ConstantInt* CreateConstantInt(intmax_t value);
 
