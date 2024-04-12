@@ -3,6 +3,7 @@
 
 #include "vipir/Module.h"
 
+#include "vipir/IR/Instruction/LoadInst.h"
 #include "vipir/MC/Builder.h"
 
 #include "vasm/codegen/Elf.h"
@@ -75,5 +76,16 @@ namespace vipir
         opcodeBuilder.patchForwardLabels();
 
         outputFormat->print(stream);
+    }
+
+
+    Value* getPointerOperand(Value* value)
+    {
+        if (LoadInst* load = dynamic_cast<LoadInst*>(value))
+        {
+            return load->getPointer();
+        }
+
+        return nullptr;
     }
 }

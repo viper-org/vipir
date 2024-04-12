@@ -20,6 +20,11 @@ namespace vipir
         stream << std::format("load i32 %{}, {}", mValueId, mPtr->ident());
     }
 
+    Value* LoadInst::getPointer()
+    {
+        return mPtr;
+    }
+
     std::string LoadInst::ident() const
     {
         return std::format("%{}", mValueId);

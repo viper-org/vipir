@@ -20,6 +20,8 @@ namespace vipir
     public:
         void print(std::ostream& stream) override;
 
+        Value* getPointer();
+
     protected:
         void emit(MC::Builder& builder) override;
         std::string ident() const override;

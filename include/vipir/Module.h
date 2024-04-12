@@ -43,6 +43,8 @@ namespace vipir
         std::string mName;
         std::vector<GlobalPtr> mGlobals;
     };
+
+    Value* getPointerOperand(Value* value);
 }
 
 #endif // VIPIR_MODULE_H
