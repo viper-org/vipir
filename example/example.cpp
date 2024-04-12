@@ -34,6 +34,9 @@ int main()
 
     builder.CreateStore(local1, local1Value);
 
+    auto test = builder.CreateLoad(local1);
+    test->eraseFromParent();
+
     auto lhs = builder.CreateLoad(local1);
     auto rhs = builder.CreateLoad(local1);
     auto retval = builder.CreateSub(lhs, rhs);

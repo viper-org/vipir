@@ -36,6 +36,13 @@ namespace vipir
         mValueList.push_back(ValuePtr(value));
     }
 
+    void BasicBlock::eraseValue(Value* value)
+    {
+        std::erase_if(mValueList, [value](ValuePtr& valuePtr) {
+            return valuePtr.get() == value;
+        });
+    }
+
     void BasicBlock::print(std::ostream& stream)
     {
         stream << std::format("{}:\n", mName);

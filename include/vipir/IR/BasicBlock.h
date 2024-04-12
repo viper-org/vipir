@@ -27,6 +27,7 @@ namespace vipir
         Function* getParent();
 
         void insertValue(Value* value);
+        void eraseValue(Value* value);
 
         void print(std::ostream& stream) override;
         std::string ident() const override;

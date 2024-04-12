@@ -20,6 +20,8 @@ namespace vipir
     public:
         Instruction(Module& module, BasicBlock* parent) : Value(module), mParent(parent) { }
 
+        void eraseFromParent();
+
         enum BinaryOperators
         {
             ADD, SUB
