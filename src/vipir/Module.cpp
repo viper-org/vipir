@@ -25,6 +25,12 @@ namespace vipir
         return mName;
     }
 
+    int Module::getNextValueId()
+    {
+        static int valueId = 0;
+        return ++valueId;
+    }
+
     void Module::insertGlobal(Global* global)
     {
         mGlobals.push_back(GlobalPtr(global));

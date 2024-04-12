@@ -20,6 +20,7 @@ namespace vipir
     class AllocaInst;
     class StoreInst;
     class LoadInst;
+    class BinaryInst;
 
     class ConstantInt;
 
@@ -35,6 +36,8 @@ namespace vipir
         AllocaInst* CreateAlloca(Type* allocatedType, std::string_view name);
         StoreInst* CreateStore(Value* ptr, Value* value);
         LoadInst* CreateLoad(Value* ptr);
+        BinaryInst* CreateAdd(Value* left, Value* right);
+        BinaryInst* CreateSub(Value* left, Value* right);
 
         ConstantInt* CreateConstantInt(intmax_t value, Type* type);
 

@@ -5,6 +5,8 @@
 
 #include "vipir/IR/BasicBlock.h"
 
+#include "vipir/Module.h"
+
 #include "vasm/instruction/operand/Register.h"
 
 #include "vasm/instruction/twoOperandInstruction/MovInstruction.h"
@@ -13,15 +15,14 @@
 
 namespace vipir
 {
-    static int vregCount = 1;
     void LoadInst::print(std::ostream& stream)
     {
-        stream << std::format("load i32 %vreg{}, {}", mVregNum, mPtr->ident());
+        stream << std::format("load i32 %{}, {}", mValueId, mPtr->ident());
     }
 
     std::string LoadInst::ident() const
     {
-        return std::format("%vreg{}", mVregNum);
+        return std::format("%{}", mValueId);
     }
 
     void LoadInst::emit(MC::Builder& builder)
@@ -36,13 +37,19 @@ namespace vipir
         instruction::OperandPtr  reg = std::make_unique<instruction::Register>(mRegisterID, size);
 
         builder.addValue(std::make_unique<instruction::MovInstruction>(std::move(reg), std::move(ptr)));
+
+        mEmittedValue = std::move(reg);
     }
 
     LoadInst::LoadInst(BasicBlock* parent, Value* ptr)
         : Instruction(parent->getModule(), parent)
         , mPtr(ptr)
-        , mVregNum(vregCount++)
+        , mValueId(mModule.getNextValueId())
     {
         requiresRegister = true;
+        if (AllocaInst* alloca = dynamic_cast<AllocaInst*>(mPtr)) // TODO: Get this properly from pointer type
+        {
+            mType = alloca->getAllocatedType();
+        }
     }
 }

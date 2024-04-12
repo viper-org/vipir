@@ -8,6 +8,8 @@
 #include "vipir/IR/Constant/ConstantInt.h"
 #include "vipir/IR/Instruction/AllocaInst.h"
 #include "vipir/IR/Instruction/LoadInst.h"
+#include "vipir/IR/Instruction/BinaryInst.h"
+
 #include "vipir/Type/Type.h"
 
 #include <iostream>
@@ -28,10 +30,13 @@ int main()
     builder.setInsertPoint(bb1);
 
     auto local1 = builder.CreateAlloca(i32Type, "testvar1");
-    auto local1Value = builder.CreateConstantInt(123, i32Type);
+    auto local1Value = builder.CreateConstantInt(6, i32Type);
 
     builder.CreateStore(local1, local1Value);
-    auto retval = builder.CreateLoad(local1);
+
+    auto lhs = builder.CreateLoad(local1);
+    auto rhs = builder.CreateLoad(local1);
+    auto retval = builder.CreateSub(lhs, rhs);
     builder.CreateRet(retval);
 
     mod.emit(std::cout, vipir::OutputFormat::ELF);

@@ -30,12 +30,14 @@ namespace vipir
         Module(std::string name);
 
         std::string_view getName() const;
+        int getNextValueId();
 
         void insertGlobal(Global* global);
 
         void print(std::ostream& stream) const;
 
         void emit(std::ostream& stream, OutputFormat outputFormat) const;
+
 
     private:
         std::string mName;

@@ -28,7 +28,7 @@ namespace vipir
         LoadInst(BasicBlock* parent, Value* ptr);
 
         Value* mPtr;
-        int mVregNum;
+        int mValueId;
     };
 }
 
