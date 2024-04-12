@@ -37,9 +37,9 @@ namespace vipir
         return ret;
     }
 
-    AllocaInst* IRBuilder::CreateAlloca(std::string_view name)
+    AllocaInst* IRBuilder::CreateAlloca(Type* allocatedType, std::string_view name)
     {
-        AllocaInst* alloca = new AllocaInst(mInsertPoint, name);
+        AllocaInst* alloca = new AllocaInst(mInsertPoint, allocatedType, name);
 
         mInsertPoint->insertValue(alloca);
         mInsertPoint->getParent()->insertAlloca(alloca);
@@ -66,9 +66,9 @@ namespace vipir
     }
 
 
-    ConstantInt* IRBuilder::CreateConstantInt(intmax_t value)
+    ConstantInt* IRBuilder::CreateConstantInt(intmax_t value, Type* type)
     {
-        ConstantInt* constantInt = new ConstantInt(mInsertPoint, value);
+        ConstantInt* constantInt = new ConstantInt(mInsertPoint, value, type);
 
         mInsertPoint->insertValue(constantInt);
 

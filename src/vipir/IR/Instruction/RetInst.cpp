@@ -41,7 +41,7 @@ namespace vipir
             instruction::OperandPtr& returnValue = mReturnValue->getEmittedValue();
             if (returnValue)
             {
-                instruction::OperandPtr reg = instruction::Register::Get("eax"); // TODO: Get size from return value
+                instruction::OperandPtr reg = std::make_unique<instruction::Register>(0, mReturnValue->getType()->getOperandSize());
                 builder.addValue(std::make_unique<instruction::MovInstruction>(std::move(reg), std::move(returnValue)));
             }
         }

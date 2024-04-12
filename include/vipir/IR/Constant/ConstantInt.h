@@ -26,7 +26,7 @@ namespace vipir
         void emit(MC::Builder& builder) override;
 
     private:
-        ConstantInt(BasicBlock* parent, intmax_t value);
+        ConstantInt(BasicBlock* parent, intmax_t value, Type* type);
 
         intmax_t mValue;
     };

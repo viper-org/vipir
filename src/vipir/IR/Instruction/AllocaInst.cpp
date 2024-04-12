@@ -13,12 +13,17 @@ namespace vipir
 {
     void AllocaInst::print(std::ostream& stream)
     {
-        stream << std::format("alloca {}: i32", mName);
+        stream << std::format("alloca {}: {}", mName, mAllocatedType->getName());
+    }
+
+    Type* AllocaInst::getAllocatedType()
+    {
+        return mAllocatedType;
     }
 
     std::string AllocaInst::ident() const
     {
-        return std::format("i32* {}", mName);
+        return std::format("{}* {}", mAllocatedType->getName(), mName);
     }
 
     void AllocaInst::emit(MC::Builder& builder)
@@ -27,8 +32,9 @@ namespace vipir
         mEmittedValue = std::make_unique<instruction::Memory>(std::move(base), -mStackOffset);
     }
 
-    AllocaInst::AllocaInst(BasicBlock* parent, std::string_view name)
+    AllocaInst::AllocaInst(BasicBlock* parent, Type* allocatedType, std::string_view name)
         : Instruction(parent->getModule(), parent)
+        , mAllocatedType(allocatedType)
         , mName(name)
         , mStackOffset(0)
     {

@@ -8,6 +8,8 @@
 #ifndef VIPIR_IR_VALUE_H
 #define VIPIR_IR_VALUE_H 1
 
+#include "vipir/Type/Type.h"
+
 #include "vipir/MC/Builder.h"
 
 #include "vasm/instruction/Operand.h"
@@ -27,6 +29,7 @@ namespace vipir
         virtual ~Value() { }
 
         Module& getModule() { return mModule; }
+        Type* getType() { return mType; }
         virtual std::vector<Value*> getOperands() { return std::vector<Value*>(); }
 
         virtual void print(std::ostream& stream) = 0;
@@ -36,6 +39,8 @@ namespace vipir
     
     protected:
         Module& mModule;
+        Type* mType;
+        
         instruction::OperandPtr mEmittedValue;
 
         bool requiresRegister{false};

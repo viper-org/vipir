@@ -32,11 +32,11 @@ namespace vipir
         BasicBlock* getInsertPoint();
 
         RetInst* CreateRet(Value* returnValue);
-        AllocaInst* CreateAlloca(std::string_view name);
+        AllocaInst* CreateAlloca(Type* allocatedType, std::string_view name);
         StoreInst* CreateStore(Value* ptr, Value* value);
         LoadInst* CreateLoad(Value* ptr);
 
-        ConstantInt* CreateConstantInt(intmax_t value);
+        ConstantInt* CreateConstantInt(intmax_t value, Type* type);
 
     private:
         BasicBlock* mInsertPoint;

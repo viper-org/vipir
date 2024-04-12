@@ -87,13 +87,13 @@ namespace vipir
     void Function::setLocalStackOffsets()
     {
         std::sort(mAllocaList.begin(), mAllocaList.end(), [](AllocaInst* lhs, AllocaInst* rhs) {
-            return 32 > 32; // TODO: Use allocated type size
+            return lhs->getAllocatedType()->getSizeInBits() > rhs->getAllocatedType()->getSizeInBits();
         });
 
         int offset = 0;
         for (auto alloca : mAllocaList)
         {
-            offset += 32 / 8; // TODO: Use allocated type size
+            offset += alloca->getAllocatedType()->getSizeInBits() / 8;
             alloca->mStackOffset = offset;
         }
         

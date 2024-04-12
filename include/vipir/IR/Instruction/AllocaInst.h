@@ -21,13 +21,16 @@ namespace vipir
     public:
         void print(std::ostream& stream) override;
 
+        Type* getAllocatedType();
+
     protected:
         void emit(MC::Builder& builder) override;
         std::string ident() const override;
 
     private:
-        AllocaInst(BasicBlock* parent, std::string_view name);
+        AllocaInst(BasicBlock* parent, Type* allocatedType, std::string_view name);
 
+        Type* mAllocatedType;
         std::string mName;
 
         int mStackOffset;

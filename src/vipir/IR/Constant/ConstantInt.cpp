@@ -16,7 +16,7 @@ namespace vipir
 
     std::string ConstantInt::ident() const
     {
-        return std::format("i32 {}", mValue);
+        return std::format("{} {}", mType->getName(), mValue);
     }
 
 
@@ -25,9 +25,10 @@ namespace vipir
         mEmittedValue = std::make_unique<instruction::Immediate>(mValue);
     }
 
-    ConstantInt::ConstantInt(BasicBlock* parent, intmax_t value)
+    ConstantInt::ConstantInt(BasicBlock* parent, intmax_t value, Type* type)
         : Value(parent->getModule())
         , mValue(value)
     {
+        mType = type;
     }
 }

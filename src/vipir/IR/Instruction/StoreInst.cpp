@@ -26,7 +26,7 @@ namespace vipir
         instruction::OperandPtr& ptr   = mPtr->getEmittedValue();
         instruction::OperandPtr& value = mValue->getEmittedValue();
 
-        builder.addValue(std::make_unique<instruction::MovInstruction>(std::move(ptr), std::move(value), codegen::OperandSize::Long));
+        builder.addValue(std::make_unique<instruction::MovInstruction>(std::move(ptr), std::move(value), mValue->getType()->getOperandSize()));
     }
 
     StoreInst::StoreInst(BasicBlock* parent, Value* ptr, Value* value)
