@@ -24,6 +24,7 @@ namespace vipir
         codegen::OperandSize getOperandSize() { return mOperandSize; }
 
         static Type* GetIntegerType(int bits);
+        static Type* GetVoidType();
 
     protected:
         Type(std::size_t sizeInBits, std::string_view name)

@@ -2,6 +2,7 @@
 
 #include "vipir/Type/Type.h"
 #include "vipir/Type/IntegerType.h"
+#include "vipir/Type/VoidType.h"
 
 #include <cassert>
 #include <memory>
@@ -26,6 +27,20 @@ namespace vipir
         }
 
         types.push_back(std::make_unique<IntegerType>(bits));
+        return types.back().get();
+    }
+
+    Type* Type::GetVoidType()
+    {
+        for (const auto& type : types)
+        {
+            if (VoidType* voidType = dynamic_cast<VoidType*>(type.get()))
+            {
+                return voidType;
+            }
+        }
+
+        types.push_back(std::make_unique<VoidType>());
         return types.back().get();
     }
 }

@@ -27,6 +27,7 @@ set(SOURCES
 
     "src/vipir/Type/Type.cpp"
     "src/vipir/Type/IntegerType.cpp"
+    "src/vipir/Type/VoidType.cpp"
 
     "src/vipir/MC/Builder.cpp"
 )
@@ -51,6 +52,7 @@ set(HEADERS
 
     "include/vipir/Type/Type.h"
     "include/vipir/Type/IntegerType.h"
+    "include/vipir/Type/VoidType.h"
 
     "include/vipir/MC/Builder.h"
 )

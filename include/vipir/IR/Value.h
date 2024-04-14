@@ -25,7 +25,7 @@ namespace vipir
     friend class BasicBlock;
     friend class Function;
     public:
-        Value(Module& module) : mModule(module) { }
+        Value(Module& module) : mModule(module), mType(Type::GetVoidType()) { }
         virtual ~Value() { }
 
         Module& getModule() { return mModule; }

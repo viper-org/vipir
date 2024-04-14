@@ -1,6 +1,6 @@
 // Copyright 2024 solar-mist
 
-#include <vipir/Type/IntegerType.h>
+#include "vipir/Type/IntegerType.h"
 
 #include <format>
 
