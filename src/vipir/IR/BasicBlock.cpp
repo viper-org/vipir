@@ -18,7 +18,7 @@ namespace vipir
         std::string basicBlockName = std::string(name);
         if (basicBlockName.empty())
         {
-            basicBlockName = std::to_string(basicBlockNumber);
+            basicBlockName = std::format("{}", basicBlockNumber++);
         }
 
         BasicBlock* basicBlock = new BasicBlock(std::move(basicBlockName), parent);
