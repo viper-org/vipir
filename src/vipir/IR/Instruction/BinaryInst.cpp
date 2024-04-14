@@ -97,7 +97,7 @@ namespace vipir
             case Instruction::EQ:
             case Instruction::NE:
             {
-                mType = Type::GetIntegerType(1);
+                mType = Type::GetBooleanType();
                 break;
             }
         }
