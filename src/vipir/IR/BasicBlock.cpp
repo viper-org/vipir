@@ -61,10 +61,14 @@ namespace vipir
         return std::format("label %{}", mName);
     }
 
+    void BasicBlock::setEmittedValue()
+    {
+        mEmittedValue = std::make_unique<instruction::LabelOperand>(mName);
+    }
+
     void BasicBlock::emit(MC::Builder& builder)
     {
         builder.addValue(std::make_unique<instruction::Label>(mName));
-        mEmittedValue = std::make_unique<instruction::LabelOperand>(mName);
         for (auto& value : mValueList)
         {
             value->emit(builder);

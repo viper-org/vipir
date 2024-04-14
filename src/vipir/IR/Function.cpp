@@ -72,6 +72,11 @@ namespace vipir
 
         for (auto& basicBlock : mBasicBlockList)
         {
+            basicBlock->setEmittedValue();
+        }
+
+        for (auto& basicBlock : mBasicBlockList)
+        {
             basicBlock->emit(builder);
         }
     }

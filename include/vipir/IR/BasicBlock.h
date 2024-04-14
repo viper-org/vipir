@@ -33,6 +33,7 @@ namespace vipir
         std::string ident() const override;
 
     protected:
+        void setEmittedValue();
         void emit(MC::Builder& builder) override;
 
     private:
