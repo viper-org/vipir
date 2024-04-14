@@ -24,6 +24,7 @@ namespace vipir
     class BranchInst;
 
     class ConstantInt;
+    class ConstantBool;
 
     class IRBuilder
     {
@@ -49,6 +50,7 @@ namespace vipir
         BranchInst* CreateCondBr(Value* condition, BasicBlock* trueBranch, BasicBlock* falseBranch);
 
         ConstantInt* CreateConstantInt(intmax_t value, Type* type);
+        ConstantBool* CreateConstantBool(bool value);
 
     private:
         BasicBlock* mInsertPoint;

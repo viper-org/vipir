@@ -12,6 +12,7 @@
 #include "vipir/IR/Instruction/BranchInst.h"
 
 #include "vipir/IR/Constant/ConstantInt.h"
+#include "vipir/IR/Constant/ConstantBool.h"
 
 namespace vipir
 {
@@ -129,5 +130,14 @@ namespace vipir
         mInsertPoint->insertValue(constantInt);
 
         return constantInt;
+    }
+
+    ConstantBool* IRBuilder::CreateConstantBool(bool value)
+    {
+        ConstantBool* constantBool = new ConstantBool(mInsertPoint, value);
+
+        mInsertPoint->insertValue(constantBool);
+
+        return constantBool;
     }
 }

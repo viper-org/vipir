@@ -1,11 +1,12 @@
 // Copyright 2024 solar-mist
 
 /*
- * ConstantInts are integer literals
+ * ConstantBools are boolean literals, true
+ * or false
 */
 
-#ifndef VIPIR_IR_CONSTANT_CONSTANT_INT_H
-#define VIPIR_IR_CONSTANT_CONSTANT_INT_H 1
+#ifndef VIPIR_IR_CONSTANT_CONSTANT_BOOL_H
+#define VIPIR_IR_CONSTANT_CONSTANT_BOOL_H 1
 
 #include "vipir/IR/Value.h"
 
@@ -14,7 +15,7 @@
 namespace vipir
 {
     class BasicBlock;
-    class ConstantInt : public Value
+    class ConstantBool : public Value
     {
     friend class IRBuilder;
     public:
@@ -25,10 +26,10 @@ namespace vipir
         void emit(MC::Builder& builder) override;
 
     private:
-        ConstantInt(BasicBlock* parent, intmax_t value, Type* type);
+        ConstantBool(BasicBlock* parent, bool value);
 
-        intmax_t mValue;
+        bool mValue;
     };
 }
 
-#endif // VIPIR_IR_CONSTANT_CONSTANT_INT_H
+#endif // VIPIR_IR_CONSTANT_CONSTANT_BOOL_H

@@ -17,6 +17,7 @@ set(SOURCES
     "src/vipir/IR/IRBuilder.cpp"
 
     "src/vipir/IR/Constant/ConstantInt.cpp"
+    "src/vipir/IR/Constant/ConstantBool.cpp"
 
     "src/vipir/IR/Instruction/Instruction.cpp"
     "src/vipir/IR/Instruction/RetInst.cpp"
@@ -47,6 +48,7 @@ set(HEADERS
     "include/vipir/IR/IRBuilder.h"
 
     "include/vipir/IR/Constant/ConstantInt.h"
+    "include/vipir/IR/Constant/ConstantBool.h"
 
     "include/vipir/IR/Instruction/Instruction.h"
     "include/vipir/IR/Instruction/RetInst.h"
