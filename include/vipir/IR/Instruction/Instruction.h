@@ -24,7 +24,9 @@ namespace vipir
 
         enum BinaryOperators
         {
-            ADD, SUB
+            ADD, SUB,
+
+            EQ, NE
         };
 
     protected:

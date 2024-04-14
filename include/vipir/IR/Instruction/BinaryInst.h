@@ -36,6 +36,8 @@ namespace vipir
         Value* mRight;
 
         int mValueId;
+
+        MC::Builder* mBuilder; // For comparison operations that are emitted when used
     };
 }
 

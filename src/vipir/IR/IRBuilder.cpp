@@ -84,6 +84,24 @@ namespace vipir
         return add;
     }
 
+    BinaryInst* IRBuilder::CreateCmpEQ(Value* left, Value* right)
+    {
+        BinaryInst* add = new BinaryInst(mInsertPoint, left, Instruction::EQ, right);
+
+        mInsertPoint->insertValue(add);
+
+        return add;
+    }
+
+    BinaryInst* IRBuilder::CreateCmpNE(Value* left, Value* right)
+    {
+        BinaryInst* add = new BinaryInst(mInsertPoint, left, Instruction::NE, right);
+
+        mInsertPoint->insertValue(add);
+
+        return add;
+    }
+
 
     ConstantInt* IRBuilder::CreateConstantInt(intmax_t value, Type* type)
     {

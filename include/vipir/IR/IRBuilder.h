@@ -38,6 +38,8 @@ namespace vipir
         LoadInst* CreateLoad(Value* ptr);
         BinaryInst* CreateAdd(Value* left, Value* right);
         BinaryInst* CreateSub(Value* left, Value* right);
+        BinaryInst* CreateCmpEQ(Value* left, Value* right);
+        BinaryInst* CreateCmpNE(Value* left, Value* right);
 
         ConstantInt* CreateConstantInt(intmax_t value, Type* type);
 

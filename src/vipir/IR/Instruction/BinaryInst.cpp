@@ -5,6 +5,7 @@
 #include "vipir/IR/BasicBlock.h"
 #include "vipir/IR/Function.h"
 
+#include "vipir/MC/CmpOperand.h"
 #include "vipir/Module.h"
 
 #include "vasm/instruction/twoOperandInstruction/LogicalInstruction.h"
@@ -24,6 +25,14 @@ namespace vipir
                 break;
             case Instruction::SUB:
                 operatorName = "sub";
+                break;
+            
+            case Instruction::EQ:
+                operatorName = "cmp eq";
+                break;
+            
+            case Instruction::NE:
+                operatorName = "cmp ne";
                 break;
         }
         stream << std::format("{} %{}, {}, {}", operatorName, mValueId, mLeft->ident(), mRight->ident());
@@ -59,6 +68,11 @@ namespace vipir
                 mEmittedValue = std::move(left);
                 break;
             }
+
+            case Instruction::EQ:
+            case Instruction::NE:
+                mBuilder = &builder;
+                break;
         }
     }
 
@@ -70,11 +84,50 @@ namespace vipir
         , mValueId(mModule.getNextValueId())
     {
         assert(left->getType() == right->getType());
-        mType = left->getType();
+        
+        switch (mOperator)
+        {
+            case Instruction::ADD:
+            case Instruction::SUB:
+            {
+                mType = left->getType();
+                break;
+            }
+
+            case Instruction::EQ:
+            case Instruction::NE:
+            {
+                mType = Type::GetIntegerType(1);
+                break;
+            }
+        }
     }
 
     instruction::OperandPtr& BinaryInst::getEmittedValue()
     {
+        switch (mOperator)
+        {
+            case Instruction::EQ:
+            {
+                instruction::OperandPtr& left  = mLeft->getEmittedValue();
+                instruction::OperandPtr& right = mRight->getEmittedValue();
+                mBuilder->addValue(std::make_unique<instruction::CmpInstruction>(std::move(left), std::move(right), codegen::OperandSize::None));
+                mEmittedValue = std::make_unique<CmpOperand>(CmpOperator::EQ);
+                break;
+            }
+            case Instruction::NE:
+            {
+                instruction::OperandPtr& left  = mLeft->getEmittedValue();
+                instruction::OperandPtr& right = mRight->getEmittedValue();
+                mBuilder->addValue(std::make_unique<instruction::CmpInstruction>(std::move(left), std::move(right), codegen::OperandSize::None));
+                mEmittedValue = std::make_unique<CmpOperand>(CmpOperator::NE);
+                break;
+            }
+
+            default:
+                break;
+        }
+
         return mEmittedValue;
     }
 }
