@@ -23,7 +23,7 @@ namespace vipir
 
     std::string AllocaInst::ident() const
     {
-        return std::format("{}* {}", mAllocatedType->getName(), mName);
+        return std::format("{} {}", mType->getName(), mName);
     }
 
     void AllocaInst::emit(MC::Builder& builder)
@@ -38,5 +38,6 @@ namespace vipir
         , mName(name)
         , mStackOffset(0)
     {
+        mType = Type::GetPointerType(mAllocatedType);
     }
 }

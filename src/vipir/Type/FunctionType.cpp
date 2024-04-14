@@ -12,6 +12,11 @@ namespace vipir
     {
     }
 
+    bool FunctionType::isFunctionType() const
+    {
+        return true;
+    }
+
     Type* FunctionType::getReturnType() const
     {
         return mReturnType;

@@ -8,4 +8,9 @@ namespace vipir
         : Type(0, "void")
     {
     }
+
+    bool VoidType::isVoidType() const
+    {
+        return true;
+    }
 }

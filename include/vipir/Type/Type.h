@@ -23,9 +23,15 @@ namespace vipir
         std::string_view getName() { return mName; }
         codegen::OperandSize getOperandSize() { return mOperandSize; }
 
+        virtual bool isIntegerType()  const { return false; }
+        virtual bool isVoidType()     const { return false; }
+        virtual bool isFunctionType() const { return false; }
+        virtual bool isPointerType()  const { return false; }
+
         static Type* GetIntegerType(int bits);
         static Type* GetVoidType();
         static Type* GetFunctionType(Type* returnType); // TODO: Add argument types
+        static Type* GetPointerType(Type* baseType);
 
     protected:
         Type(std::size_t sizeInBits, std::string_view name)

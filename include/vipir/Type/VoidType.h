@@ -17,6 +17,8 @@ namespace vipir
     {
     public:
         VoidType();
+
+        bool isVoidType() const override;
     };
 }
 

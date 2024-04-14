@@ -1,7 +1,6 @@
 // Copyright 2024 solar-mist
 
 #include "vipir/IR/Instruction/LoadInst.h"
-#include "vipir/IR/Instruction/AllocaInst.h"
 
 #include "vipir/IR/BasicBlock.h"
 
@@ -10,14 +9,16 @@
 #include "vasm/instruction/operand/Register.h"
 
 #include "vasm/instruction/twoOperandInstruction/MovInstruction.h"
+#include "vipir/Type/PointerType.h"
 
+#include <cassert>
 #include <format>
 
 namespace vipir
 {
     void LoadInst::print(std::ostream& stream)
     {
-        stream << std::format("load i32 %{}, {}", mValueId, mPtr->ident());
+        stream << std::format("load {} %{}, {}", mType->getName(), mValueId, mPtr->ident());
     }
 
     Value* LoadInst::getPointer()
@@ -32,11 +33,7 @@ namespace vipir
 
     void LoadInst::emit(MC::Builder& builder)
     {
-        codegen::OperandSize size = codegen::OperandSize::None; // TODO: Get this properly from pointer type
-        if (AllocaInst* alloca = dynamic_cast<AllocaInst*>(mPtr))
-        {
-            size = alloca->getAllocatedType()->getOperandSize();
-        }
+        codegen::OperandSize size = mType->getOperandSize();
         
         instruction::OperandPtr& ptr = mPtr->getEmittedValue();
         instruction::OperandPtr  reg = std::make_unique<instruction::Register>(mRegisterID, size);
@@ -51,10 +48,9 @@ namespace vipir
         , mPtr(ptr)
         , mValueId(mModule.getNextValueId())
     {
+        assert(mPtr->getType()->isPointerType());
+        mType = static_cast<PointerType*>(mPtr->getType())->getBaseType();
+
         requiresRegister = true;
-        if (AllocaInst* alloca = dynamic_cast<AllocaInst*>(mPtr)) // TODO: Get this properly from pointer type
-        {
-            mType = alloca->getAllocatedType();
-        }
     }
 }

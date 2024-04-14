@@ -27,4 +27,9 @@ namespace vipir
                 break;
         }
     }
+
+    bool IntegerType::isIntegerType() const
+    {
+        return true;
+    }
 }

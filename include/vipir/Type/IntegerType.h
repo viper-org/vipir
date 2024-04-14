@@ -16,6 +16,8 @@ namespace vipir
     {
     public:
         IntegerType(int bits);
+
+        bool isIntegerType() const override;
     };
 }
 

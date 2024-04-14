@@ -18,6 +18,8 @@ namespace vipir
     public:
         FunctionType(Type* returnType);
 
+        bool isFunctionType() const override;
+
         Type* getReturnType() const;
 
         static FunctionType* Create(Type* returnType); // TODO: Add arguments
