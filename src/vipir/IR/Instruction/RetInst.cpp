@@ -62,6 +62,13 @@ namespace vipir
         : Instruction(parent->getModule(), parent)
         , mReturnValue(returnValue)
     {
-        assert(mReturnValue->getType() == mParent->getParent()->getFunctionType()->getReturnType());
+        if (!mReturnValue)
+        {
+            assert(mParent->getParent()->getFunctionType()->getReturnType() == Type::GetVoidType());
+        }
+        else
+        {
+            assert(mReturnValue->getType() == mParent->getParent()->getFunctionType()->getReturnType());
+        }
     }
 }
