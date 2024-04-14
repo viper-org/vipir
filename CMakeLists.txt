@@ -24,6 +24,7 @@ set(SOURCES
     "src/vipir/IR/Instruction/StoreInst.cpp"
     "src/vipir/IR/Instruction/LoadInst.cpp"
     "src/vipir/IR/Instruction/BinaryInst.cpp"
+    "src/vipir/IR/Instruction/BranchInst.cpp"
 
     "src/vipir/Type/Type.cpp"
     "src/vipir/Type/IntegerType.cpp"
@@ -53,6 +54,7 @@ set(HEADERS
     "include/vipir/IR/Instruction/StoreInst.h"
     "include/vipir/IR/Instruction/LoadInst.h"
     "include/vipir/IR/Instruction/BinaryInst.h"
+    "include/vipir/IR/Instruction/BranchInst.h"
 
     "include/vipir/Type/Type.h"
     "include/vipir/Type/IntegerType.h"

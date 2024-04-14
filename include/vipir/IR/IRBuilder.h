@@ -21,6 +21,7 @@ namespace vipir
     class StoreInst;
     class LoadInst;
     class BinaryInst;
+    class BranchInst;
 
     class ConstantInt;
 
@@ -33,13 +34,19 @@ namespace vipir
         BasicBlock* getInsertPoint();
 
         RetInst* CreateRet(Value* returnValue);
+
         AllocaInst* CreateAlloca(Type* allocatedType, std::string_view name);
+
         StoreInst* CreateStore(Value* ptr, Value* value);
         LoadInst* CreateLoad(Value* ptr);
+
         BinaryInst* CreateAdd(Value* left, Value* right);
         BinaryInst* CreateSub(Value* left, Value* right);
         BinaryInst* CreateCmpEQ(Value* left, Value* right);
         BinaryInst* CreateCmpNE(Value* left, Value* right);
+
+        BranchInst* CreateBr(BasicBlock* destination);
+        BranchInst* CreateCondBr(Value* condition, BasicBlock* trueBranch, BasicBlock* falseBranch);
 
         ConstantInt* CreateConstantInt(intmax_t value, Type* type);
 

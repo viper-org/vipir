@@ -16,7 +16,7 @@ namespace vipir
 
     class BranchInst : public Instruction
     {
-    friend class Builder;
+    friend class IRBuilder;
     public:
         void print(std::ostream& stream) override;
         std::string ident() const override;

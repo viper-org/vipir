@@ -9,6 +9,7 @@
 #include "vipir/IR/Instruction/StoreInst.h"
 #include "vipir/IR/Instruction/LoadInst.h"
 #include "vipir/IR/Instruction/BinaryInst.h"
+#include "vipir/IR/Instruction/BranchInst.h"
 
 #include "vipir/IR/Constant/ConstantInt.h"
 
@@ -100,6 +101,24 @@ namespace vipir
         mInsertPoint->insertValue(add);
 
         return add;
+    }
+
+    BranchInst* IRBuilder::CreateBr(BasicBlock* destination)
+    {
+        BranchInst* branch = new BranchInst(mInsertPoint, destination);
+
+        mInsertPoint->insertValue(branch);
+
+        return branch;
+    }
+
+    BranchInst* IRBuilder::CreateCondBr(Value* condition, BasicBlock* trueBranch, BasicBlock* falseBranch)
+    {
+        BranchInst* branch = new BranchInst(mInsertPoint, condition, trueBranch, falseBranch);
+
+        mInsertPoint->insertValue(branch);
+
+        return branch;
     }
 
 
