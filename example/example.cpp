@@ -20,10 +20,10 @@ int main()
     vipir::Module mod("test.tst");
     vipir::IRBuilder builder;
 
-    auto i32Type = vipir::Type::GetIntegerType(64);
-    auto i64Type = vipir::Type::GetIntegerType(32);
+    auto i32Type = vipir::Type::GetIntegerType(32);
+    auto i64Type = vipir::Type::GetIntegerType(64);
 
-    auto func = vipir::Function::Create(mod, "main");
+    auto func = vipir::Function::Create(vipir::FunctionType::Create(i32Type), mod, "main");
     auto bb1 = vipir::BasicBlock::Create("test", func);
     auto bb2 = vipir::BasicBlock::Create("test2", func);
 

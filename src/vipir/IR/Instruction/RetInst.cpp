@@ -3,11 +3,14 @@
 #include "vipir/IR/Instruction/RetInst.h"
 
 #include "vipir/IR/BasicBlock.h"
+#include "vipir/IR/Function.h"
 
 #include "vasm/instruction/operand/Register.h"
 
 #include "vasm/instruction/NoOperandInstruction.h"
 #include "vasm/instruction/twoOperandInstruction/MovInstruction.h"
+
+#include <cassert>
 
 namespace vipir
 {
@@ -59,5 +62,6 @@ namespace vipir
         : Instruction(parent->getModule(), parent)
         , mReturnValue(returnValue)
     {
+        assert(mReturnValue->getType() == mParent->getParent()->getFunctionType()->getReturnType());
     }
 }

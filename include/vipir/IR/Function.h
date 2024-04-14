@@ -11,6 +11,8 @@
 #include "vipir/IR/Global.h"
 #include "vipir/IR/BasicBlock.h"
 
+#include "vipir/Type/FunctionType.h"
+
 #include <memory>
 
 namespace vipir
@@ -21,7 +23,9 @@ namespace vipir
     friend class IRBuilder;
     using BasicBlockPtr = std::unique_ptr<BasicBlock>;
     public:
-        static Function* Create(/*FunctionType* type, */Module& module, std::string_view name);
+        static Function* Create(FunctionType* type, Module& module, std::string_view name);
+
+        FunctionType* getFunctionType() const;
 
         void insertBasicBlock(BasicBlock* basicBlock);
 
@@ -32,7 +36,7 @@ namespace vipir
         void emit(MC::Builder& builder) override;
 
     private:
-        Function(/*FunctionType* type, */Module& module, std::string_view name);
+        Function(FunctionType* type, Module& module, std::string_view name);
 
         std::string mName;
 

@@ -25,6 +25,7 @@ namespace vipir
 
         static Type* GetIntegerType(int bits);
         static Type* GetVoidType();
+        static Type* GetFunctionType(Type* returnType); // TODO: Add argument types
 
     protected:
         Type(std::size_t sizeInBits, std::string_view name)

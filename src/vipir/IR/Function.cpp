@@ -20,13 +20,18 @@
 
 namespace vipir
 {
-    Function* Function::Create(/*FunctionType* type, */Module& module, std::string_view name)
+    Function* Function::Create(FunctionType* type, Module& module, std::string_view name)
     {
-        Function* func = new Function(/*type, */module, name);
+        Function* func = new Function(type, module, name);
 
         module.insertGlobal(func);
 
         return func;
+    }
+
+    FunctionType* Function::getFunctionType() const
+    {
+        return static_cast<FunctionType*>(mType);
     }
 
     void Function::insertBasicBlock(BasicBlock* basicBlock)
@@ -36,7 +41,7 @@ namespace vipir
 
     void Function::print(std::ostream& stream)
     {
-        stream << std::format("\n\nfunction @{}() -> i32 {{\n", mName);
+        stream << std::format("\n\nfunction @{}() -> {} {{\n", mName, getFunctionType()->getReturnType()->getName());
         for (auto& basicBlock : mBasicBlockList)
         {
             basicBlock->print(stream);
@@ -71,12 +76,12 @@ namespace vipir
         }
     }
 
-    Function::Function(/*FunctionType* type, */Module& module, std::string_view name)
+    Function::Function(FunctionType* type, Module& module, std::string_view name)
         : Global(module)
         , mName(name)
-        /*,mType(type)*/
         , mTotalStackOffset(0)
     {
+        mType = type;
     }
 
     void Function::insertAlloca(AllocaInst* alloca)
