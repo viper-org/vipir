@@ -30,6 +30,7 @@ namespace vipir
 
         static Type* GetIntegerType(int bits);
         static Type* GetVoidType();
+        static Type* GetBooleanType();
         static Type* GetFunctionType(Type* returnType); // TODO: Add argument types
         static Type* GetPointerType(Type* baseType);
 

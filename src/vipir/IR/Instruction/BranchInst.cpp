@@ -10,6 +10,7 @@
 #include "vasm/instruction/singleOperandInstruction/JmpInstruction.h"
 #include "vasm/instruction/singleOperandInstruction/JccInstruction.h"
 
+#include <cassert>
 #include <format>
 #include <iostream>
 
@@ -81,5 +82,6 @@ namespace vipir
         , mTrueBranch(trueBranch)
         , mFalseBranch(falseBranch)
     {
+        assert(mCondition->getType() == Type::GetBooleanType());
     }
 }

@@ -3,6 +3,7 @@
 #include "vipir/Type/Type.h"
 #include "vipir/Type/IntegerType.h"
 #include "vipir/Type/VoidType.h"
+#include "vipir/Type/BooleanType.h"
 #include "vipir/Type/FunctionType.h"
 #include "vipir/Type/PointerType.h"
 
@@ -43,6 +44,20 @@ namespace vipir
         }
 
         types.push_back(std::make_unique<VoidType>());
+        return types.back().get();
+    }
+
+    Type* Type::GetBooleanType()
+    {
+        for (const auto& type : types)
+        {
+            if (BooleanType* booleanType = dynamic_cast<BooleanType*>(type.get()))
+            {
+                return booleanType;
+            }
+        }
+
+        types.push_back(std::make_unique<BooleanType>());
         return types.back().get();
     }
 

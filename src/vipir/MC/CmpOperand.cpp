@@ -13,4 +13,9 @@ namespace vipir
     {
         return mOperator;
     }
+
+    std::unique_ptr<instruction::Operand> CmpOperand::clone()
+    {
+        return std::make_unique<CmpOperand>(mOperator);
+    }
 }
