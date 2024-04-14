@@ -26,7 +26,8 @@ namespace vipir
 
     std::vector<Value*> RetInst::getOperands()
     {
-        return {mReturnValue};
+        if (mReturnValue) return {mReturnValue};
+        else return std::vector<Value*>();
     }
 
     std::string RetInst::ident() const
