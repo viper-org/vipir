@@ -5,6 +5,8 @@
 
 #include "vasm/instruction/Label.h"
 
+#include "vasm/instruction/operand/Label.h"
+
 #include <format>
 
 namespace vipir
@@ -62,6 +64,7 @@ namespace vipir
     void BasicBlock::emit(MC::Builder& builder)
     {
         builder.addValue(std::make_unique<instruction::Label>(mName));
+        mEmittedValue = std::make_unique<instruction::LabelOperand>(mName);
         for (auto& value : mValueList)
         {
             value->emit(builder);
