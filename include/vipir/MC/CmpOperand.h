@@ -11,6 +11,10 @@ namespace vipir
     {
         EQ,
         NE,
+        LT,
+        GT,
+        LE,
+        GE,
     };
 
     class CmpOperand : public instruction::Operand

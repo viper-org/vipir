@@ -45,6 +45,10 @@ namespace vipir
         BinaryInst* CreateSub(Value* left, Value* right);
         BinaryInst* CreateCmpEQ(Value* left, Value* right);
         BinaryInst* CreateCmpNE(Value* left, Value* right);
+        BinaryInst* CreateCmpLT(Value* left, Value* right);
+        BinaryInst* CreateCmpGT(Value* left, Value* right);
+        BinaryInst* CreateCmpLE(Value* left, Value* right);
+        BinaryInst* CreateCmpGE(Value* left, Value* right);
 
         BranchInst* CreateBr(BasicBlock* destination);
         BranchInst* CreateCondBr(Value* condition, BasicBlock* trueBranch, BasicBlock* falseBranch);

@@ -63,6 +63,32 @@ namespace vipir
                     builder.addValue(std::make_unique<instruction::JmpInstruction>(std::move(mFalseBranch->getEmittedValue())));
                     break;
                 }
+
+                case CmpOperator::LT:
+                {
+                    builder.addValue(std::make_unique<instruction::JlInstruction>(std::move(mTrueBranch->getEmittedValue())));
+                    builder.addValue(std::make_unique<instruction::JmpInstruction>(std::move(mFalseBranch->getEmittedValue())));
+                    break;
+                }
+                case CmpOperator::GT:
+                {
+                    builder.addValue(std::make_unique<instruction::JgInstruction>(std::move(mTrueBranch->getEmittedValue())));
+                    builder.addValue(std::make_unique<instruction::JmpInstruction>(std::move(mFalseBranch->getEmittedValue())));
+                    break;
+                }
+
+                case CmpOperator::LE:
+                {
+                    builder.addValue(std::make_unique<instruction::JleInstruction>(std::move(mTrueBranch->getEmittedValue())));
+                    builder.addValue(std::make_unique<instruction::JmpInstruction>(std::move(mFalseBranch->getEmittedValue())));
+                    break;
+                }
+                case CmpOperator::GE:
+                {
+                    builder.addValue(std::make_unique<instruction::JgeInstruction>(std::move(mTrueBranch->getEmittedValue())));
+                    builder.addValue(std::make_unique<instruction::JmpInstruction>(std::move(mFalseBranch->getEmittedValue())));
+                    break;
+                }
             }
         }
     }

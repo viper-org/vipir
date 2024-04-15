@@ -31,6 +31,7 @@ namespace vipir
     }
 
 
+
     RetInst* IRBuilder::CreateRet(Value* returnValue)
     {
         RetInst* ret = new RetInst(mInsertPoint, returnValue);
@@ -39,6 +40,8 @@ namespace vipir
 
         return ret;
     }
+
+
 
     AllocaInst* IRBuilder::CreateAlloca(Type* allocatedType, std::string_view name)
     {
@@ -49,6 +52,8 @@ namespace vipir
 
         return alloca;
     }
+
+
 
     StoreInst* IRBuilder::CreateStore(Value* ptr, Value* value)
     {
@@ -68,6 +73,8 @@ namespace vipir
         return load;
     }
 
+
+
     BinaryInst* IRBuilder::CreateAdd(Value* left, Value* right)
     {
         BinaryInst* add = new BinaryInst(mInsertPoint, left, Instruction::ADD, right);
@@ -79,30 +86,68 @@ namespace vipir
 
     BinaryInst* IRBuilder::CreateSub(Value* left, Value* right)
     {
-        BinaryInst* add = new BinaryInst(mInsertPoint, left, Instruction::SUB, right);
+        BinaryInst* sub = new BinaryInst(mInsertPoint, left, Instruction::SUB, right);
 
-        mInsertPoint->insertValue(add);
+        mInsertPoint->insertValue(sub);
 
-        return add;
+        return sub;
     }
 
     BinaryInst* IRBuilder::CreateCmpEQ(Value* left, Value* right)
     {
-        BinaryInst* add = new BinaryInst(mInsertPoint, left, Instruction::EQ, right);
+        BinaryInst* eq = new BinaryInst(mInsertPoint, left, Instruction::EQ, right);
 
-        mInsertPoint->insertValue(add);
+        mInsertPoint->insertValue(eq);
 
-        return add;
+        return eq;
     }
 
     BinaryInst* IRBuilder::CreateCmpNE(Value* left, Value* right)
     {
-        BinaryInst* add = new BinaryInst(mInsertPoint, left, Instruction::NE, right);
+        BinaryInst* ne = new BinaryInst(mInsertPoint, left, Instruction::NE, right);
 
-        mInsertPoint->insertValue(add);
+        mInsertPoint->insertValue(ne);
 
-        return add;
+        return ne;
     }
+
+    BinaryInst* IRBuilder::CreateCmpLT(Value* left, Value* right)
+    {
+        BinaryInst* lt = new BinaryInst(mInsertPoint, left, Instruction::LT, right);
+
+        mInsertPoint->insertValue(lt);
+
+        return lt;
+    }
+
+    BinaryInst* IRBuilder::CreateCmpGT(Value* left, Value* right)
+    {
+        BinaryInst* gt = new BinaryInst(mInsertPoint, left, Instruction::GT, right);
+
+        mInsertPoint->insertValue(gt);
+
+        return gt;
+    }
+
+    BinaryInst* IRBuilder::CreateCmpLE(Value* left, Value* right)
+    {
+        BinaryInst* le = new BinaryInst(mInsertPoint, left, Instruction::LE, right);
+
+        mInsertPoint->insertValue(le);
+
+        return le;
+    }
+
+    BinaryInst* IRBuilder::CreateCmpGE(Value* left, Value* right)
+    {
+        BinaryInst* ge = new BinaryInst(mInsertPoint, left, Instruction::GE, right);
+
+        mInsertPoint->insertValue(ge);
+
+        return ge;
+    }
+
+
 
     BranchInst* IRBuilder::CreateBr(BasicBlock* destination)
     {
@@ -121,6 +166,7 @@ namespace vipir
 
         return branch;
     }
+
 
 
     ConstantInt* IRBuilder::CreateConstantInt(intmax_t value, Type* type)

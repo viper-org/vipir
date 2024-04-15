@@ -30,9 +30,22 @@ namespace vipir
             case Instruction::EQ:
                 operatorName = "cmp eq";
                 break;
-            
             case Instruction::NE:
                 operatorName = "cmp ne";
+                break;
+            
+            case Instruction::LT:
+                operatorName = "cmp lt";
+                break;
+            case Instruction::GT:
+                operatorName = "cmp gt";
+                break;
+            
+            case Instruction::LE:
+                operatorName = "cmp le";
+                break;
+            case Instruction::GE:
+                operatorName = "cmp ge";
                 break;
         }
         stream << std::format("{} %{}, {}, {}", operatorName, mValueId, mLeft->ident(), mRight->ident());
@@ -71,6 +84,10 @@ namespace vipir
 
             case Instruction::EQ:
             case Instruction::NE:
+            case Instruction::LT:
+            case Instruction::GT:
+            case Instruction::LE:
+            case Instruction::GE:
                 mBuilder = &builder;
                 break;
         }
@@ -96,6 +113,10 @@ namespace vipir
 
             case Instruction::EQ:
             case Instruction::NE:
+            case Instruction::LT:
+            case Instruction::GT:
+            case Instruction::LE:
+            case Instruction::GE:
             {
                 mType = Type::GetBooleanType();
                 break;
@@ -105,24 +126,35 @@ namespace vipir
 
     instruction::OperandPtr& BinaryInst::getEmittedValue()
     {
+        auto GenerateCmp = [this](CmpOperator op){
+            instruction::OperandPtr& left  = mLeft->getEmittedValue();
+            instruction::OperandPtr& right = mRight->getEmittedValue();
+            mBuilder->addValue(std::make_unique<instruction::CmpInstruction>(std::move(left), std::move(right), codegen::OperandSize::None));
+            mEmittedValue = std::make_unique<CmpOperand>(op);
+        };
+
         switch (mOperator)
         {
             case Instruction::EQ:
-            {
-                instruction::OperandPtr& left  = mLeft->getEmittedValue();
-                instruction::OperandPtr& right = mRight->getEmittedValue();
-                mBuilder->addValue(std::make_unique<instruction::CmpInstruction>(std::move(left), std::move(right), codegen::OperandSize::None));
-                mEmittedValue = std::make_unique<CmpOperand>(CmpOperator::EQ);
+                GenerateCmp(CmpOperator::EQ);
                 break;
-            }
             case Instruction::NE:
-            {
-                instruction::OperandPtr& left  = mLeft->getEmittedValue();
-                instruction::OperandPtr& right = mRight->getEmittedValue();
-                mBuilder->addValue(std::make_unique<instruction::CmpInstruction>(std::move(left), std::move(right), codegen::OperandSize::None));
-                mEmittedValue = std::make_unique<CmpOperand>(CmpOperator::NE);
+                GenerateCmp(CmpOperator::NE);
                 break;
-            }
+
+            case Instruction::LT:
+                GenerateCmp(CmpOperator::LT);
+                break;
+            case Instruction::GT:
+                GenerateCmp(CmpOperator::GT);
+                break;
+
+            case Instruction::LE:
+                GenerateCmp(CmpOperator::LE);
+                break;
+            case Instruction::GE:
+                GenerateCmp(CmpOperator::GE);
+                break;
 
             default:
                 break;
