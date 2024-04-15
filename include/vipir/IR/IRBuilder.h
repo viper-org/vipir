@@ -21,6 +21,7 @@ namespace vipir
     class StoreInst;
     class LoadInst;
     class BinaryInst;
+    class UnaryInst;
     class BranchInst;
 
     class ConstantInt;
@@ -49,6 +50,8 @@ namespace vipir
         BinaryInst* CreateCmpGT(Value* left, Value* right);
         BinaryInst* CreateCmpLE(Value* left, Value* right);
         BinaryInst* CreateCmpGE(Value* left, Value* right);
+
+        UnaryInst* CreateNeg(Value* operand);
 
         BranchInst* CreateBr(BasicBlock* destination);
         BranchInst* CreateCondBr(Value* condition, BasicBlock* trueBranch, BasicBlock* falseBranch);

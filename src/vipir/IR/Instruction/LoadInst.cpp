@@ -35,10 +35,10 @@ namespace vipir
     {
         codegen::OperandSize size = mType->getOperandSize();
         
-        instruction::OperandPtr& ptr = mPtr->getEmittedValue();
-        instruction::OperandPtr  reg = std::make_unique<instruction::Register>(mRegisterID, size);
+        instruction::OperandPtr ptr = mPtr->getEmittedValue();
+        instruction::OperandPtr reg = std::make_unique<instruction::Register>(mRegisterID, size);
 
-        builder.addValue(std::make_unique<instruction::MovInstruction>(std::move(reg), std::move(ptr)));
+        builder.addValue(std::make_unique<instruction::MovInstruction>(reg->clone(), std::move(ptr)));
 
         mEmittedValue = std::move(reg);
     }

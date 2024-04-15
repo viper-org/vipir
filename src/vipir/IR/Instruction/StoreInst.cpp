@@ -23,8 +23,8 @@ namespace vipir
 
     void StoreInst::emit(MC::Builder& builder)
     {
-        instruction::OperandPtr& ptr   = mPtr->getEmittedValue();
-        instruction::OperandPtr& value = mValue->getEmittedValue();
+        instruction::OperandPtr ptr   = mPtr->getEmittedValue();
+        instruction::OperandPtr value = mValue->getEmittedValue();
 
         builder.addValue(std::make_unique<instruction::MovInstruction>(std::move(ptr), std::move(value), mValue->getType()->getOperandSize()));
     }

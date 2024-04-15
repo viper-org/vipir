@@ -42,7 +42,7 @@ namespace vipir
     {
         if (mReturnValue)
         {
-            instruction::OperandPtr& returnValue = mReturnValue->getEmittedValue();
+            instruction::OperandPtr returnValue = mReturnValue->getEmittedValue();
             if (returnValue)
             {
                 instruction::Register* returnRegister = dynamic_cast<instruction::Register*>(returnValue.get());

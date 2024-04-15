@@ -30,6 +30,10 @@ namespace vipir
             LT, GT,
             LE, GE,
         };
+        enum UnaryOperators
+        {
+            NEG
+        };
 
     protected:
         BasicBlock* mParent;

@@ -9,6 +9,7 @@
 #include "vipir/IR/Instruction/StoreInst.h"
 #include "vipir/IR/Instruction/LoadInst.h"
 #include "vipir/IR/Instruction/BinaryInst.h"
+#include "vipir/IR/Instruction/UnaryInst.h"
 #include "vipir/IR/Instruction/BranchInst.h"
 
 #include "vipir/IR/Constant/ConstantInt.h"
@@ -165,6 +166,16 @@ namespace vipir
         mInsertPoint->insertValue(branch);
 
         return branch;
+    }
+
+
+    UnaryInst* IRBuilder::CreateNeg(Value* operand)
+    {
+        UnaryInst* neg = new UnaryInst(mInsertPoint, operand, Instruction::NEG);
+
+        mInsertPoint->insertValue(neg);
+
+        return neg;
     }
 
 

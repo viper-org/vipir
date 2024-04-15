@@ -35,7 +35,7 @@ namespace vipir
         virtual void print(std::ostream& stream) = 0;
         virtual std::string ident() const = 0;
 
-        virtual instruction::OperandPtr& getEmittedValue() { return mEmittedValue; }
+        virtual instruction::OperandPtr getEmittedValue() { return mEmittedValue->clone(); }
     
     protected:
         Module& mModule;

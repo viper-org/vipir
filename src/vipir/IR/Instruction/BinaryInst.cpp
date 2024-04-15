@@ -67,16 +67,16 @@ namespace vipir
         {
             case Instruction::ADD:
             {
-                instruction::OperandPtr& left  = mLeft->getEmittedValue();
-                instruction::OperandPtr& right = mRight->getEmittedValue();
+                instruction::OperandPtr left  = mLeft->getEmittedValue();
+                instruction::OperandPtr right = mRight->getEmittedValue();
                 builder.addValue(std::make_unique<instruction::AddInstruction>(left->clone(), std::move(right), codegen::OperandSize::None));
                 mEmittedValue = std::move(left);
                 break;
             }
             case Instruction::SUB:
             {
-                instruction::OperandPtr& left  = mLeft->getEmittedValue();
-                instruction::OperandPtr& right = mRight->getEmittedValue();
+                instruction::OperandPtr left  = mLeft->getEmittedValue();
+                instruction::OperandPtr right = mRight->getEmittedValue();
                 builder.addValue(std::make_unique<instruction::SubInstruction>(left->clone(), std::move(right), codegen::OperandSize::None));
                 mEmittedValue = std::move(left);
                 break;
@@ -124,11 +124,11 @@ namespace vipir
         }
     }
 
-    instruction::OperandPtr& BinaryInst::getEmittedValue()
+    instruction::OperandPtr BinaryInst::getEmittedValue()
     {
         auto GenerateCmp = [this](CmpOperator op){
-            instruction::OperandPtr& left  = mLeft->getEmittedValue();
-            instruction::OperandPtr& right = mRight->getEmittedValue();
+            instruction::OperandPtr left  = mLeft->getEmittedValue();
+            instruction::OperandPtr right = mRight->getEmittedValue();
             mBuilder->addValue(std::make_unique<instruction::CmpInstruction>(std::move(left), std::move(right), codegen::OperandSize::None));
             mEmittedValue = std::make_unique<CmpOperand>(op);
         };
@@ -160,6 +160,6 @@ namespace vipir
                 break;
         }
 
-        return mEmittedValue;
+        return mEmittedValue->clone();
     }
 }

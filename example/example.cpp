@@ -9,6 +9,7 @@
 #include "vipir/IR/Instruction/AllocaInst.h"
 #include "vipir/IR/Instruction/LoadInst.h"
 #include "vipir/IR/Instruction/BinaryInst.h"
+#include "vipir/IR/Instruction/UnaryInst.h"
 
 #include "vipir/Type/Type.h"
 
@@ -39,7 +40,9 @@ int main()
 
     auto lhs = builder.CreateLoad(local1);
     auto rhs = builder.CreateLoad(local1);
-    auto retval = builder.CreateSub(lhs, rhs);
+    auto test2 = builder.CreateSub(lhs, rhs);
+
+    auto retval = builder.CreateNeg(test2);
     builder.CreateRet(retval);
 
     mod.emit(std::cout, vipir::OutputFormat::ELF);

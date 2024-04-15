@@ -47,7 +47,7 @@ namespace vipir
         }
         else
         {
-            instruction::OperandPtr& condition = mCondition->getEmittedValue();
+            instruction::OperandPtr condition = mCondition->getEmittedValue();
             CmpOperand* cmp = static_cast<CmpOperand*>(condition.get());
             switch (cmp->getOperator())
             {
