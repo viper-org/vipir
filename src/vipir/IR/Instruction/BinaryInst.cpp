@@ -26,6 +26,16 @@ namespace vipir
             case Instruction::SUB:
                 operatorName = "sub";
                 break;
+
+            case Instruction::BWOR:
+                operatorName = "bwor";
+                break;
+            case Instruction::BWAND:
+                operatorName = "bwand";
+                break;
+            case Instruction::BWXOR:
+                operatorName = "bwxor";
+                break;
             
             case Instruction::EQ:
                 operatorName = "cmp eq";
@@ -63,22 +73,38 @@ namespace vipir
 
     void BinaryInst::emit(MC::Builder& builder)
     {
+        auto GenerateInstruction = [&builder, this]<class InstructionT>(){
+            instruction::OperandPtr left  = mLeft->getEmittedValue();
+            instruction::OperandPtr right = mRight->getEmittedValue();
+            builder.addValue(std::make_unique<InstructionT>(left->clone(), std::move(right), codegen::OperandSize::None));
+            mEmittedValue = std::move(left);
+        };
         switch (mOperator)
         {
             case Instruction::ADD:
             {
-                instruction::OperandPtr left  = mLeft->getEmittedValue();
-                instruction::OperandPtr right = mRight->getEmittedValue();
-                builder.addValue(std::make_unique<instruction::AddInstruction>(left->clone(), std::move(right), codegen::OperandSize::None));
-                mEmittedValue = std::move(left);
+                GenerateInstruction.template operator()<instruction::AddInstruction>();
                 break;
             }
             case Instruction::SUB:
             {
-                instruction::OperandPtr left  = mLeft->getEmittedValue();
-                instruction::OperandPtr right = mRight->getEmittedValue();
-                builder.addValue(std::make_unique<instruction::SubInstruction>(left->clone(), std::move(right), codegen::OperandSize::None));
-                mEmittedValue = std::move(left);
+                GenerateInstruction.template operator()<instruction::SubInstruction>();
+                break;
+            }
+
+            case Instruction::BWOR:
+            {
+                GenerateInstruction.template operator()<instruction::OrInstruction>();
+                break;
+            }
+            case Instruction::BWAND:
+            {
+                GenerateInstruction.template operator()<instruction::AndInstruction>();
+                break;
+            }
+            case Instruction::BWXOR:
+            {
+                GenerateInstruction.template operator()<instruction::XorInstruction>();
                 break;
             }
 
@@ -106,6 +132,9 @@ namespace vipir
         {
             case Instruction::ADD:
             case Instruction::SUB:
+            case Instruction::BWOR:
+            case Instruction::BWAND:
+            case Instruction::BWXOR:
             {
                 mType = left->getType();
                 break;

@@ -26,13 +26,16 @@ namespace vipir
         {
             ADD, SUB,
 
+            BWAND, BWOR, BWXOR,
+
             EQ, NE,
             LT, GT,
             LE, GE,
         };
         enum UnaryOperators
         {
-            NEG
+            NEG,
+            NOT,
         };
 
     protected:

@@ -35,15 +35,24 @@ namespace vipir
         void setInsertPoint(BasicBlock* newInsertPoint);
         BasicBlock* getInsertPoint();
 
+
         RetInst* CreateRet(Value* returnValue);
 
+
         AllocaInst* CreateAlloca(Type* allocatedType, std::string_view name);
+
 
         StoreInst* CreateStore(Value* ptr, Value* value);
         LoadInst* CreateLoad(Value* ptr);
 
+
         BinaryInst* CreateAdd(Value* left, Value* right);
         BinaryInst* CreateSub(Value* left, Value* right);
+
+        BinaryInst* CreateBWOr(Value* left, Value* right);
+        BinaryInst* CreateBWAnd(Value* left, Value* right);
+        BinaryInst* CreateBWXor(Value* left, Value* right);
+
         BinaryInst* CreateCmpEQ(Value* left, Value* right);
         BinaryInst* CreateCmpNE(Value* left, Value* right);
         BinaryInst* CreateCmpLT(Value* left, Value* right);
@@ -51,10 +60,14 @@ namespace vipir
         BinaryInst* CreateCmpLE(Value* left, Value* right);
         BinaryInst* CreateCmpGE(Value* left, Value* right);
 
+
         UnaryInst* CreateNeg(Value* operand);
+        UnaryInst* CreateNot(Value* operand);
+
 
         BranchInst* CreateBr(BasicBlock* destination);
         BranchInst* CreateCondBr(Value* condition, BasicBlock* trueBranch, BasicBlock* falseBranch);
+
 
         ConstantInt* CreateConstantInt(intmax_t value, Type* type);
         ConstantBool* CreateConstantBool(bool value);

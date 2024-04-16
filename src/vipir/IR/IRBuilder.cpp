@@ -94,6 +94,33 @@ namespace vipir
         return sub;
     }
 
+    BinaryInst* IRBuilder::CreateBWOr(Value* left, Value* right)
+    {
+        BinaryInst* bwor = new BinaryInst(mInsertPoint, left, Instruction::BWOR, right);
+
+        mInsertPoint->insertValue(bwor);
+
+        return bwor;
+    }
+
+    BinaryInst* IRBuilder::CreateBWAnd(Value* left, Value* right)
+    {
+        BinaryInst* bwand = new BinaryInst(mInsertPoint, left, Instruction::BWAND, right);
+
+        mInsertPoint->insertValue(bwand);
+
+        return bwand;
+    }
+
+    BinaryInst* IRBuilder::CreateBWXor(Value* left, Value* right)
+    {
+        BinaryInst* bwxor = new BinaryInst(mInsertPoint, left, Instruction::BWXOR, right);
+
+        mInsertPoint->insertValue(bwxor);
+
+        return bwxor;
+    }
+
     BinaryInst* IRBuilder::CreateCmpEQ(Value* left, Value* right)
     {
         BinaryInst* eq = new BinaryInst(mInsertPoint, left, Instruction::EQ, right);
@@ -176,6 +203,15 @@ namespace vipir
         mInsertPoint->insertValue(neg);
 
         return neg;
+    }
+
+    UnaryInst* IRBuilder::CreateNot(Value* operand)
+    {
+        UnaryInst* notInst = new UnaryInst(mInsertPoint, operand, Instruction::NOT);
+
+        mInsertPoint->insertValue(notInst);
+
+        return notInst;
     }
 
 

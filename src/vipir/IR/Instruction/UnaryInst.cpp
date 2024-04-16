@@ -22,6 +22,9 @@ namespace vipir
             case Instruction::NEG:
                 operatorName = "neg";
                 break;
+            case Instruction::NOT:
+                operatorName = "not";
+                break;
         }
         stream << std::format("{} %{}, {}", operatorName, mValueId, mOperand->ident());
     }
@@ -47,6 +50,13 @@ namespace vipir
                 mEmittedValue = std::move(operand);
                 break;
             }
+            case Instruction::NOT:
+            {
+                instruction::OperandPtr operand = mOperand->getEmittedValue();
+                builder.addValue(std::make_unique<instruction::NotInstruction>(operand->clone()));
+                mEmittedValue = std::move(operand);
+                break;
+            }
         }
     }
 
@@ -59,6 +69,8 @@ namespace vipir
         switch (mOperator)
         {
             case Instruction::NEG:
+                mType = mOperand->getType();
+            case NOT:
                 mType = mOperand->getType();
         }
     }
