@@ -48,6 +48,7 @@ namespace vipir
             (void)ptr.release();
             instruction::RegisterPtr ptrReg = instruction::RegisterPtr(regOperand);
             instruction::OperandPtr memory = std::make_unique<instruction::Memory>(std::move(ptrReg), std::nullopt);
+            builder.addValue(std::make_unique<instruction::MovInstruction>(reg->clone(), std::move(memory)));
         }
 
         mEmittedValue = std::move(reg);
