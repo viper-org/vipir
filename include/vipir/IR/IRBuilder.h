@@ -21,6 +21,7 @@ namespace vipir
     class AllocaInst;
     class StoreInst;
     class LoadInst;
+    class AddrInst;
     class BinaryInst;
     class UnaryInst;
     class BranchInst;
@@ -46,6 +47,7 @@ namespace vipir
 
         StoreInst* CreateStore(Value* ptr, Value* value);
         LoadInst* CreateLoad(Value* ptr);
+        AddrInst* CreateAddrOf(Value* ptr);
 
 
         BinaryInst* CreateAdd(Value* left, Value* right);

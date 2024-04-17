@@ -8,6 +8,7 @@
 #include "vipir/IR/Instruction/AllocaInst.h"
 #include "vipir/IR/Instruction/StoreInst.h"
 #include "vipir/IR/Instruction/LoadInst.h"
+#include "vipir/IR/Instruction/AddrInst.h"
 #include "vipir/IR/Instruction/BinaryInst.h"
 #include "vipir/IR/Instruction/UnaryInst.h"
 #include "vipir/IR/Instruction/BranchInst.h"
@@ -73,6 +74,15 @@ namespace vipir
         mInsertPoint->insertValue(load);
 
         return load;
+    }
+
+    AddrInst* IRBuilder::CreateAddrOf(Value* ptr)
+    {
+        AddrInst* addr = new AddrInst(mInsertPoint, ptr);
+
+        mInsertPoint->insertValue(addr);
+
+        return addr;
     }
 
 
