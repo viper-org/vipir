@@ -142,6 +142,19 @@ namespace vipir
                 index--;
             }
         }
+
+        // If any values don't have an end interval, set it to the same as the
+        // start - they are never used
+        for (auto& basicBlock : mBasicBlockList)
+        {
+            for (auto& value : basicBlock->mValueList)
+            {
+                if (value->mInterval.second == -1)
+                {
+                    value->mInterval.second = value->mInterval.first;
+                }
+            }
+        }
     }
 
     std::vector<Function::Overlap> Function::getOverlaps()
@@ -176,7 +189,7 @@ namespace vipir
                     }
 
                     // Check if the value's first use is before this value's last and that this value's first use is before the current lifetime end
-                    if (value->mInterval.first >= overlap.value->mInterval.second && value->mInterval.first < overlap.end)
+                    if (value->mInterval.first >= overlap.value->mInterval.second && (value->mInterval.first < overlap.end || overlap.end == -1))
                     {
                         overlap.end = value->mInterval.first;
                     }
