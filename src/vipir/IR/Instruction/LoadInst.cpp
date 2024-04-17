@@ -7,6 +7,7 @@
 #include "vipir/Module.h"
 
 #include "vasm/instruction/operand/Register.h"
+#include "vasm/instruction/operand/Memory.h"
 
 #include "vasm/instruction/twoOperandInstruction/MovInstruction.h"
 #include "vipir/Type/PointerType.h"
@@ -38,7 +39,16 @@ namespace vipir
         instruction::OperandPtr ptr = mPtr->getEmittedValue();
         instruction::OperandPtr reg = std::make_unique<instruction::Register>(mRegisterID, size);
 
-        builder.addValue(std::make_unique<instruction::MovInstruction>(reg->clone(), std::move(ptr)));
+        if (dynamic_cast<instruction::Memory*>(ptr.get()))
+        {
+            builder.addValue(std::make_unique<instruction::MovInstruction>(reg->clone(), std::move(ptr)));
+        }
+        else if (auto regOperand = dynamic_cast<instruction::Register*>(ptr.get()))
+        {
+            (void)ptr.release();
+            instruction::RegisterPtr ptrReg = instruction::RegisterPtr(regOperand);
+            instruction::OperandPtr memory = std::make_unique<instruction::Memory>(std::move(ptrReg), std::nullopt);
+        }
 
         mEmittedValue = std::move(reg);
     }
