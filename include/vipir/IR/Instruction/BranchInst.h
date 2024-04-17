@@ -12,8 +12,6 @@
 
 namespace vipir
 {
-    class Builder;
-
     class BranchInst : public Instruction
     {
     friend class IRBuilder;

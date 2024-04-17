@@ -27,6 +27,7 @@ set(SOURCES
     "src/vipir/IR/Instruction/BinaryInst.cpp"
     "src/vipir/IR/Instruction/UnaryInst.cpp"
     "src/vipir/IR/Instruction/BranchInst.cpp"
+    "src/vipir/IR/Instruction/CallInst.cpp"
 
     "src/vipir/Type/Type.cpp"
     "src/vipir/Type/IntegerType.cpp"
@@ -59,6 +60,7 @@ set(HEADERS
     "include/vipir/IR/Instruction/BinaryInst.h"
     "include/vipir/IR/Instruction/UnaryInst.h"
     "include/vipir/IR/Instruction/BranchInst.h"
+    "include/vipir/IR/Instruction/CallInst.h"
 
     "include/vipir/Type/Type.h"
     "include/vipir/Type/IntegerType.h"

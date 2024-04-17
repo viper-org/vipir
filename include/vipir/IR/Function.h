@@ -47,7 +47,18 @@ namespace vipir
         void insertAlloca(AllocaInst* alloca);
         void setLocalStackOffsets();
 
+
+        // This structure represents a value requiring a specific
+        // register and the earliest and latest values that overlap
+        // with it, so the register can be allocated for their lifetimes
+        struct Overlap
+        {
+            Value* value;
+            int start;
+            int end;
+        };
         void setLiveIntervals();
+        std::vector<Overlap> getOverlaps();
         void allocateRegisters();
     };
 }

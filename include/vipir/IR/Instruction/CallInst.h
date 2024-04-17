@@ -1,35 +1,34 @@
 // Copyright 2024 solar-mist
 
 /*
- * An instruction that loads a value from an AllocaInst
- * or other pointer
+ * An instruction that calls a function
 */
 
-#ifndef VIPIR_IR_INSTRUCTION_LOAD_INST_H
-#define VIPIR_IR_INSTRUCTION_LOAD_INST_H 1
+#ifndef VIPIR_IR_INSTRUCTION_CALL_INST_H
+#define VIPIR_IR_INSTRUCTION_CALL_INST_H 1
 
 #include "vipir/IR/Instruction/Instruction.h"
 
 namespace vipir
 {
-    class LoadInst : public Instruction
+    class Function;
+
+    class CallInst : public Instruction
     {
     friend class IRBuilder;
     public:
         void print(std::ostream& stream) override;
-
-        Value* getPointer();
 
     protected:
         void emit(MC::Builder& builder) override;
         std::string ident() const override;
 
     private:
-        LoadInst(BasicBlock* parent, Value* ptr);
+        CallInst(BasicBlock* parent, Function* function);
 
-        Value* mPtr;
+        Function* mFunction;
         int mValueId;
     };
 }
 
-#endif // VIPIR_IR_INSTRUCTION_LOAD_INST_H
+#endif // VIPIR_IR_INSTRUCTION_CALL_INST_H

@@ -46,6 +46,7 @@ namespace vipir
         bool requiresRegister{false};
         std::pair<int, int> mInterval{-1,-1};
         int mRegisterID;
+        int mRequiredRegister{-1};
 
         virtual void emit(MC::Builder& builder) = 0;
     };

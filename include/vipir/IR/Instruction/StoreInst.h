@@ -12,8 +12,6 @@
 
 namespace vipir
 {
-    class Builder;
-
     class StoreInst : public Instruction
     {
     friend class IRBuilder;

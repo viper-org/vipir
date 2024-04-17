@@ -9,6 +9,7 @@
 
 #include "vasm/instruction/Label.h"
 #include "vasm/instruction/operand/Register.h"
+#include "vasm/instruction/operand/Label.h"
 
 #include "vasm/instruction/singleOperandInstruction/PushInstruction.h"
 #include "vasm/instruction/twoOperandInstruction/MovInstruction.h"
@@ -56,6 +57,8 @@ namespace vipir
 
     void Function::emit(MC::Builder& builder)
     {
+        mEmittedValue = std::make_unique<instruction::LabelOperand>(mName);
+
         allocateRegisters();
         setLocalStackOffsets();
 
@@ -141,9 +144,54 @@ namespace vipir
         }
     }
 
+    std::vector<Function::Overlap> Function::getOverlaps()
+    {
+        std::vector<Overlap> overlaps;
+
+        // Find all values that require a specific register
+        for (auto& basicBlock : mBasicBlockList)
+        {
+            for (auto& value : basicBlock->mValueList)
+            {
+                if (value->mRequiredRegister != -1)
+                {
+                    value->mRegisterID = value->mRequiredRegister;
+                    overlaps.push_back(Overlap{value.get(), -1, -1});
+                }
+            }
+        }
+
+
+        // Set the start and end of the lifetime of these values
+        for (auto& overlap : overlaps)
+        {
+            for (auto& basicBlock : mBasicBlockList)
+            {
+                for (auto& value : basicBlock->mValueList)
+                {
+                    // Check if the value's last use is before this value's first and that this value's last use is after the current lifetime beginning
+                    if (value->mInterval.second <= overlap.value->mInterval.first && value->mInterval.second > overlap.start)
+                    {
+                        overlap.start = value->mInterval.second;
+                    }
+
+                    // Check if the value's first use is before this value's last and that this value's first use is before the current lifetime end
+                    if (value->mInterval.first >= overlap.value->mInterval.second && value->mInterval.first < overlap.end)
+                    {
+                        overlap.end = value->mInterval.first;
+                    }
+                }
+            }
+        }
+
+        return overlaps;
+    }
+
     void Function::allocateRegisters()
     {
         setLiveIntervals();
+
+        auto overlaps = getOverlaps();
 
         std::deque<int> registerIDs { 0, 1, 2, 3, 4, 5 };
         std::vector<Value*> activeValues;
@@ -159,11 +207,27 @@ namespace vipir
             });
         };
 
+        int index = 0;
         for (auto& basicBlock : mBasicBlockList)
         {
             for (auto& value : basicBlock->mValueList)
             {
                 ExpireOldIntervals(value->mInterval.first);
+
+                for (auto& overlap : overlaps)
+                {
+                    if (overlap.start == index)
+                    {
+                        // We found a value that requires a register now
+                        std::erase(registerIDs, overlap.value->mRequiredRegister);
+                    }
+                    if (overlap.end == index)
+                    {
+                        // This value no longer needs its required register
+                        registerIDs.push_front(overlap.value->mRequiredRegister);
+                    }
+                }
+
                 if (value->requiresRegister)
                 {
                     activeValues.push_back(value.get());
@@ -171,6 +235,7 @@ namespace vipir
                     value->mRegisterID = registerIDs.front();
                     registerIDs.pop_front();
                 }
+                index++;
             }
         }
     }

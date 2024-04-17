@@ -15,6 +15,7 @@
 namespace vipir
 {
     class BasicBlock;
+    class Function;
 
     class RetInst;
     class AllocaInst;
@@ -23,6 +24,7 @@ namespace vipir
     class BinaryInst;
     class UnaryInst;
     class BranchInst;
+    class CallInst;
 
     class ConstantInt;
     class ConstantBool;
@@ -67,6 +69,9 @@ namespace vipir
 
         BranchInst* CreateBr(BasicBlock* destination);
         BranchInst* CreateCondBr(Value* condition, BasicBlock* trueBranch, BasicBlock* falseBranch);
+
+
+        CallInst* CreateCall(Function* function);
 
 
         ConstantInt* CreateConstantInt(intmax_t value, Type* type);

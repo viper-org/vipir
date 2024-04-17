@@ -12,8 +12,6 @@
 
 namespace vipir
 {
-    class Builder;
-
     class AllocaInst : public Instruction
     {
     friend class IRBuilder;

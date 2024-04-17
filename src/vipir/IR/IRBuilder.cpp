@@ -11,6 +11,7 @@
 #include "vipir/IR/Instruction/BinaryInst.h"
 #include "vipir/IR/Instruction/UnaryInst.h"
 #include "vipir/IR/Instruction/BranchInst.h"
+#include "vipir/IR/Instruction/CallInst.h"
 
 #include "vipir/IR/Constant/ConstantInt.h"
 #include "vipir/IR/Constant/ConstantBool.h"
@@ -212,6 +213,16 @@ namespace vipir
         mInsertPoint->insertValue(notInst);
 
         return notInst;
+    }
+
+
+    CallInst* IRBuilder::CreateCall(Function* function)
+    {
+        CallInst* call = new CallInst(mInsertPoint, function);
+
+        mInsertPoint->insertValue(call);
+
+        return call;
     }
 
 
