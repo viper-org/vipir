@@ -166,16 +166,15 @@ namespace vipir
         {
             for (auto& value : basicBlock->mValueList)
             {
-                if (value->mRequiredRegister != -1)
+                if (value->mRegisterSmashes.size())
                 {
-                    value->mRegisterID = value->mRequiredRegister;
-                    overlaps.push_back(Overlap{value.get(), -1, -1});
+                    overlaps.push_back(Overlap{value.get(), -1, value->mInterval.second});
                 }
             }
         }
 
 
-        // Set the start and end of the lifetime of these values
+        // Set the start of the lifetime of these values
         for (auto& overlap : overlaps)
         {
             for (auto& basicBlock : mBasicBlockList)
@@ -186,12 +185,6 @@ namespace vipir
                     if (value->mInterval.second <= overlap.value->mInterval.first && value->mInterval.second > overlap.start)
                     {
                         overlap.start = value->mInterval.second;
-                    }
-
-                    // Check if the value's first use is before this value's last and that this value's first use is before the current lifetime end
-                    if (value->mInterval.first >= overlap.value->mInterval.second && (value->mInterval.first < overlap.end || overlap.end == -1))
-                    {
-                        overlap.end = value->mInterval.first;
                     }
                 }
             }
@@ -231,13 +224,15 @@ namespace vipir
                 {
                     if (overlap.start == index)
                     {
-                        // We found a value that requires a register now
-                        std::erase(registerIDs, overlap.value->mRequiredRegister);
+                        // We found a value that smashes a register so we don't want to allocate it until after
+                        registerIDs.erase(std::remove_if(registerIDs.begin(), registerIDs.end(), [&overlap](int id){
+                            return std::find(overlap.value->mRegisterSmashes.begin(), overlap.value->mRegisterSmashes.end(), id) != overlap.value->mRegisterSmashes.end();
+                        }), registerIDs.end());
                     }
                     if (overlap.end == index)
                     {
-                        // This value no longer needs its required register
-                        registerIDs.push_front(overlap.value->mRequiredRegister);
+                        // This value's smashed registers have been smashed already so we can allocate them again
+                        std::copy(overlap.value->mRegisterSmashes.begin(), overlap.value->mRegisterSmashes.end(), std::front_inserter(registerIDs));
                     }
                 }
 

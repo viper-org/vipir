@@ -44,6 +44,7 @@ namespace vipir
     {
         mType = mFunction->getFunctionType()->getReturnType();
 
-        mRequiredRegister = 0; // eax
+        requiresRegister = true;
+        mRegisterSmashes.push_back(0); // eax
     }
 }
