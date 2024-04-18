@@ -2,12 +2,12 @@
 
 #include "vipir/IR/Function.h"
 
-#include "vasm/instruction/operand/Immediate.h"
 #include "vipir/IR/Instruction/AllocaInst.h"
 
 #include "vipir/Module.h"
 
 #include "vasm/instruction/Label.h"
+#include "vasm/instruction/Directive.h"
 #include "vasm/instruction/operand/Register.h"
 #include "vasm/instruction/operand/Label.h"
 
@@ -49,12 +49,16 @@ namespace vipir
 
     void Function::print(std::ostream& stream)
     {
-        stream << std::format("\n\nfunction @{}() -> {} {{\n", mName, getFunctionType()->getReturnType()->getName());
-        for (auto& basicBlock : mBasicBlockList)
+        stream << std::format("\n\nfunction @{}() -> {} ", mName, getFunctionType()->getReturnType()->getName());
+        if (!mBasicBlockList.empty())
         {
-            basicBlock->print(stream);
+            stream << "{\n";
+            for (auto& basicBlock : mBasicBlockList)
+            {
+                basicBlock->print(stream);
+            }
+            stream << "}";
         }
-        stream << "}";
     }
 
     std::string Function::ident() const
@@ -65,6 +69,12 @@ namespace vipir
     void Function::emit(MC::Builder& builder)
     {
         mEmittedValue = std::make_unique<instruction::LabelOperand>(mName);
+
+        if (mBasicBlockList.empty()) // Function declaration
+        {
+            builder.addValue(std::make_unique<instruction::ExternDirective>(mName));
+            return;
+        }
 
         allocateRegisters();
         setLocalStackOffsets();
