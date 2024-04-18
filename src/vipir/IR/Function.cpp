@@ -168,7 +168,7 @@ namespace vipir
             {
                 if (value->mRegisterSmashes.size())
                 {
-                    overlaps.push_back(Overlap{value.get(), -1, value->mInterval.first});
+                    overlaps.push_back(Overlap{value.get(), -1, value->mInterval.second});
                 }
             }
         }
@@ -220,6 +220,14 @@ namespace vipir
             {
                 ExpireOldIntervals(value->mInterval.first);
 
+                if (value->requiresRegister)
+                {
+                    activeValues.push_back(value.get());
+
+                    value->mRegisterID = registerIDs.front();
+                    registerIDs.pop_front();
+                }
+                
                 for (auto& overlap : overlaps)
                 {
                     if (overlap.start == index)
@@ -236,13 +244,6 @@ namespace vipir
                     }
                 }
 
-                if (value->requiresRegister)
-                {
-                    activeValues.push_back(value.get());
-
-                    value->mRegisterID = registerIDs.front();
-                    registerIDs.pop_front();
-                }
                 index++;
             }
         }
