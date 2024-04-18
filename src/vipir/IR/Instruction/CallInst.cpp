@@ -2,7 +2,6 @@
 
 #include "vipir/IR/Instruction/CallInst.h"
 
-#include "vasm/instruction/twoOperandInstruction/MovInstruction.h"
 #include "vipir/IR/BasicBlock.h"
 #include "vipir/IR/Function.h"
 
@@ -11,6 +10,7 @@
 #include "vasm/instruction/operand/Register.h"
 
 #include "vasm/instruction/singleOperandInstruction/CallInstruction.h"
+#include "vasm/instruction/twoOperandInstruction/MovInstruction.h"
 
 #include <cassert>
 #include <format>
@@ -38,7 +38,7 @@ namespace vipir
         if (mRegisterID != 0) // eax
         {
             instruction::OperandPtr eax = std::make_unique<instruction::Register>(0, size);
-            builder.addValue(std::make_unique<instruction::MovInstruction>(std::move(reg), std::move(eax)));
+            builder.addValue(std::make_unique<instruction::MovInstruction>(reg->clone(), std::move(eax)));
         }
         mEmittedValue = std::move(reg);
     }
