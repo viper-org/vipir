@@ -2,6 +2,7 @@
 #include "vipir/Module.h"
 
 #include "vipir/IR/Function.h"
+#include "vipir/IR/GlobalString.h"
 #include "vipir/IR/BasicBlock.h"
 #include "vipir/IR/IRBuilder.h"
 #include "vipir/IR/Constant/ConstantInt.h"
@@ -38,6 +39,8 @@ int main()
 
     auto constant = builder.CreateConstantInt(69, i32Type);
     auto retval = builder.CreateCall(func1, {constant});
+
+    auto str = vipir::GlobalString::Create(mod, "hi");
 
     builder.CreateRet(retval);
 

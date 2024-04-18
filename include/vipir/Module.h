@@ -40,11 +40,11 @@ namespace vipir
         }
 
         abi::ABI* abi() const;
-
         std::string_view getName() const;
         int getNextValueId();
 
         void insertGlobal(Global* global);
+        void insertGlobalAtFront(Global* global);
 
         void print(std::ostream& stream) const;
 
