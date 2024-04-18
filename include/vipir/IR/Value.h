@@ -35,6 +35,8 @@ namespace vipir
         virtual void print(std::ostream& stream) = 0;
         virtual std::string ident() const = 0;
 
+        void setPreferredRegister(int reg) { mPreferredRegisterID = reg; }
+
         virtual instruction::OperandPtr getEmittedValue() { return mEmittedValue->clone(); }
     
     protected:
@@ -46,6 +48,7 @@ namespace vipir
         bool requiresRegister{false};
         std::pair<int, int> mInterval{-1,-1};
         int mRegisterID;
+        int mPreferredRegisterID;
         std::vector<int> mRegisterSmashes;
 
         virtual void emit(MC::Builder& builder) = 0;

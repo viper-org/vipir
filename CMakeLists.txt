@@ -40,6 +40,8 @@ set(SOURCES
 
     "src/vipir/MC/Builder.cpp"
     "src/vipir/MC/CmpOperand.cpp"
+
+    "src/vipir/ABI/SysV.cpp"
 )
 
 set(HEADERS
@@ -75,6 +77,9 @@ set(HEADERS
 
     "include/vipir/MC/Builder.h"
     "include/vipir/MC/CmpOperand.h"
+
+    "include/vipir/ABI/ABI.h"
+    "include/vipir/ABI/SysV.h"
 )
 
 add_library(vipir ${SOURCES} ${HEADERS})

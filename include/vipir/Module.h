@@ -10,6 +10,9 @@
 
 #include "vipir/IR/Global.h"
 
+#include "vipir/ABI/ABI.h"
+
+#include <cassert>
 #include <memory>
 #include <string>
 #include <vector>
@@ -29,6 +32,15 @@ namespace vipir
     public:
         Module(std::string name);
 
+        template <class T>
+        void setABI()
+        {
+            assert(mAbi == nullptr);
+            mAbi = std::make_unique<T>();
+        }
+
+        abi::ABI* abi() const;
+
         std::string_view getName() const;
         int getNextValueId();
 
@@ -41,6 +53,7 @@ namespace vipir
 
     private:
         std::string mName;
+        std::unique_ptr<abi::ABI> mAbi;
         std::vector<GlobalPtr> mGlobals;
     };
 

@@ -5,6 +5,8 @@
 #include "vipir/IR/BasicBlock.h"
 #include "vipir/IR/Function.h"
 
+#include "vipir/Module.h"
+
 #include "vasm/instruction/operand/Register.h"
 
 #include "vasm/instruction/NoOperandInstruction.h"
@@ -46,9 +48,9 @@ namespace vipir
             if (returnValue)
             {
                 instruction::Register* returnRegister = dynamic_cast<instruction::Register*>(returnValue.get());
-                if (!returnRegister || returnRegister->getID() != 0) // eax
+                if (!returnRegister || returnRegister->getID() != mModule.abi()->getReturnRegister())
                 {
-                    instruction::OperandPtr reg = std::make_unique<instruction::Register>(0, mReturnValue->getType()->getOperandSize());
+                    instruction::OperandPtr reg = std::make_unique<instruction::Register>(mModule.abi()->getReturnRegister(), mReturnValue->getType()->getOperandSize());
                     builder.addValue(std::make_unique<instruction::MovInstruction>(std::move(reg), std::move(returnValue)));
                 }
             }
@@ -70,5 +72,7 @@ namespace vipir
         {
             assert(mReturnValue->getType() == mParent->getParent()->getFunctionType()->getReturnType());
         }
+
+        mReturnValue->setPreferredRegister(mModule.abi()->getReturnRegister());
     }
 }

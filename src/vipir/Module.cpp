@@ -21,6 +21,11 @@ namespace vipir
     {
     }
 
+    abi::ABI* Module::abi() const
+    {
+        return mAbi.get();
+    }
+
     std::string_view Module::getName() const
     {
         return mName;

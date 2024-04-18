@@ -226,9 +226,9 @@ namespace vipir
     }
 
 
-    CallInst* IRBuilder::CreateCall(Function* function)
+    CallInst* IRBuilder::CreateCall(Function* function, std::vector<Value*> parameters)
     {
-        CallInst* call = new CallInst(mInsertPoint, function);
+        CallInst* call = new CallInst(mInsertPoint, function, std::move(parameters));
 
         mInsertPoint->insertValue(call);
 

@@ -24,9 +24,10 @@ namespace vipir
         std::string ident() const override;
 
     private:
-        CallInst(BasicBlock* parent, Function* function);
+        CallInst(BasicBlock* parent, Function* function, std::vector<Value*> parameters);
 
         Function* mFunction;
+        std::vector<Value*> mParameters;
         int mValueId;
     };
 }

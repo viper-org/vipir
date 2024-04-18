@@ -73,7 +73,7 @@ namespace vipir
         BranchInst* CreateCondBr(Value* condition, BasicBlock* trueBranch, BasicBlock* falseBranch);
 
 
-        CallInst* CreateCall(Function* function);
+        CallInst* CreateCall(Function* function, std::vector<Value*> parameters);
 
 
         ConstantInt* CreateConstantInt(intmax_t value, Type* type);

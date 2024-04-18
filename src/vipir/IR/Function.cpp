@@ -247,12 +247,30 @@ namespace vipir
             {
                 ExpireOldIntervals(value->mInterval.first);
 
+                for (auto& overlap : overlaps)
+                {
+                    if (overlap.end == index)
+                    {
+                        // This value's smashed registers have been smashed already so we can allocate them again
+                        std::copy(overlap.value->mRegisterSmashes.begin(), overlap.value->mRegisterSmashes.end(), std::front_inserter(registerIDs));
+                    }
+                }
+
                 if (value->requiresRegister)
                 {
                     activeValues.push_back(value.get());
 
-                    value->mRegisterID = registerIDs.front();
-                    registerIDs.pop_front();
+                    auto it = std::find(registerIDs.begin(), registerIDs.end(), value->mPreferredRegisterID);
+                    if (it != registerIDs.end())
+                    {
+                        value->mRegisterID = *it;
+                        registerIDs.erase(it);
+                    }
+                    else
+                    {
+                        value->mRegisterID = registerIDs.front();
+                        registerIDs.pop_front();
+                    }
                 }
 
                 for (auto& overlap : overlaps)
@@ -263,11 +281,6 @@ namespace vipir
                         registerIDs.erase(std::remove_if(registerIDs.begin(), registerIDs.end(), [&overlap](int id){
                             return std::find(overlap.value->mRegisterSmashes.begin(), overlap.value->mRegisterSmashes.end(), id) != overlap.value->mRegisterSmashes.end();
                         }), registerIDs.end());
-                    }
-                    if (overlap.end == index)
-                    {
-                        // This value's smashed registers have been smashed already so we can allocate them again
-                        std::copy(overlap.value->mRegisterSmashes.begin(), overlap.value->mRegisterSmashes.end(), std::front_inserter(registerIDs));
                     }
                 }
 
