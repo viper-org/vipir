@@ -11,11 +11,14 @@ namespace vipir
         , mReturnType(returnType)
         , mArgumentTypes(std::move(argumentTypes))
     {
-        for (auto i = 0; i < mArgumentTypes.size() - 1; ++i)
+        if (!mArgumentTypes.empty())
         {
-            mName += std::string(mArgumentTypes[i]->getName()) + ", ";
+            for (auto i = 0; i < mArgumentTypes.size() - 1; ++i)
+            {
+                mName += std::string(mArgumentTypes[i]->getName()) + ", ";
+            }
+            mName += std::string(mArgumentTypes.back()->getName()) + ')';
         }
-        mName += std::string(mArgumentTypes.back()->getName()) + ')';
     }
 
     bool FunctionType::isFunctionType() const
