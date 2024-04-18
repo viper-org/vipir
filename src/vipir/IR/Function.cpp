@@ -35,6 +35,13 @@ namespace vipir
         return static_cast<FunctionType*>(mType);
     }
 
+    Argument* Function::getArgument(int index) const
+    {
+        if (index < mArguments.size()) return mArguments.at(index).get();
+
+        return nullptr;
+    }
+
     void Function::insertBasicBlock(BasicBlock* basicBlock)
     {
         mBasicBlockList.push_back(BasicBlockPtr(basicBlock));
@@ -78,6 +85,11 @@ namespace vipir
             basicBlock->setEmittedValue();
         }
 
+        for (auto& argument : mArguments)
+        {
+            argument->emit(builder);
+        }
+
         for (auto& basicBlock : mBasicBlockList)
         {
             basicBlock->emit(builder);
@@ -90,6 +102,12 @@ namespace vipir
         , mTotalStackOffset(0)
     {
         mType = type;
+
+        for (auto type : getFunctionType()->getArgumentTypes())
+        {
+            std::string id = std::to_string(module.getNextValueId());
+            mArguments.push_back(std::make_unique<Argument>(module, type, std::move(id)));
+        }
     }
 
     void Function::insertAlloca(AllocaInst* alloca)
@@ -199,8 +217,17 @@ namespace vipir
 
         auto overlaps = getOverlaps();
 
-        std::deque<int> registerIDs { 0, 1, 2, 3, 4, 5 };
+        std::deque<int> registerIDs { 0, 1, 2, 3, 6, 7 };
+        std::deque<int> argumentRegisterIDs { 7, 6, 1, 2 };
         std::vector<Value*> activeValues;
+
+        for (auto& argument : mArguments)
+        {
+            argument->mRegisterID = argumentRegisterIDs.front();
+            argumentRegisterIDs.pop_front();
+            registerIDs.erase(std::remove(registerIDs.begin(), registerIDs.end(), argument->mRegisterID));
+            activeValues.push_back(argument.get());
+        }
 
         auto ExpireOldIntervals = [&activeValues, &registerIDs](int i){
             std::erase_if(activeValues, [i, &registerIDs](Value* value){

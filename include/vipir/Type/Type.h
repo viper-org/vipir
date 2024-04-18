@@ -11,6 +11,7 @@
 #include "vasm/codegen/Opcodes.h"
 
 #include <string>
+#include <vector>
 
 namespace vipir
 {
@@ -31,7 +32,7 @@ namespace vipir
         static Type* GetIntegerType(int bits);
         static Type* GetVoidType();
         static Type* GetBooleanType();
-        static Type* GetFunctionType(Type* returnType); // TODO: Add argument types
+        static Type* GetFunctionType(Type* returnType, std::vector<Type*> argumentTypes);
         static Type* GetPointerType(Type* baseType);
 
     protected:

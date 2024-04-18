@@ -9,6 +9,7 @@
 #define VIPIR_IR_FUNCTION_H 1
 
 #include "vipir/IR/Global.h"
+#include "vipir/IR/Argument.h"
 #include "vipir/IR/BasicBlock.h"
 
 #include "vipir/Type/FunctionType.h"
@@ -26,6 +27,7 @@ namespace vipir
         static Function* Create(FunctionType* type, Module& module, std::string_view name);
 
         FunctionType* getFunctionType() const;
+        Argument* getArgument(int index) const;
 
         void insertBasicBlock(BasicBlock* basicBlock);
 
@@ -39,6 +41,7 @@ namespace vipir
         Function(FunctionType* type, Module& module, std::string_view name);
 
         std::string mName;
+        std::vector<ArgumentPtr> mArguments;
 
         std::vector<BasicBlockPtr> mBasicBlockList;
         std::vector<AllocaInst*> mAllocaList;

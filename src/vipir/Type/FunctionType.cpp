@@ -6,10 +6,16 @@
 
 namespace vipir
 {
-    FunctionType::FunctionType(Type* returnType)
-        : Type(0, std::format("{}()", returnType->getName()))
+    FunctionType::FunctionType(Type* returnType, std::vector<Type*> argumentTypes)
+        : Type(0, std::format("{}(", returnType->getName()))
         , mReturnType(returnType)
+        , mArgumentTypes(std::move(argumentTypes))
     {
+        for (auto i = 0; i < mArgumentTypes.size() - 1; ++i)
+        {
+            mName += std::string(mArgumentTypes[i]->getName()) + ", ";
+        }
+        mName += std::string(mArgumentTypes.back()->getName()) + ')';
     }
 
     bool FunctionType::isFunctionType() const
@@ -22,8 +28,13 @@ namespace vipir
         return mReturnType;
     }
 
-    FunctionType* FunctionType::Create(Type* returnType)
+    const std::vector<Type*>& FunctionType::getArgumentTypes() const
     {
-        return static_cast<FunctionType*>(Type::GetFunctionType(returnType));
+        return mArgumentTypes;
+    }
+
+    FunctionType* FunctionType::Create(Type* returnType, std::vector<Type*> argumentTypes)
+    {
+        return static_cast<FunctionType*>(Type::GetFunctionType(returnType, argumentTypes));
     }
 }

@@ -10,22 +10,25 @@
 
 #include "vipir/Type/Type.h"
 
+#include <vector>
+
 namespace vipir
 {
-    // TODO: Add arguments
     class FunctionType : public Type
     {
     public:
-        FunctionType(Type* returnType);
+        FunctionType(Type* returnType, std::vector<Type*> argumentTypes);
 
         bool isFunctionType() const override;
 
         Type* getReturnType() const;
+        const std::vector<Type*>& getArgumentTypes() const;
 
-        static FunctionType* Create(Type* returnType); // TODO: Add arguments
+        static FunctionType* Create(Type* returnType, std::vector<Type*> argumentTypes);
 
     private:
         Type* mReturnType;
+        std::vector<Type*> mArgumentTypes;
     };
 }
 

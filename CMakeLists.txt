@@ -13,6 +13,7 @@ set(SOURCES
     "src/vipir/Module.cpp"
 
     "src/vipir/IR/Function.cpp"
+    "src/vipir/IR/Argument.cpp"
     "src/vipir/IR/BasicBlock.cpp"
     "src/vipir/IR/IRBuilder.cpp"
 
@@ -47,6 +48,7 @@ set(HEADERS
     "include/vipir/IR/Value.h"
     "include/vipir/IR/Global.h"
     "include/vipir/IR/Function.h"
+    "include/vipir/IR/Argument.h"
     "include/vipir/IR/BasicBlock.h"
     "include/vipir/IR/IRBuilder.h"
 
