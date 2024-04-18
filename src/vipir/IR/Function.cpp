@@ -168,7 +168,7 @@ namespace vipir
             {
                 if (value->mRegisterSmashes.size())
                 {
-                    overlaps.push_back(Overlap{value.get(), -1, value->mInterval.second});
+                    overlaps.push_back(Overlap{value.get(), -1, value->mInterval.first});
                 }
             }
         }
@@ -227,7 +227,7 @@ namespace vipir
                     value->mRegisterID = registerIDs.front();
                     registerIDs.pop_front();
                 }
-                
+
                 for (auto& overlap : overlaps)
                 {
                     if (overlap.start == index)
