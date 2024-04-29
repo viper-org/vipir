@@ -22,6 +22,7 @@ namespace vipir
     class StoreInst;
     class LoadInst;
     class AddrInst;
+    class GEPInst;
     class BinaryInst;
     class UnaryInst;
     class BranchInst;
@@ -48,6 +49,7 @@ namespace vipir
         StoreInst* CreateStore(Value* ptr, Value* value);
         LoadInst* CreateLoad(Value* ptr);
         AddrInst* CreateAddrOf(Value* ptr);
+        GEPInst* CreateGEP(Value* ptr, Value* offset);
 
 
         BinaryInst* CreateAdd(Value* left, Value* right);

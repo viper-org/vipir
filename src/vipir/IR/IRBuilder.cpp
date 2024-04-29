@@ -9,6 +9,7 @@
 #include "vipir/IR/Instruction/StoreInst.h"
 #include "vipir/IR/Instruction/LoadInst.h"
 #include "vipir/IR/Instruction/AddrInst.h"
+#include "vipir/IR/Instruction/GEPInst.h"
 #include "vipir/IR/Instruction/BinaryInst.h"
 #include "vipir/IR/Instruction/UnaryInst.h"
 #include "vipir/IR/Instruction/BranchInst.h"
@@ -83,6 +84,15 @@ namespace vipir
         mInsertPoint->insertValue(addr);
 
         return addr;
+    }
+
+    GEPInst* IRBuilder::CreateGEP(Value* ptr, Value* offset)
+    {
+        GEPInst* gep = new GEPInst(mInsertPoint, ptr, offset);
+
+        mInsertPoint->insertValue(gep);
+
+        return gep;
     }
 
 

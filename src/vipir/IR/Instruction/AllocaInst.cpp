@@ -29,7 +29,7 @@ namespace vipir
     void AllocaInst::emit(MC::Builder& builder)
     {
         auto base = instruction::Register::Get("rbp");
-        mEmittedValue = std::make_unique<instruction::Memory>(std::move(base), -mStackOffset);
+        mEmittedValue = std::make_unique<instruction::Memory>(std::move(base), -mStackOffset, nullptr, std::nullopt);
     }
 
     AllocaInst::AllocaInst(BasicBlock* parent, Type* allocatedType, std::string_view name)
