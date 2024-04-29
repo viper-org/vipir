@@ -41,9 +41,9 @@ namespace vipir
     {
         mGlobals.push_back(GlobalPtr(global));
     }
-    void Module::insertGlobalAtFront(Global* global)
+    void Module::insertGlobalAt(Global* global, int offset)
     {
-        mGlobals.insert(mGlobals.begin(), GlobalPtr(global));
+        mGlobals.insert(mGlobals.end() + offset, GlobalPtr(global));
     }
 
     void Module::print(std::ostream& stream) const

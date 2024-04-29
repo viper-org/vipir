@@ -44,12 +44,11 @@ namespace vipir
         int getNextValueId();
 
         void insertGlobal(Global* global);
-        void insertGlobalAtFront(Global* global);
+        void insertGlobalAt(Global* global, int offset);
 
         void print(std::ostream& stream) const;
 
         void emit(std::ostream& stream, OutputFormat outputFormat) const;
-
 
     private:
         std::string mName;

@@ -1,8 +1,8 @@
 // Copyright 2024 solar-mist
 
 /*
- * GlobalStrings are pointers to a string literal
- * that can be accessed anywhere in the program
+ * GlobalStrings represent a string value that
+ * exist in the global scope
 */
 
 #ifndef VIPIR_IR_GLOBAL_STRING_H
@@ -14,6 +14,7 @@ namespace vipir
 {
     class GlobalString : public Global
     {
+    friend class IRBuilder;
     public:
         static GlobalString* Create(Module& module, std::string value);
 

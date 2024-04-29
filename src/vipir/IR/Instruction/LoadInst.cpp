@@ -2,14 +2,18 @@
 
 #include "vipir/IR/Instruction/LoadInst.h"
 
+#include "vasm/instruction/operand/Label.h"
 #include "vipir/IR/BasicBlock.h"
 
 #include "vipir/Module.h"
 
-#include "vasm/instruction/operand/Register.h"
-#include "vasm/instruction/operand/Memory.h"
-
 #include "vasm/instruction/twoOperandInstruction/MovInstruction.h"
+#include "vasm/instruction/twoOperandInstruction/LeaInstruction.h"
+
+#include "vasm/instruction/operand/Memory.h"
+#include "vasm/instruction/operand/Register.h"
+#include "vasm/instruction/operand/Relative.h"
+
 #include "vipir/Type/PointerType.h"
 
 #include <cassert>
@@ -49,6 +53,13 @@ namespace vipir
             instruction::RegisterPtr ptrReg = instruction::RegisterPtr(regOperand);
             instruction::OperandPtr memory = std::make_unique<instruction::Memory>(std::move(ptrReg), std::nullopt);
             builder.addValue(std::make_unique<instruction::MovInstruction>(reg->clone(), std::move(memory)));
+        }
+        else if (auto labelOperand = dynamic_cast<instruction::LabelOperand*>(ptr.get()))
+        {
+            (void)ptr.release();
+            instruction::LabelOperandPtr labelPtr = instruction::LabelOperandPtr(labelOperand);
+            instruction::RelativePtr rel = std::make_unique<instruction::Relative>(std::move(labelPtr));
+            builder.addValue(std::make_unique<instruction::LeaInstruction>(std::move(reg), std::move(rel)));
         }
 
         mEmittedValue = std::move(reg);
