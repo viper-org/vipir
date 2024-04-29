@@ -50,6 +50,7 @@ namespace vipir
         LoadInst* CreateLoad(Value* ptr);
         AddrInst* CreateAddrOf(Value* ptr);
         GEPInst* CreateGEP(Value* ptr, Value* offset);
+        GEPInst* CreateStructGEP(Value* ptr, int index);
 
 
         BinaryInst* CreateAdd(Value* left, Value* right);

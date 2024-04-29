@@ -5,6 +5,7 @@
 #include "vipir/IR/BasicBlock.h"
 
 #include "vasm/instruction/operand/Register.h"
+#include "vasm/instruction/operand/Memory.h"
 
 #include "vasm/instruction/twoOperandInstruction/MovInstruction.h"
 #include <format>
@@ -25,6 +26,13 @@ namespace vipir
     {
         instruction::OperandPtr ptr   = mPtr->getEmittedValue();
         instruction::OperandPtr value = mValue->getEmittedValue();
+
+        if (auto reg = dynamic_cast<instruction::Register*>(ptr.get()))
+        {
+            (void)ptr.release();
+            instruction::RegisterPtr ptrReg = instruction::RegisterPtr(reg);
+            ptr = std::make_unique<instruction::Memory>(std::move(ptrReg), std::nullopt, nullptr, std::nullopt);
+        }
 
         builder.addValue(std::make_unique<instruction::MovInstruction>(std::move(ptr), std::move(value), mValue->getType()->getOperandSize()));
     }

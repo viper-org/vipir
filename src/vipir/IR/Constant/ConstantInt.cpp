@@ -20,6 +20,11 @@ namespace vipir
         return std::format("{} {}", mType->getName(), mValue);
     }
 
+    intmax_t ConstantInt::getValue() const
+    {
+        return mValue;
+    }
+
 
     void ConstantInt::emit(MC::Builder& builder)
     {

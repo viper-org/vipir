@@ -6,6 +6,7 @@
 #include "vipir/Type/BooleanType.h"
 #include "vipir/Type/FunctionType.h"
 #include "vipir/Type/PointerType.h"
+#include "vipir/Type/StructType.h"
 
 #include <cassert>
 #include <memory>
@@ -95,6 +96,23 @@ namespace vipir
         }
 
         types.push_back(std::make_unique<PointerType>(baseType));
+        return types.back().get();
+    }
+
+    Type* Type::GetStructType(std::vector<Type*> fieldTypes)
+    {
+        for (const auto& type : types)
+        {
+            if (StructType* structType = dynamic_cast<StructType*>(type.get()))
+            {
+                if (structType->getFields() == fieldTypes)
+                {
+                    return structType;
+                }
+            }
+        }
+
+        types.push_back(std::make_unique<StructType>(std::move(fieldTypes)));
         return types.back().get();
     }
 }

@@ -5,7 +5,9 @@
 
 #include "vipir/IR/BasicBlock.h"
 
+#include "vipir/IR/Constant/ConstantInt.h"
 #include "vipir/Type/PointerType.h"
+#include "vipir/Type/StructType.h"
 
 #include "vipir/Module.h"
 
@@ -42,16 +44,24 @@ namespace vipir
         instruction::OperandPtr ptr = mPtr->getEmittedValue();
         instruction::OperandPtr offset = mOffset->getEmittedValue();
 
-        instruction::Register* ptrReg = static_cast<instruction::Register*>(ptr.get());
+        instruction::Register* ptrReg = dynamic_cast<instruction::Register*>(ptr.get());
+        instruction::Memory* ptrMem = dynamic_cast<instruction::Memory*>(ptr.get());
+        std::optional<int> displacement;
+        if (ptrMem)
+        {
+            ptrReg = ptrMem->getBase();
+            displacement = ptrMem->getDisplacement();
+        }
 
-        int scale = static_cast<PointerType*>(mType)->getBaseType()->getSizeInBits() / 8;
+        int scale = static_cast<PointerType*>(mType)->getBaseType()->getAlignment() / 8;
 
         if (auto immediate = dynamic_cast<instruction::Immediate*>(offset.get()))
         {
-            int displacement = immediate->imm64() * scale;
+            int disp = immediate->imm64() * scale;
+            if (displacement) disp += *displacement;
             (void)ptr.release();
 
-            instruction::OperandPtr memory = std::make_unique<instruction::Memory>(instruction::RegisterPtr(ptrReg), displacement, nullptr, std::nullopt);
+            instruction::OperandPtr memory = std::make_unique<instruction::Memory>(instruction::RegisterPtr(ptrReg), disp, nullptr, std::nullopt);
             builder.addValue(std::make_unique<instruction::LeaInstruction>(reg->clone(), std::move(memory)));
             mEmittedValue = std::move(reg);
         }
@@ -61,7 +71,7 @@ namespace vipir
             instruction::Register* index = regOffset;
             (void)offset.release();
 
-            instruction::OperandPtr memory = std::make_unique<instruction::Memory>(instruction::RegisterPtr(ptrReg), std::nullopt, instruction::RegisterPtr(regOffset), scale);
+            instruction::OperandPtr memory = std::make_unique<instruction::Memory>(instruction::RegisterPtr(ptrReg), displacement, instruction::RegisterPtr(regOffset), scale);
             builder.addValue(std::make_unique<instruction::LeaInstruction>(reg->clone(), std::move(memory)));
             mEmittedValue = std::move(reg);
         }
@@ -73,9 +83,17 @@ namespace vipir
         , mOffset(offset)
         , mValueId(mModule.getNextValueId())
     {
-        mType = mPtr->getType();
-
-        assert(mType->isPointerType());
+        if (static_cast<PointerType*>(mPtr->getType())->getBaseType()->isStructType())
+        {
+            StructType* structType = dynamic_cast<StructType*>(static_cast<PointerType*>(mPtr->getType())->getBaseType());
+            ConstantInt* offset = static_cast<ConstantInt*>(mOffset);
+            mType = Type::GetPointerType(structType->getField(offset->getValue()));
+        }
+        else
+        {
+            mType = mPtr->getType();
+            assert(mType->isPointerType());
+        }
 
         requiresRegister = true;
     }

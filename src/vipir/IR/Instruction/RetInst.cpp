@@ -70,9 +70,8 @@ namespace vipir
         }
         else
         {
+            mReturnValue->setPreferredRegister(mModule.abi()->getReturnRegister());
             assert(mReturnValue->getType() == mParent->getParent()->getFunctionType()->getReturnType());
         }
-
-        mReturnValue->setPreferredRegister(mModule.abi()->getReturnRegister());
     }
 }

@@ -94,6 +94,14 @@ namespace vipir
 
         return gep;
     }
+    GEPInst* IRBuilder::CreateStructGEP(Value* ptr, int index)
+    {
+        GEPInst* gep = new GEPInst(mInsertPoint, ptr, CreateConstantInt(index, Type::GetIntegerType(32)));
+
+        mInsertPoint->insertValue(gep);
+
+        return gep;
+    }
 
 
 

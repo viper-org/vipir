@@ -6,7 +6,7 @@
 #include "vipir/IR/BasicBlock.h"
 #include "vipir/IR/IRBuilder.h"
 #include "vipir/IR/Constant/ConstantInt.h"
-#include "vipir/IR/Instruction/CallInst.h"
+#include "vipir/IR/Instruction/AllocaInst.h"
 #include "vipir/IR/Instruction/AddrInst.h"
 #include "vipir/IR/Instruction/GEPInst.h"
 #include "vipir/IR/Instruction/LoadInst.h"
@@ -27,30 +27,24 @@ int main()
 
     auto i32Type = vipir::Type::GetIntegerType(32);
     auto i8Type = vipir::Type::GetIntegerType(8);
-
-    // simple function that just returns its first argument
-    auto func1 = vipir::Function::Create(vipir::FunctionType::Create(i32Type, {i32Type}), mod, "test");
-    auto bb1 = vipir::BasicBlock::Create("", func1);
-    builder.setInsertPoint(bb1);
-    builder.CreateRet(func1->getArgument(0));
-
+    auto voidType = vipir::Type::GetVoidType();
+    auto structType = vipir::Type::GetStructType({i32Type, i32Type});
 
     // call the other function and return that
-    auto func2 = vipir::Function::Create(vipir::FunctionType::Create(i8Type, {}), mod, "main");
+    auto func2 = vipir::Function::Create(vipir::FunctionType::Create(i32Type, {}), mod, "main");
     auto bb2 = vipir::BasicBlock::Create("", func2);
 
     builder.setInsertPoint(bb2);
 
-    auto constant = builder.CreateConstantInt(1, i32Type);
-    auto retval = builder.CreateCall(func1, {constant});
+    auto alloca = builder.CreateAlloca(structType, "test");
+    auto gep = builder.CreateStructGEP(alloca, 1);
+    auto constant = builder.CreateConstantInt(66, i32Type);
+    builder.CreateStore(gep, constant);
 
-    auto str = vipir::GlobalString::Create(mod, "hi");
-    auto strLoad = builder.CreateAddrOf(str);
+    auto gep2 = builder.CreateStructGEP(alloca, 1);
+    auto load = builder.CreateLoad(gep2);
 
-    auto gep = builder.CreateGEP(strLoad, retval);
-    auto ret = builder.CreateLoad(gep);
-
-    builder.CreateRet(ret);
+    builder.CreateRet(load);
 
     mod.emit(std::cout, vipir::OutputFormat::ELF);
 }
