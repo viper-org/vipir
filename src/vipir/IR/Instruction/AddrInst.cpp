@@ -1,13 +1,14 @@
 // Copyright 2024 solar-mist
 
 #include "vipir/IR/Instruction/AddrInst.h"
-#include "vipir/IR/Instruction/AllocaInst.h"
 
 #include "vipir/IR/BasicBlock.h"
 
 #include "vipir/Module.h"
 
 #include "vasm/instruction/operand/Register.h"
+#include "vasm/instruction/operand/Relative.h"
+#include "vasm/instruction/operand/Label.h"
 
 #include "vasm/instruction/twoOperandInstruction/LeaInstruction.h"
 
@@ -37,8 +38,17 @@ namespace vipir
         
         instruction::OperandPtr ptr = mPtr->getEmittedValue();
         instruction::OperandPtr reg = std::make_unique<instruction::Register>(mRegisterID, size);
-
-        builder.addValue(std::make_unique<instruction::LeaInstruction>(reg->clone(), std::move(ptr)));
+        if (auto labelOperand = dynamic_cast<instruction::LabelOperand*>(ptr.get()))
+        {
+            (void)ptr.release();
+            instruction::LabelOperandPtr labelPtr = instruction::LabelOperandPtr(labelOperand);
+            instruction::RelativePtr rel = std::make_unique<instruction::Relative>(std::move(labelPtr));
+            builder.addValue(std::make_unique<instruction::LeaInstruction>(reg->clone(), std::move(rel)));
+        }
+        else
+        {
+            builder.addValue(std::make_unique<instruction::LeaInstruction>(reg->clone(), std::move(ptr)));
+        }
 
         mEmittedValue = std::move(reg);
     }
@@ -48,7 +58,6 @@ namespace vipir
         , mPtr(ptr)
         , mValueId(mModule.getNextValueId())
     {
-        assert(dynamic_cast<AllocaInst*>(mPtr) != nullptr);
         mType = mPtr->getType();
 
         requiresRegister = true;
