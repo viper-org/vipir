@@ -21,6 +21,8 @@ namespace vipir
         void print(std::ostream& stream) override;
         std::string ident() const override;
 
+        bool isConstant() const override;
+
         intmax_t getValue() const;
 
     protected:

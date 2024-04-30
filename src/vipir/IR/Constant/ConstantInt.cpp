@@ -19,6 +19,11 @@ namespace vipir
     {
         return std::format("{} {}", mType->getName(), mValue);
     }
+    
+    bool ConstantInt::isConstant() const
+    {
+        return true;
+    }
 
     intmax_t ConstantInt::getValue() const
     {

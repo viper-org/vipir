@@ -9,6 +9,7 @@
 #define VIPIR_MODULE_H 1
 
 #include "vipir/IR/Global.h"
+#include "vipir/IR/GlobalVar.h"
 
 #include "vipir/ABI/ABI.h"
 
@@ -43,6 +44,7 @@ namespace vipir
         std::string_view getName() const;
         int getNextValueId();
 
+        GlobalVar* createGlobalVar(Type* type);
         void insertGlobal(Global* global);
         void insertGlobalAt(Global* global, int offset);
 

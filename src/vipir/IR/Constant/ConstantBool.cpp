@@ -19,6 +19,11 @@ namespace vipir
         return std::format("{} {}", mType->getName(), mValue);
     }
 
+    bool ConstantBool::isConstant() const
+    {
+        return true;
+    }
+
 
     void ConstantBool::emit(MC::Builder& builder)
     {

@@ -10,6 +10,8 @@
 
 #include "vasm/instruction/operand/Memory.h"
 #include "vasm/instruction/operand/Register.h"
+#include "vasm/instruction/operand/Label.h"
+#include "vasm/instruction/operand/Relative.h"
 
 #include "vipir/Type/PointerType.h"
 
@@ -50,6 +52,13 @@ namespace vipir
             instruction::RegisterPtr ptrReg = instruction::RegisterPtr(regOperand);
             instruction::OperandPtr memory = std::make_unique<instruction::Memory>(std::move(ptrReg), std::nullopt, nullptr, std::nullopt);
             builder.addValue(std::make_unique<instruction::MovInstruction>(reg->clone(), std::move(memory)));
+        }
+        else if (auto labelOperand = dynamic_cast<instruction::LabelOperand*>(ptr.get()))
+        {
+            (void)ptr.release();
+            instruction::LabelOperandPtr labelPtr = instruction::LabelOperandPtr(labelOperand);
+            instruction::RelativePtr rel = std::make_unique<instruction::Relative>(std::move(labelPtr));
+            builder.addValue(std::make_unique<instruction::MovInstruction>(reg->clone(), std::move(rel)));
         }
 
         mEmittedValue = std::move(reg);

@@ -37,6 +37,13 @@ namespace vipir
         return ++valueId;
     }
 
+    GlobalVar* Module::createGlobalVar(Type* type)
+    {
+        GlobalVar* global = new GlobalVar(*this, type);
+        insertGlobalAt(global, -1);
+        return global;
+    }
+
     void Module::insertGlobal(Global* global)
     {
         mGlobals.push_back(GlobalPtr(global));

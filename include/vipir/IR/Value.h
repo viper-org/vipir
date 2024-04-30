@@ -22,6 +22,7 @@ namespace vipir
     
     class Value
     {
+    friend class GlobalVar;
     friend class BasicBlock;
     friend class Function;
     public:
@@ -31,6 +32,7 @@ namespace vipir
         Module& getModule() { return mModule; }
         Type* getType() { return mType; }
         virtual std::vector<Value*> getOperands() { return std::vector<Value*>(); }
+        virtual bool isConstant() const { return false; }
 
         virtual void print(std::ostream& stream) = 0;
         virtual std::string ident() const = 0;
