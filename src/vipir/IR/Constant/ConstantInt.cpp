@@ -5,6 +5,8 @@
 
 #include "vipir/IR/BasicBlock.h"
 
+#include "vipir/Module.h"
+
 #include "vasm/instruction/operand/Immediate.h"
 
 #include <format>
@@ -14,7 +16,7 @@ namespace vipir
     ConstantInt* ConstantInt::Get(Module& module, intmax_t value, Type* type)
     {
         ConstantInt* constant = new ConstantInt(module, value, type);
-
+        module.insertConstant(constant);
         return constant;
     }
 

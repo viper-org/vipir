@@ -53,7 +53,6 @@ namespace vipir
     {
         assert(value->isConstant());
         mInitialValue = value;
-        mModule.insertConstant(value);
     }
 
     GlobalVar::GlobalVar(Module& module, Type* type)
