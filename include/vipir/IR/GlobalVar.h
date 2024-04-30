@@ -27,7 +27,7 @@ namespace vipir
     private:
         GlobalVar(Module& module, Type* type);
 
-        std::unique_ptr<Value> mInitialValue;
+        Value* mInitialValue;
         int mValueId;
     };
 }

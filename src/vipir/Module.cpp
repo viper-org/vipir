@@ -53,6 +53,11 @@ namespace vipir
         mGlobals.insert(mGlobals.end() + offset, GlobalPtr(global));
     }
 
+    void Module::insertConstant(Value* constant)
+    {
+        mConstants.push_back(ValuePtr(constant));
+    }
+
     void Module::print(std::ostream& stream) const
     {
         stream << std::format("file \"{}\"", mName);
@@ -66,6 +71,10 @@ namespace vipir
     void Module::emit(std::ostream& stream, OutputFormat format) const
     {
         MC::Builder builder;
+        for (const ValuePtr& constant : mConstants)
+        {
+            constant->emit(builder);
+        }
         for (const GlobalPtr& global : mGlobals)
         {
             global->emit(builder);

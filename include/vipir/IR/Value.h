@@ -22,7 +22,7 @@ namespace vipir
     
     class Value
     {
-    friend class GlobalVar;
+    friend class Module;
     friend class BasicBlock;
     friend class Function;
     public:

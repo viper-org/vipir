@@ -29,7 +29,7 @@ namespace vipir
     class Module
     {
     using GlobalPtr = std::unique_ptr<Global>;
-
+    using ValuePtr = std::unique_ptr<Value>;
     public:
         Module(std::string name);
 
@@ -47,6 +47,7 @@ namespace vipir
         GlobalVar* createGlobalVar(Type* type);
         void insertGlobal(Global* global);
         void insertGlobalAt(Global* global, int offset);
+        void insertConstant(Value* constant);
 
         void print(std::ostream& stream) const;
 
@@ -56,6 +57,7 @@ namespace vipir
         std::string mName;
         std::unique_ptr<abi::ABI> mAbi;
         std::vector<GlobalPtr> mGlobals;
+        std::vector<ValuePtr> mConstants;
     };
 
     Value* getPointerOperand(Value* value);

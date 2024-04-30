@@ -29,7 +29,6 @@ namespace vipir
         mEmittedValue = std::make_unique<instruction::LabelOperand>(std::to_string(mValueId));
         builder.addValue(std::make_unique<instruction::Label>(std::to_string(mValueId)));
 
-        mInitialValue->emit(builder);
         instruction::OperandPtr initVal = mInitialValue->getEmittedValue();
         switch(mType->getOperandSize())
         {
@@ -53,7 +52,8 @@ namespace vipir
     void GlobalVar::setInitialValue(Value* value)
     {
         assert(value->isConstant());
-        mInitialValue = std::unique_ptr<Value>(value);
+        mInitialValue = value;
+        mModule.insertConstant(value);
     }
 
     GlobalVar::GlobalVar(Module& module, Type* type)
