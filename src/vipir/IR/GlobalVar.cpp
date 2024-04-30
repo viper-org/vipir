@@ -53,7 +53,7 @@ namespace vipir
     void GlobalVar::setInitialValue(Value* value)
     {
         assert(value->isConstant());
-        mInitialValue = value;
+        mInitialValue = std::unique_ptr<Value>(value);
     }
 
     GlobalVar::GlobalVar(Module& module, Type* type)

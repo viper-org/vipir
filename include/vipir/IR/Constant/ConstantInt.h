@@ -18,6 +18,8 @@ namespace vipir
     {
     friend class IRBuilder;
     public:
+        static ConstantInt* Get(Module& module, intmax_t value, Type* type);
+
         void print(std::ostream& stream) override;
         std::string ident() const override;
 
@@ -30,6 +32,7 @@ namespace vipir
 
     private:
         ConstantInt(BasicBlock* parent, intmax_t value, Type* type);
+        ConstantInt(Module& module, intmax_t value, Type* type);
 
         intmax_t mValue;
     };

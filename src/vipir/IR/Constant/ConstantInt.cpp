@@ -11,6 +11,13 @@
 
 namespace vipir
 {
+    ConstantInt* ConstantInt::Get(Module& module, intmax_t value, Type* type)
+    {
+        ConstantInt* constant = new ConstantInt(module, value, type);
+
+        return constant;
+    }
+
     void ConstantInt::print(std::ostream&)
     {
     }
@@ -19,7 +26,7 @@ namespace vipir
     {
         return std::format("{} {}", mType->getName(), mValue);
     }
-    
+
     bool ConstantInt::isConstant() const
     {
         return true;
@@ -38,6 +45,12 @@ namespace vipir
 
     ConstantInt::ConstantInt(BasicBlock* parent, intmax_t value, Type* type)
         : Value(parent->getModule())
+        , mValue(value)
+    {
+        mType = type;
+    }
+    ConstantInt::ConstantInt(Module& module, intmax_t value, Type* type)
+        : Value(module)
         , mValue(value)
     {
         mType = type;

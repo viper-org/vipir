@@ -34,7 +34,7 @@ int main()
     builder.setInsertPoint(bb2);
 
     auto global = mod.createGlobalVar(i32Type);
-    auto initVal = builder.CreateConstantInt(69, i32Type);
+    auto initVal = vipir::ConstantInt::Get(mod, 69, i32Type);
     global->setInitialValue(initVal);
 
     auto load = builder.CreateLoad(global);
