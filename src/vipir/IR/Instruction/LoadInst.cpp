@@ -23,6 +23,11 @@ namespace vipir
         stream << std::format("load {} %{}, {}", mType->getName(), mValueId, mPtr->ident());
     }
 
+    std::vector<Value*> LoadInst::getOperands()
+    {
+        return {mPtr};
+    }
+
     Value* LoadInst::getPointer()
     {
         return mPtr;

@@ -17,6 +17,11 @@ namespace vipir
         stream << std::format("store {} -> {}", mValue->ident(), mPtr->ident());
     }
 
+    std::vector<Value*> StoreInst::getOperands()
+    {
+        return {mPtr, mValue};
+    }
+
     std::string StoreInst::ident() const
     {
         return "%undef";

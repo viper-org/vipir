@@ -18,6 +18,8 @@ namespace vipir
     public:
         void print(std::ostream& stream) override;
 
+        std::vector<Value*> getOperands() override;
+
         Value* getPointer();
 
     protected:
