@@ -20,10 +20,10 @@ namespace vipir
     public:
         virtual ~Type() { }
 
-        std::size_t getSizeInBits() { return mSizeInBits; }
-        std::size_t getAlignment() { return mAlignment; }
-        std::string_view getName() { return mName; }
-        codegen::OperandSize getOperandSize() { return mOperandSize; }
+        std::size_t getSizeInBits() const { return mSizeInBits; }
+        std::size_t getAlignment() const { return mAlignment; }
+        std::string_view getName() { return mName; } const
+        codegen::OperandSize getOperandSize() const { return mOperandSize; }
 
         virtual bool isIntegerType()  const { return false; }
         virtual bool isVoidType()     const { return false; }

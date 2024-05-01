@@ -16,6 +16,7 @@
 #include "vasm/instruction/singleOperandInstruction/DeclInstruction.h"
 #include "vasm/instruction/Directive.h"
 
+#include <algorithm>
 #include <format>
 
 namespace vipir
@@ -46,11 +47,13 @@ namespace vipir
     {
         if (auto structOperand = dynamic_cast<StructOperand*>(value.get()))
         {
-            int index = 0;
+            StructType* structType = static_cast<StructType*>(static_cast<PointerType*>(mType)->getBaseType());
+            auto it = std::max_element(structType->getFields().begin(), structType->getFields().end(), [](auto a, auto b){
+                return a->getSizeInBits() < b->getSizeInBits();
+            });
             for (auto& value : structOperand->getValues())
             {
-                StructType* structType = static_cast<StructType*>(static_cast<PointerType*>(mType)->getBaseType());
-                emitConstant(builder, structType->getField(index++)->getOperandSize(), std::move(value));
+                emitConstant(builder, (*it)->getOperandSize(), std::move(value));
             }
         }
         else
