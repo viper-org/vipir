@@ -50,7 +50,14 @@ namespace vipir
     }
     void Module::insertGlobalAt(Global* global, int offset)
     {
-        mGlobals.insert(mGlobals.end() + offset, GlobalPtr(global));
+        if (mGlobals.empty())
+        {
+            mGlobals.push_back(GlobalPtr(global));
+        }
+        else
+        {
+            mGlobals.insert(mGlobals.end() + offset, GlobalPtr(global));
+        }
     }
 
     void Module::insertConstant(Value* constant)
