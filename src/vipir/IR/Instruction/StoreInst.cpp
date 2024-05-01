@@ -39,7 +39,7 @@ namespace vipir
         {
             (void)ptr.release();
             instruction::LabelOperandPtr labelPtr = instruction::LabelOperandPtr(labelOperand);
-            instruction::RelativePtr rel = std::make_unique<instruction::Relative>(std::move(labelPtr));
+            instruction::RelativePtr rel = std::make_unique<instruction::Relative>(std::move(labelPtr), std::nullopt);
             
             if (dynamic_cast<instruction::Immediate*>(value.get()))
             {

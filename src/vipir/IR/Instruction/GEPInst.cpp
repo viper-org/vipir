@@ -14,6 +14,7 @@
 #include "vasm/instruction/operand/Register.h"
 #include "vasm/instruction/operand/Immediate.h"
 #include "vasm/instruction/operand/Memory.h"
+#include "vasm/instruction/operand/Relative.h"
 
 #include "vasm/instruction/twoOperandInstruction/LeaInstruction.h"
 
@@ -46,6 +47,7 @@ namespace vipir
 
         instruction::Register* ptrReg = dynamic_cast<instruction::Register*>(ptr.get());
         instruction::Memory* ptrMem = dynamic_cast<instruction::Memory*>(ptr.get());
+        instruction::Relative* ptrRel = dynamic_cast<instruction::Relative*>(ptr.get());
         std::optional<int> displacement;
         if (ptrMem)
         {
@@ -60,8 +62,17 @@ namespace vipir
             int disp = immediate->imm64() * scale;
             if (displacement) disp += *displacement;
             (void)ptr.release();
-
-            instruction::OperandPtr memory = std::make_unique<instruction::Memory>(instruction::RegisterPtr(ptrReg), disp, nullptr, std::nullopt);
+            
+            instruction::OperandPtr memory;
+            if (ptrRel)
+            {
+                (void)ptr.release();
+                memory = instruction::OperandPtr(ptrRel);
+            }
+            else
+            {
+                memory = std::make_unique<instruction::Memory>(instruction::RegisterPtr(ptrReg), disp, nullptr, std::nullopt);
+            }
             builder.addValue(std::make_unique<instruction::LeaInstruction>(reg->clone(), std::move(memory)));
             mEmittedValue = std::move(reg);
         }
@@ -71,7 +82,16 @@ namespace vipir
             instruction::Register* index = regOffset;
             (void)offset.release();
 
-            instruction::OperandPtr memory = std::make_unique<instruction::Memory>(instruction::RegisterPtr(ptrReg), displacement, instruction::RegisterPtr(regOffset), scale);
+            instruction::OperandPtr memory;
+            if (ptrRel)
+            {
+                (void)ptr.release();
+                memory = instruction::OperandPtr(ptrRel);
+            }
+            else
+            {
+                memory = std::make_unique<instruction::Memory>(instruction::RegisterPtr(ptrReg), displacement, instruction::RegisterPtr(regOffset), scale);
+            }
             builder.addValue(std::make_unique<instruction::LeaInstruction>(reg->clone(), std::move(memory)));
             mEmittedValue = std::move(reg);
         }

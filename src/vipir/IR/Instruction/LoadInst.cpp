@@ -57,7 +57,7 @@ namespace vipir
         {
             (void)ptr.release();
             instruction::LabelOperandPtr labelPtr = instruction::LabelOperandPtr(labelOperand);
-            instruction::RelativePtr rel = std::make_unique<instruction::Relative>(std::move(labelPtr));
+            instruction::RelativePtr rel = std::make_unique<instruction::Relative>(std::move(labelPtr), std::nullopt);
             builder.addValue(std::make_unique<instruction::MovInstruction>(reg->clone(), std::move(rel)));
         }
 
