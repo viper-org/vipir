@@ -37,6 +37,9 @@ int main()
     auto initVal = vipir::ConstantInt::Get(mod, 69, i32Type);
     global->setInitialValue(initVal);
 
+    auto newval = vipir::ConstantInt::Get(mod, 33, i32Type);
+    builder.CreateStore(global, newval);
+
     auto load = builder.CreateLoad(global);
 
     builder.CreateRet(load);

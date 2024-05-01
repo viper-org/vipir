@@ -68,6 +68,8 @@ namespace vipir
 
     void Function::emit(MC::Builder& builder)
     {
+        builder.addValue(std::make_unique<instruction::SectionDirective>(".text"));
+
         mEmittedValue = std::make_unique<instruction::LabelOperand>(mName);
 
         if (mBasicBlockList.empty()) // Function declaration

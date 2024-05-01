@@ -95,7 +95,7 @@ namespace vipir
 
         for (const auto& value : builder.getValues())
         {
-            value->emit(opcodeBuilder, codegen::Section::Text);
+            value->emit(opcodeBuilder, opcodeBuilder.getSection());
         }
 
         opcodeBuilder.patchForwardLabels();

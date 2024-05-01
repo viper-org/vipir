@@ -9,6 +9,7 @@
 #include "vasm/instruction/operand/Label.h"
 
 #include "vasm/instruction/singleOperandInstruction/DeclInstruction.h"
+#include "vasm/instruction/Directive.h"
 
 #include <format>
 
@@ -26,6 +27,8 @@ namespace vipir
 
     void GlobalVar::emit(MC::Builder& builder)
     {
+        builder.addValue(std::make_unique<instruction::SectionDirective>(".data"));
+
         mEmittedValue = std::make_unique<instruction::LabelOperand>(std::to_string(mValueId));
         builder.addValue(std::make_unique<instruction::Label>(std::to_string(mValueId)));
 
