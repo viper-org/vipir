@@ -55,7 +55,7 @@ namespace vipir
         }
         else
         {
-            switch(mType->getOperandSize())
+            switch(size)
             {
                 case codegen::OperandSize::Byte:
                     builder.addValue(std::make_unique<instruction::DeclInstruction<codegen::OperandSize::Byte> >(std::move(value)));
