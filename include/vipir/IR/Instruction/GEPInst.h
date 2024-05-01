@@ -29,6 +29,7 @@ namespace vipir
 
         Value* mPtr;
         Value* mOffset;
+        int mAlignment;
 
         int mValueId;
     };

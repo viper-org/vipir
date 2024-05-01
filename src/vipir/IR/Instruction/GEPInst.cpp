@@ -56,7 +56,7 @@ namespace vipir
             displacement = ptrMem->getDisplacement();
         }
 
-        int scale = static_cast<PointerType*>(mType)->getBaseType()->getAlignment() / 8;
+        int scale = mAlignment / 8;
 
         if (auto immediate = dynamic_cast<instruction::Immediate*>(offset.get()))
         {
@@ -100,10 +100,12 @@ namespace vipir
             StructType* structType = dynamic_cast<StructType*>(static_cast<PointerType*>(mPtr->getType())->getBaseType());
             ConstantInt* offset = static_cast<ConstantInt*>(mOffset);
             mType = Type::GetPointerType(structType->getField(offset->getValue()));
+            mAlignment = structType->getAlignment();
         }
         else
         {
             mType = mPtr->getType();
+            mAlignment = mType->getAlignment();
             assert(mType->isPointerType());
         }
 
