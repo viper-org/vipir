@@ -5,6 +5,11 @@
 
 #include "vipir/Module.h"
 
+#include "vipir/Type/StructType.h"
+#include "vipir/Type/PointerType.h"
+
+#include "vipir/MC/StructOperand.h"
+
 #include "vasm/instruction/Label.h"
 #include "vasm/instruction/operand/Label.h"
 
@@ -33,22 +38,40 @@ namespace vipir
         builder.addValue(std::make_unique<instruction::Label>(std::to_string(mValueId)));
 
         instruction::OperandPtr initVal = mInitialValue->getEmittedValue();
-        switch(mType->getOperandSize())
+
+        emitConstant(builder, mType->getOperandSize(), std::move(initVal));
+    }
+
+    void GlobalVar::emitConstant(MC::Builder& builder, codegen::OperandSize size, instruction::OperandPtr value)
+    {
+        if (auto structOperand = dynamic_cast<StructOperand*>(value.get()))
         {
-            case codegen::OperandSize::Byte:
-                builder.addValue(std::make_unique<instruction::DeclInstruction<codegen::OperandSize::Byte> >(std::move(initVal)));
-                break;
-            case codegen::OperandSize::Word:
-                builder.addValue(std::make_unique<instruction::DeclInstruction<codegen::OperandSize::Word> >(std::move(initVal)));
-                break;
-            case codegen::OperandSize::Long:
-                builder.addValue(std::make_unique<instruction::DeclInstruction<codegen::OperandSize::Long> >(std::move(initVal)));
-                break;
-            case codegen::OperandSize::Quad:
-                builder.addValue(std::make_unique<instruction::DeclInstruction<codegen::OperandSize::Quad> >(std::move(initVal)));
-                break;
-            case codegen::OperandSize::None:
-                break; // TODO: Add struct initial value support
+            int index = 0;
+            for (auto& value : structOperand->getValues())
+            {
+                StructType* structType = static_cast<StructType*>(static_cast<PointerType*>(mType)->getBaseType());
+                emitConstant(builder, structType->getField(index++)->getOperandSize(), std::move(value));
+            }
+        }
+        else
+        {
+            switch(mType->getOperandSize())
+            {
+                case codegen::OperandSize::Byte:
+                    builder.addValue(std::make_unique<instruction::DeclInstruction<codegen::OperandSize::Byte> >(std::move(value)));
+                    break;
+                case codegen::OperandSize::Word:
+                    builder.addValue(std::make_unique<instruction::DeclInstruction<codegen::OperandSize::Word> >(std::move(value)));
+                    break;
+                case codegen::OperandSize::Long:
+                    builder.addValue(std::make_unique<instruction::DeclInstruction<codegen::OperandSize::Long> >(std::move(value)));
+                    break;
+                case codegen::OperandSize::Quad:
+                    builder.addValue(std::make_unique<instruction::DeclInstruction<codegen::OperandSize::Quad> >(std::move(value)));
+                    break;
+                case codegen::OperandSize::None:
+                    break;
+            }
         }
     }
 

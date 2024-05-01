@@ -21,6 +21,7 @@ set(SOURCES
 
     "src/vipir/IR/Constant/ConstantInt.cpp"
     "src/vipir/IR/Constant/ConstantBool.cpp"
+    "src/vipir/IR/Constant/ConstantStruct.cpp"
 
     "src/vipir/IR/Instruction/Instruction.cpp"
     "src/vipir/IR/Instruction/RetInst.cpp"
@@ -44,6 +45,7 @@ set(SOURCES
 
     "src/vipir/MC/Builder.cpp"
     "src/vipir/MC/CmpOperand.cpp"
+    "src/vipir/MC/StructOperand.cpp"
 
     "src/vipir/ABI/SysV.cpp"
 )
@@ -62,6 +64,7 @@ set(HEADERS
 
     "include/vipir/IR/Constant/ConstantInt.h"
     "include/vipir/IR/Constant/ConstantBool.h"
+    "include/vipir/IR/Constant/ConstantStruct.h"
 
     "include/vipir/IR/Instruction/Instruction.h"
     "include/vipir/IR/Instruction/RetInst.h"
@@ -85,6 +88,7 @@ set(HEADERS
 
     "include/vipir/MC/Builder.h"
     "include/vipir/MC/CmpOperand.h"
+    "include/vipir/MC/StructOperand.h"
 
     "include/vipir/ABI/ABI.h"
     "include/vipir/ABI/SysV.h"

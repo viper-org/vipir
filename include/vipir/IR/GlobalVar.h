@@ -24,6 +24,8 @@ namespace vipir
     protected:
         void emit(MC::Builder& builder) override;
 
+        void emitConstant(MC::Builder& builder, codegen::OperandSize size, instruction::OperandPtr value);
+
     private:
         GlobalVar(Module& module, Type* type);
 
