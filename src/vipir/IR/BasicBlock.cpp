@@ -3,6 +3,8 @@
 #include "vipir/IR/BasicBlock.h"
 #include "vipir/IR/Function.h"
 
+#include "vipir/Module.h"
+
 #include "vasm/instruction/Label.h"
 
 #include "vasm/instruction/operand/Label.h"
@@ -11,14 +13,12 @@
 
 namespace vipir
 {
-    static int basicBlockNumber = 0;
-
     BasicBlock* BasicBlock::Create(std::string_view name, Function* parent)
     {
         std::string basicBlockName = std::string(name);
         if (basicBlockName.empty())
         {
-            basicBlockName = std::format("{}", basicBlockNumber++);
+            basicBlockName = std::format("{}", parent->getModule().getNextValueId());
         }
 
         BasicBlock* basicBlock = new BasicBlock(std::move(basicBlockName), parent);
