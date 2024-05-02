@@ -15,6 +15,7 @@
 #include "vipir/IR/Instruction/BranchInst.h"
 #include "vipir/IR/Instruction/CallInst.h"
 #include "vipir/IR/Instruction/PtrCastInst.h"
+#include "vipir/IR/Instruction/SExtInst.h"
 
 #include "vipir/IR/Constant/ConstantInt.h"
 #include "vipir/IR/Constant/ConstantBool.h"
@@ -254,7 +255,6 @@ namespace vipir
         return call;
     }
 
-    
     PtrCastInst* IRBuilder::CreatePtrCast(Value* ptr, Type* destType)
     {
         PtrCastInst* cast = new PtrCastInst(mInsertPoint, ptr, destType);
@@ -262,6 +262,15 @@ namespace vipir
         mInsertPoint->insertValue(cast);
 
         return cast;
+    }
+
+    SExtInst* IRBuilder::CreateSExt(Value* value, Type* destType)
+    {
+        SExtInst* sext = new SExtInst(mInsertPoint, value, destType);
+
+        mInsertPoint->insertValue(sext);
+
+        return sext;
     }
 
 

@@ -35,6 +35,7 @@ set(SOURCES
     "src/vipir/IR/Instruction/BranchInst.cpp"
     "src/vipir/IR/Instruction/CallInst.cpp"
     "src/vipir/IR/Instruction/PtrCastInst.cpp"
+    "src/vipir/IR/Instruction/SExtInst.cpp"
 
     "src/vipir/Type/Type.cpp"
     "src/vipir/Type/IntegerType.cpp"
@@ -79,6 +80,7 @@ set(HEADERS
     "include/vipir/IR/Instruction/BranchInst.h"
     "include/vipir/IR/Instruction/CallInst.h"
     "include/vipir/IR/Instruction/PtrCastInst.h"
+    "include/vipir/IR/Instruction/SExtInst.h"
 
     "include/vipir/Type/Type.h"
     "include/vipir/Type/IntegerType.h"
