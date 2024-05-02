@@ -41,34 +41,36 @@ namespace vipir
 
         instruction::OperandPtr initVal = mInitialValue->getEmittedValue();
 
-        emitConstant(builder, mType->getOperandSize(), std::move(initVal));
+        emitConstant(builder, static_cast<PointerType*>(mType)->getBaseType(), std::move(initVal));
     }
 
-    void GlobalVar::emitConstant(MC::Builder& builder, codegen::OperandSize size, instruction::OperandPtr value)
+    void GlobalVar::emitConstant(MC::Builder& builder, Type* type, instruction::OperandPtr value)
     {
         if (auto compoundOperand = dynamic_cast<CompoundOperand*>(value.get()))
         {
             codegen::OperandSize size;
-            if (auto arrayType = dynamic_cast<ArrayType*>(static_cast<PointerType*>(mType)->getBaseType()))
+            if (auto arrayType = dynamic_cast<ArrayType*>(type))
             {
-                size = arrayType->getBaseType()->getOperandSize();
+                for (auto& value : compoundOperand->getValues())
+                {
+                    emitConstant(builder, arrayType->getBaseType(), std::move(value));
+                }
             }
             else
             {
-                StructType* structType = static_cast<StructType*>(static_cast<PointerType*>(mType)->getBaseType());
+                StructType* structType = static_cast<StructType*>(type);
                 auto it = std::max_element(structType->getFields().begin(), structType->getFields().end(), [](auto a, auto b){
                     return a->getSizeInBits() < b->getSizeInBits();
                 });
-                size = (*it)->getOperandSize();
-            }
-            for (auto& value : compoundOperand->getValues())
-            {
-                emitConstant(builder, size, std::move(value));
+                for (auto& value : compoundOperand->getValues())
+                {
+                    emitConstant(builder, *it, std::move(value));
+                }
             }
         }
         else
         {
-            switch(size)
+            switch(type->getOperandSize())
             {
                 case codegen::OperandSize::Byte:
                     builder.addValue(std::make_unique<instruction::DeclInstruction<codegen::OperandSize::Byte> >(std::move(value)));
