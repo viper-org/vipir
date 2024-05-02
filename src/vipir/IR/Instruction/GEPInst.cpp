@@ -69,12 +69,12 @@ namespace vipir
             if (StructType* structType = dynamic_cast<StructType*>(static_cast<PointerType*>(mPtr->getType())->getBaseType()))
             {
                 disp = displacement.value_or(0);
-                for (int i = 0; i < immediate->imm64()+1; ++i)
+                for (int i = 0; i < immediate->imm64(); ++i)
                 {
                     if (structType->getField(i)->isArrayType())
                     {
                         ArrayType* arrayType = static_cast<ArrayType*>(structType->getField(i));
-                        disp += std::max(arrayType->getBaseType()->getSizeInBits() * arrayType->getCount(), (std::size_t)scale);
+                        disp += std::max(arrayType->getSizeInBits() / 8, (std::size_t)scale);
                     }
                     else
                     {
