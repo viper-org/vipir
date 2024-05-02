@@ -60,6 +60,8 @@ namespace vipir
         BinaryInst* CreateAdd(Value* left, Value* right);
         BinaryInst* CreateSub(Value* left, Value* right);
 
+        BinaryInst* CreateIMul(Value* left, Value* right);
+
         BinaryInst* CreateBWOr(Value* left, Value* right);
         BinaryInst* CreateBWAnd(Value* left, Value* right);
         BinaryInst* CreateBWXor(Value* left, Value* right);

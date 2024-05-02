@@ -38,6 +38,7 @@ namespace vipir
         virtual std::string ident() const = 0;
 
         void setPreferredRegister(int reg) { mPreferredRegisterID = reg; }
+        bool requiresRegister() const { return mRequiresRegister; }
 
         virtual instruction::OperandPtr getEmittedValue() { return mEmittedValue->clone(); }
     
@@ -47,7 +48,7 @@ namespace vipir
         
         instruction::OperandPtr mEmittedValue;
 
-        bool requiresRegister{false};
+        bool mRequiresRegister{false};
         std::pair<int, int> mInterval{-1,-1};
         int mRegisterID;
         int mPreferredRegisterID;

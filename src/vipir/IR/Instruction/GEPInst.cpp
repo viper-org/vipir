@@ -134,6 +134,6 @@ namespace vipir
             assert(mType->isPointerType());
         }
 
-        requiresRegister = true;
+        mRequiresRegister = true;
     }
 }

@@ -72,6 +72,6 @@ namespace vipir
         assert(mPtr->getType()->isPointerType());
         mType = static_cast<PointerType*>(mPtr->getType())->getBaseType();
 
-        requiresRegister = true;
+        mRequiresRegister = true;
     }
 }

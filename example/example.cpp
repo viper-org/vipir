@@ -10,7 +10,7 @@
 #include "vipir/IR/Constant/ConstantArray.h"
 #include "vipir/IR/Instruction/AllocaInst.h"
 #include "vipir/IR/Instruction/AddrInst.h"
-#include "vipir/IR/Instruction/GEPInst.h"
+#include "vipir/IR/Instruction/BinaryInst.h"
 #include "vipir/IR/Instruction/LoadInst.h"
 
 #include "vipir/Type/StructType.h"
@@ -34,19 +34,20 @@ int main()
     auto i8Type = vipir::Type::GetIntegerType(8);
     auto arrayType = vipir::Type::GetArrayType(i32Type, 3);
 
-    auto func2 = vipir::Function::Create(vipir::FunctionType::Create(i32Type, {i32Type}), mod, "main");
+    auto func2 = vipir::Function::Create(vipir::FunctionType::Create(i32Type, {}), mod, "main");
     auto bb2 = vipir::BasicBlock::Create("", func2);
 
     builder.setInsertPoint(bb2);
 
-    auto global = mod.createGlobalVar(arrayType);
-    auto init1 = vipir::ConstantInt::Get(mod, 12, i32Type);
-    auto init2 = vipir::ConstantInt::Get(mod, 33, i32Type);
-    auto init3 = vipir::ConstantInt::Get(mod, 69, i32Type);
-    auto globalInitializer = vipir::ConstantArray::Get(mod, arrayType, {init1, init2, init3});
-    global->setInitialValue(globalInitializer);
+    auto alloca = builder.CreateAlloca(i32Type, "");
+    auto val1 = vipir::ConstantInt::Get(mod, 12, i32Type);
+    builder.CreateStore(alloca, val1);
 
-    auto ret = vipir::ConstantInt::Get(mod, 1, i32Type);
+    auto load = builder.CreateLoad(alloca);
+
+    auto b = vipir::ConstantInt::Get(mod, 1, i32Type);
+
+    auto ret = builder.CreateIMul(load, b);
 
     builder.CreateRet(ret);
 

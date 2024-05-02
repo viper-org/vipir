@@ -70,7 +70,7 @@ namespace vipir
     {
         mType = mFunction->getFunctionType()->getReturnType();
 
-        requiresRegister = true;
+        mRequiresRegister = true;
         mRegisterSmashes.push_back(mModule.abi()->getReturnRegister());
 
         int index = 0;

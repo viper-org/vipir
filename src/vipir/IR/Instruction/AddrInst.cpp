@@ -60,6 +60,6 @@ namespace vipir
     {
         mType = mPtr->getType();
 
-        requiresRegister = true;
+        mRequiresRegister = true;
     }
 }

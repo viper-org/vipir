@@ -268,7 +268,7 @@ namespace vipir
                     }
                 }
 
-                if (value->requiresRegister)
+                if (value->requiresRegister())
                 {
                     activeValues.push_back(value.get());
 

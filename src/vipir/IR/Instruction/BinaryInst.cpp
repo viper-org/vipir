@@ -2,6 +2,7 @@
 
 
 #include "vipir/IR/Instruction/BinaryInst.h"
+
 #include "vipir/IR/BasicBlock.h"
 #include "vipir/IR/Function.h"
 
@@ -9,6 +10,10 @@
 #include "vipir/Module.h"
 
 #include "vasm/instruction/twoOperandInstruction/LogicalInstruction.h"
+#include "vasm/instruction/twoOperandInstruction/MovInstruction.h"
+#include "vasm/instruction/variableOperandInstruction/IMulInstruction.h"
+
+#include "vasm/instruction/operand/Immediate.h"
 
 #include <cassert>
 #include <format>
@@ -25,6 +30,10 @@ namespace vipir
                 break;
             case Instruction::SUB:
                 operatorName = "sub";
+                break;
+
+            case Instruction::IMUL:
+                operatorName = "imul";
                 break;
 
             case Instruction::BWOR:
@@ -92,6 +101,25 @@ namespace vipir
                 break;
             }
 
+            case Instruction::IMUL:
+            {
+                instruction::OperandPtr left = mLeft->getEmittedValue();
+                instruction::OperandPtr reg = std::make_unique<instruction::Register>(mRegisterID, mType->getOperandSize());
+                builder.addValue(std::make_unique<instruction::MovInstruction>(reg->clone(), std::move(left)));
+
+                instruction::OperandPtr right = mRight->getEmittedValue();
+                if (dynamic_cast<instruction::Immediate*>(right.get()))
+                {
+                    builder.addValue(std::make_unique<instruction::IMulInstruction>(reg->clone(), reg->clone(), std::move(right)));
+                }
+                else
+                {
+                    builder.addValue(std::make_unique<instruction::IMulInstruction>(reg->clone(), std::move(right)));
+                }
+                mEmittedValue = std::move(reg);
+                break;
+            }
+
             case Instruction::BWOR:
             {
                 GenerateInstruction.template operator()<instruction::OrInstruction>();
@@ -130,6 +158,11 @@ namespace vipir
         
         switch (mOperator)
         {
+            case Instruction::IMUL:
+            {
+                mRequiresRegister = true;
+            }
+
             case Instruction::ADD:
             case Instruction::SUB:
             case Instruction::BWOR:

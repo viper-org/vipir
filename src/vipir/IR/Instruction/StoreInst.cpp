@@ -73,7 +73,7 @@ namespace vipir
     {
         if (dynamic_cast<GlobalVar*>(mPtr) && mValue->isConstant() && mValue->getType()->getOperandSize() == codegen::OperandSize::Quad)
         {
-            requiresRegister = true;
+            mRequiresRegister = true;
         }
     }
 }

@@ -63,6 +63,6 @@ namespace vipir
 
         mType = destType;
 
-        requiresRegister = true;
+        mRequiresRegister = true;
     }
 }
