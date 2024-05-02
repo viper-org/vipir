@@ -69,7 +69,7 @@ namespace vipir
             if (StructType* structType = dynamic_cast<StructType*>(static_cast<PointerType*>(mPtr->getType())->getBaseType()))
             {
                 disp = displacement.value_or(0);
-                for (int i = 0; i < immediate->imm64(); ++i)
+                for (int i = 0; i < immediate->imm64()+1; ++i)
                 {
                     if (structType->getField(i)->isArrayType())
                     {
