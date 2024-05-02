@@ -23,6 +23,7 @@ set(SOURCES
     "src/vipir/IR/Constant/ConstantBool.cpp"
     "src/vipir/IR/Constant/ConstantStruct.cpp"
     "src/vipir/IR/Constant/ConstantArray.cpp"
+    "src/vipir/IR/Constant/ConstantNullPtr.cpp"
 
     "src/vipir/IR/Instruction/Instruction.cpp"
     "src/vipir/IR/Instruction/RetInst.cpp"
@@ -73,6 +74,7 @@ set(HEADERS
     "include/vipir/IR/Constant/ConstantBool.h"
     "include/vipir/IR/Constant/ConstantStruct.h"
     "include/vipir/IR/Constant/ConstantArray.h"
+    "include/vipir/IR/Constant/ConstantNullPtr.h"
 
     "include/vipir/IR/Instruction/Instruction.h"
     "include/vipir/IR/Instruction/RetInst.h"
