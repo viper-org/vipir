@@ -64,6 +64,24 @@ namespace vipir
             int disp = immediate->imm64() * scale;
             if (displacement) disp += *displacement;
             (void)ptr.release();
+
+            
+            if (StructType* structType = dynamic_cast<StructType*>(static_cast<PointerType*>(mPtr->getType())->getBaseType()))
+            {
+                disp = displacement.value_or(0);
+                for (int i = 0; i < immediate->imm64(); ++i)
+                {
+                    if (structType->getField(i)->isArrayType())
+                    {
+                        ArrayType* arrayType = static_cast<ArrayType*>(structType->getField(i));
+                        disp += std::max(arrayType->getBaseType()->getSizeInBits() * arrayType->getCount(), (std::size_t)scale);
+                    }
+                    else
+                    {
+                        disp += scale;
+                    }
+                }
+            }
             
             instruction::OperandPtr memory;
             if (ptrLabel)
