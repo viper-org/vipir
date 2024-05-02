@@ -38,4 +38,11 @@ namespace vipir
     {
         mEmittedValue = std::make_unique<instruction::Immediate>(0);
     }
+
+    ConstantNullPtr::ConstantNullPtr(Module& module, Type* type)
+        : Value(module)
+    {
+        assert(type->isPointerType());
+        mType = type;
+    }
 }
