@@ -6,6 +6,7 @@
 #include "vipir/IR/BasicBlock.h"
 
 #include "vipir/IR/Constant/ConstantInt.h"
+#include "vipir/Type/ArrayType.h"
 #include "vipir/Type/PointerType.h"
 #include "vipir/Type/StructType.h"
 
@@ -97,10 +98,16 @@ namespace vipir
     {
         if (static_cast<PointerType*>(mPtr->getType())->getBaseType()->isStructType())
         {
-            StructType* structType = dynamic_cast<StructType*>(static_cast<PointerType*>(mPtr->getType())->getBaseType());
+            StructType* structType = static_cast<StructType*>(static_cast<PointerType*>(mPtr->getType())->getBaseType());
             ConstantInt* offset = static_cast<ConstantInt*>(mOffset);
             mType = Type::GetPointerType(structType->getField(offset->getValue()));
             mAlignment = structType->getAlignment();
+        }
+        else if (static_cast<PointerType*>(mPtr->getType())->getBaseType()->isArrayType())
+        {
+            ArrayType* arrayType = static_cast<ArrayType*>(static_cast<PointerType*>(mPtr->getType())->getBaseType());
+            mType = Type::GetPointerType(arrayType->getBaseType());
+            mAlignment = arrayType->getBaseType()->getAlignment();
         }
         else
         {

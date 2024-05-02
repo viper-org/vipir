@@ -47,6 +47,7 @@ set(SOURCES
     "src/vipir/Type/FunctionType.cpp"
     "src/vipir/Type/PointerType.cpp"
     "src/vipir/Type/StructType.cpp"
+    "src/vipir/Type/ArrayType.cpp"
 
     "src/vipir/MC/Builder.cpp"
     "src/vipir/MC/CmpOperand.cpp"
@@ -95,6 +96,7 @@ set(HEADERS
     "include/vipir/Type/FunctionType.h"
     "include/vipir/Type/PointerType.h"
     "include/vipir/Type/StructType.h"
+    "include/vipir/Type/ArrayType.h"
 
     "include/vipir/MC/Builder.h"
     "include/vipir/MC/CmpOperand.h"

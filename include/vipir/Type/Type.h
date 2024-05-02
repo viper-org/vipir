@@ -30,6 +30,7 @@ namespace vipir
         virtual bool isFunctionType() const { return false; }
         virtual bool isPointerType()  const { return false; }
         virtual bool isStructType()   const { return false; }
+        virtual bool isArrayType()    const { return false; }
 
         static Type* GetIntegerType(int bits);
         static Type* GetVoidType();
@@ -37,12 +38,14 @@ namespace vipir
         static Type* GetFunctionType(Type* returnType, std::vector<Type*> argumentTypes);
         static Type* GetPointerType(Type* baseType);
         static Type* GetStructType(std::vector<Type*> fieldTypes);
+        static Type* GetArrayType(Type* baseType, int count);
 
     protected:
         Type(std::size_t sizeInBits, std::string_view name)
             : mSizeInBits(sizeInBits)
             , mName(name)
             , mAlignment(mSizeInBits)
+            , mOperandSize(codegen::OperandSize::None)
         {
         }
 

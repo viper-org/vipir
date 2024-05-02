@@ -7,6 +7,7 @@
 #include "vipir/Type/FunctionType.h"
 #include "vipir/Type/PointerType.h"
 #include "vipir/Type/StructType.h"
+#include "vipir/Type/ArrayType.h"
 
 #include <cassert>
 #include <memory>
@@ -113,6 +114,23 @@ namespace vipir
         }
 
         types.push_back(std::make_unique<StructType>(std::move(fieldTypes)));
+        return types.back().get();
+    }
+
+    Type* Type::GetArrayType(Type* baseType, int count)
+    {
+        for (const auto& type : types)
+        {
+            if (ArrayType* arrayType = dynamic_cast<ArrayType*>(type.get()))
+            {
+                if (arrayType->getBaseType() == baseType && arrayType->getCount() == count)
+                {
+                    return arrayType;
+                }
+            }
+        }
+
+        types.push_back(std::make_unique<ArrayType>(baseType, count));
         return types.back().get();
     }
 }
