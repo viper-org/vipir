@@ -41,7 +41,7 @@ namespace vipir
         
         mEmittedValue = std::make_unique<instruction::LabelOperand>(std::to_string(mValueId));
 
-        builder.addValue(std::make_unique<instruction::Label>(std::to_string(mValueId)));
+        builder.addValue(std::make_unique<instruction::Label>(std::to_string(mValueId), false));
         instruction::OperandPtr string = std::make_unique<instruction::String>(mValue + '\0');
         builder.addValue(std::make_unique<instruction::DeclInstruction<codegen::OperandSize::Byte> >(std::move(string)));
     }

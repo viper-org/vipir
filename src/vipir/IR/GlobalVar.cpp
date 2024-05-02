@@ -38,7 +38,7 @@ namespace vipir
         builder.addValue(std::make_unique<instruction::SectionDirective>(".data"));
 
         mEmittedValue = std::make_unique<instruction::LabelOperand>(std::to_string(mValueId));
-        builder.addValue(std::make_unique<instruction::Label>(std::to_string(mValueId)));
+        builder.addValue(std::make_unique<instruction::Label>(std::to_string(mValueId), false));
 
         instruction::OperandPtr initVal = mInitialValue->getEmittedValue();
 

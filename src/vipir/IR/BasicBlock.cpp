@@ -68,7 +68,7 @@ namespace vipir
 
     void BasicBlock::emit(MC::Builder& builder)
     {
-        builder.addValue(std::make_unique<instruction::Label>(mName));
+        builder.addValue(std::make_unique<instruction::Label>(mName, false));
         for (auto& value : mValueList)
         {
             value->emit(builder);

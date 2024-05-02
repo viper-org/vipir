@@ -81,7 +81,7 @@ namespace vipir
         allocateRegisters();
         setLocalStackOffsets();
 
-        builder.addValue(std::make_unique<instruction::Label>(mName));
+        builder.addValue(std::make_unique<instruction::Label>(mName, true));
 
         builder.addValue(std::make_unique<instruction::PushInstruction>(instruction::Register::Get("rbp")));
         builder.addValue(std::make_unique<instruction::MovInstruction>(instruction::Register::Get("rbp"), instruction::Register::Get("rsp")));
