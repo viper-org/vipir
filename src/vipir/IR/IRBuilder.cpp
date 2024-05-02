@@ -16,6 +16,7 @@
 #include "vipir/IR/Instruction/CallInst.h"
 #include "vipir/IR/Instruction/PtrCastInst.h"
 #include "vipir/IR/Instruction/SExtInst.h"
+#include "vipir/IR/Instruction/TruncInst.h"
 
 #include "vipir/IR/Constant/ConstantInt.h"
 #include "vipir/IR/Constant/ConstantBool.h"
@@ -271,6 +272,15 @@ namespace vipir
         mInsertPoint->insertValue(sext);
 
         return sext;
+    }
+
+    TruncInst* IRBuilder::CreateTrunc(Value* value, Type* destType)
+    {
+        TruncInst* trunc = new TruncInst(mInsertPoint, value, destType);
+
+        mInsertPoint->insertValue(trunc);
+
+        return trunc;
     }
 
 

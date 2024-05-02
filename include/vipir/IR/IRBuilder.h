@@ -29,6 +29,7 @@ namespace vipir
     class CallInst;
     class PtrCastInst;
     class SExtInst;
+    class TruncInst;
 
     class ConstantBool;
 
@@ -82,6 +83,7 @@ namespace vipir
 
         PtrCastInst* CreatePtrCast(Value* ptr, Type* destType);
         SExtInst* CreateSExt(Value* value, Type* destType);
+        TruncInst* CreateTrunc(Value* value, Type* destType);
 
 
         ConstantBool* CreateConstantBool(bool value);
