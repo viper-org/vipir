@@ -19,6 +19,7 @@
 
 #include <algorithm>
 #include <format>
+#include <ranges>
 
 namespace vipir
 {
@@ -59,12 +60,27 @@ namespace vipir
             else
             {
                 StructType* structType = static_cast<StructType*>(type);
-                auto it = std::max_element(structType->getFields().begin(), structType->getFields().end(), [](auto a, auto b){
+
+                auto notArray = [](Type* type) { return !type->isArrayType(); };
+                auto largestElement = std::max_element(structType->getFields().begin(), structType->getFields().end(), [](auto a, auto b){
                     return a->getSizeInBits() < b->getSizeInBits();
                 });
+                auto fieldsNotArray = structType->getFields() | std::views::filter(notArray);
+                auto largestNotArray = std::max_element(fieldsNotArray.begin(), fieldsNotArray.end(), [](auto a, auto b){
+                    return a->getSizeInBits() < b->getSizeInBits();
+                });
+
+                int index = 0;
                 for (auto& value : compoundOperand->getValues())
                 {
-                    emitConstant(builder, *it, std::move(value));
+                    if ((*largestElement)->isArrayType() && structType->getField(index++) != *largestElement)
+                    {
+                        emitConstant(builder, *largestNotArray, std::move(value));
+                    }
+                    else
+                    {
+                        emitConstant(builder, *largestElement, std::move(value));
+                    }
                 }
             }
         }
