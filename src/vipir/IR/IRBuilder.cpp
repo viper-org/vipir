@@ -14,6 +14,7 @@
 #include "vipir/IR/Instruction/UnaryInst.h"
 #include "vipir/IR/Instruction/BranchInst.h"
 #include "vipir/IR/Instruction/CallInst.h"
+#include "vipir/IR/Instruction/PtrCastInst.h"
 
 #include "vipir/IR/Constant/ConstantInt.h"
 #include "vipir/IR/Constant/ConstantBool.h"
@@ -96,7 +97,7 @@ namespace vipir
     }
     GEPInst* IRBuilder::CreateStructGEP(Value* ptr, int index)
     {
-        GEPInst* gep = new GEPInst(mInsertPoint, ptr, CreateConstantInt(index, Type::GetIntegerType(32)));
+        GEPInst* gep = new GEPInst(mInsertPoint, ptr, ConstantInt::Get(mInsertPoint->getModule(), index, Type::GetIntegerType(32)));
 
         mInsertPoint->insertValue(gep);
 
@@ -253,16 +254,16 @@ namespace vipir
         return call;
     }
 
-
-
-    ConstantInt* IRBuilder::CreateConstantInt(intmax_t value, Type* type)
+    
+    PtrCastInst* IRBuilder::CreatePtrCast(Value* ptr, Type* destType)
     {
-        ConstantInt* constantInt = new ConstantInt(mInsertPoint, value, type);
+        PtrCastInst* cast = new PtrCastInst(mInsertPoint, ptr, destType);
 
-        mInsertPoint->insertValue(constantInt);
+        mInsertPoint->insertValue(cast);
 
-        return constantInt;
+        return cast;
     }
+
 
     ConstantBool* IRBuilder::CreateConstantBool(bool value)
     {

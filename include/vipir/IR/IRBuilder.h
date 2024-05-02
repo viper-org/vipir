@@ -27,8 +27,8 @@ namespace vipir
     class UnaryInst;
     class BranchInst;
     class CallInst;
+    class PtrCastInst;
 
-    class ConstantInt;
     class ConstantBool;
 
     class IRBuilder
@@ -79,7 +79,9 @@ namespace vipir
         CallInst* CreateCall(Function* function, std::vector<Value*> parameters);
 
 
-        ConstantInt* CreateConstantInt(intmax_t value, Type* type);
+        PtrCastInst* CreatePtrCast(Value* ptr, Type* destType);
+
+
         ConstantBool* CreateConstantBool(bool value);
 
     private:
