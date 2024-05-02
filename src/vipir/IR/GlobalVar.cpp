@@ -5,10 +5,11 @@
 
 #include "vipir/Module.h"
 
+#include "vipir/Type/ArrayType.h"
 #include "vipir/Type/StructType.h"
 #include "vipir/Type/PointerType.h"
 
-#include "vipir/MC/StructOperand.h"
+#include "vipir/MC/CompoundOperand.h"
 
 #include "vasm/instruction/Label.h"
 #include "vasm/instruction/operand/Label.h"
@@ -45,15 +46,24 @@ namespace vipir
 
     void GlobalVar::emitConstant(MC::Builder& builder, codegen::OperandSize size, instruction::OperandPtr value)
     {
-        if (auto structOperand = dynamic_cast<StructOperand*>(value.get()))
+        if (auto compoundOperand = dynamic_cast<CompoundOperand*>(value.get()))
         {
-            StructType* structType = static_cast<StructType*>(static_cast<PointerType*>(mType)->getBaseType());
-            auto it = std::max_element(structType->getFields().begin(), structType->getFields().end(), [](auto a, auto b){
-                return a->getSizeInBits() < b->getSizeInBits();
-            });
-            for (auto& value : structOperand->getValues())
+            codegen::OperandSize size;
+            if (auto arrayType = dynamic_cast<ArrayType*>(static_cast<PointerType*>(mType)->getBaseType()))
             {
-                emitConstant(builder, (*it)->getOperandSize(), std::move(value));
+                size = arrayType->getBaseType()->getOperandSize();
+            }
+            else
+            {
+                StructType* structType = static_cast<StructType*>(static_cast<PointerType*>(mType)->getBaseType());
+                auto it = std::max_element(structType->getFields().begin(), structType->getFields().end(), [](auto a, auto b){
+                    return a->getSizeInBits() < b->getSizeInBits();
+                });
+                size = (*it)->getOperandSize();
+            }
+            for (auto& value : compoundOperand->getValues())
+            {
+                emitConstant(builder, size, std::move(value));
             }
         }
         else

@@ -1,7 +1,7 @@
 // Copyright 2024 solar-mist
 
-#ifndef VIPIR_MC_STRUCT_OPERAND_H
-#define VIPIR_MC_STRUCT_OPERAND_H 1
+#ifndef VIPIR_MC_COMPOUND_OPERAND_H
+#define VIPIR_MC_COMPOUND_OPERAND_H 1
 
 #include "vasm/instruction/Operand.h"
 
@@ -9,10 +9,10 @@
 
 namespace vipir
 {
-    class StructOperand : public instruction::Operand
+    class CompoundOperand : public instruction::Operand
     {
     public:
-        StructOperand(std::vector<instruction::OperandPtr> values);
+        CompoundOperand(std::vector<instruction::OperandPtr> values);
 
         std::vector<instruction::OperandPtr>& getValues();
         
@@ -23,4 +23,4 @@ namespace vipir
     };
 }
 
-#endif // VIPIR_MC_STRUCT_OPERAND_H
+#endif // VIPIR_MC_COMPOUND_OPERAND_H

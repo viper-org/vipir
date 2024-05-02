@@ -1,5 +1,4 @@
 
-#include "vipir/IR/Constant/ConstantStruct.h"
 #include "vipir/Module.h"
 
 #include "vipir/IR/Function.h"
@@ -7,6 +6,8 @@
 #include "vipir/IR/BasicBlock.h"
 #include "vipir/IR/IRBuilder.h"
 #include "vipir/IR/Constant/ConstantInt.h"
+#include "vipir/IR/Constant/ConstantStruct.h"
+#include "vipir/IR/Constant/ConstantArray.h"
 #include "vipir/IR/Instruction/AllocaInst.h"
 #include "vipir/IR/Instruction/AddrInst.h"
 #include "vipir/IR/Instruction/GEPInst.h"
@@ -38,13 +39,14 @@ int main()
 
     builder.setInsertPoint(bb2);
 
-    auto alloca = builder.CreateAlloca(arrayType, "");
-    auto val = vipir::ConstantInt::Get(mod, 44, i32Type);
-    auto gep = builder.CreateGEP(alloca, func2->getArgument(0));
-    builder.CreateStore(gep, val);
+    auto global = mod.createGlobalVar(arrayType);
+    auto init1 = vipir::ConstantInt::Get(mod, 12, i32Type);
+    auto init2 = vipir::ConstantInt::Get(mod, 33, i32Type);
+    auto init3 = vipir::ConstantInt::Get(mod, 69, i32Type);
+    auto globalInitializer = vipir::ConstantArray::Get(mod, arrayType, {init1, init2, init3});
+    global->setInitialValue(globalInitializer);
 
-    auto gep2 = builder.CreateGEP(alloca, func2->getArgument(0));
-    auto ret = builder.CreateLoad(gep2);
+    auto ret = vipir::ConstantInt::Get(mod, 1, i32Type);
 
     builder.CreateRet(ret);
 

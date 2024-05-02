@@ -5,7 +5,7 @@
 
 #include "vipir/Module.h"
 
-#include "vipir/MC/StructOperand.h"
+#include "vipir/MC/CompoundOperand.h"
 
 #include <format>
 
@@ -46,7 +46,7 @@ namespace vipir
             values.push_back(value->getEmittedValue());
         }
 
-        mEmittedValue = std::make_unique<StructOperand>(std::move(values));
+        mEmittedValue = std::make_unique<CompoundOperand>(std::move(values));
     }
 
     ConstantStruct::ConstantStruct(Module& module, Type* type, std::vector<Value*> values)
