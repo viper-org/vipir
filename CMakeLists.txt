@@ -37,6 +37,8 @@ set(SOURCES
     "src/vipir/IR/Instruction/PtrCastInst.cpp"
     "src/vipir/IR/Instruction/SExtInst.cpp"
     "src/vipir/IR/Instruction/TruncInst.cpp"
+    "src/vipir/IR/Instruction/IntToPtrInst.cpp"
+    "src/vipir/IR/Instruction/PtrToIntInst.cpp"
 
     "src/vipir/Type/Type.cpp"
     "src/vipir/Type/IntegerType.cpp"
@@ -83,6 +85,8 @@ set(HEADERS
     "include/vipir/IR/Instruction/PtrCastInst.h"
     "include/vipir/IR/Instruction/SExtInst.h"
     "include/vipir/IR/Instruction/TruncInst.h"
+    "include/vipir/IR/Instruction/IntToPtrInst.h"
+    "include/vipir/IR/Instruction/PtrToIntInst.h"
 
     "include/vipir/Type/Type.h"
     "include/vipir/Type/IntegerType.h"

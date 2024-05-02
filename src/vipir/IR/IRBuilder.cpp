@@ -17,6 +17,8 @@
 #include "vipir/IR/Instruction/PtrCastInst.h"
 #include "vipir/IR/Instruction/SExtInst.h"
 #include "vipir/IR/Instruction/TruncInst.h"
+#include "vipir/IR/Instruction/IntToPtrInst.h"
+#include "vipir/IR/Instruction/PtrToIntInst.h"
 
 #include "vipir/IR/Constant/ConstantInt.h"
 #include "vipir/IR/Constant/ConstantBool.h"
@@ -281,6 +283,24 @@ namespace vipir
         mInsertPoint->insertValue(trunc);
 
         return trunc;
+    }
+
+    IntToPtrInst* IRBuilder::CreateIntToPtr(Value* value, Type* destType)
+    {
+        IntToPtrInst* inttoptr = new IntToPtrInst(mInsertPoint, value, destType);
+
+        mInsertPoint->insertValue(inttoptr);
+
+        return inttoptr;
+    }
+
+    PtrToIntInst* IRBuilder::CreatePtrToInt(Value* value, Type* destType)
+    {
+        PtrToIntInst* ptrtoint = new PtrToIntInst(mInsertPoint, value, destType);
+
+        mInsertPoint->insertValue(ptrtoint);
+
+        return ptrtoint;
     }
 
 
