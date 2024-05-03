@@ -130,7 +130,7 @@ namespace vipir
         else
         {
             mType = mPtr->getType();
-            mAlignment = mType->getAlignment();
+            mAlignment = static_cast<PointerType*>(mType)->getBaseType()->getAlignment();
             assert(mType->isPointerType());
         }
 
