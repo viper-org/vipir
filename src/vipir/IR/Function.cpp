@@ -70,13 +70,14 @@ namespace vipir
     {
         builder.addValue(std::make_unique<instruction::SectionDirective>(".text"));
 
-        mEmittedValue = std::make_unique<instruction::LabelOperand>(mName);
 
         if (mBasicBlockList.empty()) // Function declaration
         {
+            mEmittedValue = std::make_unique<instruction::LabelOperand>(mName, "plt");
             builder.addValue(std::make_unique<instruction::ExternDirective>(mName));
             return;
         }
+        mEmittedValue = std::make_unique<instruction::LabelOperand>(mName);
 
         allocateRegisters();
         setLocalStackOffsets();
