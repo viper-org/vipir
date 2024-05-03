@@ -36,7 +36,7 @@ namespace vipir
 
     std::vector<Value*> GEPInst::getOperands()
     {
-        return std::vector<Value*>{mOffset};
+        return std::vector<Value*>{mPtr, mOffset};
     }
 
     void GEPInst::emit(MC::Builder& builder)
