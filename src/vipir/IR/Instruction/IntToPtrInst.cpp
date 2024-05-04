@@ -15,12 +15,12 @@ namespace vipir
 {
     void IntToPtrInst::print(std::ostream& stream)
     {
-        stream << std::format("inttoptr {} -> {} %{}", mValue->ident(), mType->getName(), mValueId);
+        stream << std::format("inttoptr {} -> {} %{}", mValue->ident(), mType->getName(), getName(mValueId));
     }
 
     std::string IntToPtrInst::ident() const
     {
-        return std::format("{} %{}", mType->getName(), mValueId);
+        return std::format("{} %{}", mType->getName(), getName(mValueId));
     }
 
     std::vector<Value*> IntToPtrInst::getOperands()
@@ -43,6 +43,8 @@ namespace vipir
         assert(destType->isPointerType());
         assert(mValue->getType()->isIntegerType());
         assert(mValue->getType()->getSizeInBits() == destType->getSizeInBits());
+
+        mRequiresVReg = false;
 
         mType = destType;
     }

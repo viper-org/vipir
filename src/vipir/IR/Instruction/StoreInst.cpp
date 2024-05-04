@@ -1,6 +1,7 @@
 // Copyright 2024 solar-mist
 
 #include "vipir/IR/Instruction/StoreInst.h"
+#include "vipir/IR/Instruction/AllocaInst.h"
 
 #include "vipir/IR/BasicBlock.h"
 #include "vipir/IR/GlobalVar.h"
@@ -46,23 +47,30 @@ namespace vipir
                 // mov [rel], imm64 does not exist so we need to move it into a register first
                 if (mValue->getType()->getOperandSize() == codegen::OperandSize::Quad)
                 {
-                    instruction::RegisterPtr reg = std::make_unique<instruction::Register>(mRegisterID, mValue->getType()->getOperandSize());
-                    builder.addValue(std::make_unique<instruction::MovInstruction>(reg->clone(), std::move(value)));
-                    value = std::move(reg);
+                    instruction::OperandPtr operand = mVReg->operand(codegen::OperandSize::Quad);
+                    builder.addValue(std::make_unique<instruction::MovInstruction>(operand->clone(), std::move(value)));
+                    value = std::move(operand);
                 }
             }
             builder.addValue(std::make_unique<instruction::MovInstruction>(std::move(rel), std::move(value), mValue->getType()->getOperandSize()));
         }
         else
         {
-            if (auto reg = dynamic_cast<instruction::Register*>(ptr.get()))
+            if (dynamic_cast<AllocaInst*>(mPtr))
             {
-                (void)ptr.release();
-                instruction::RegisterPtr ptrReg = instruction::RegisterPtr(reg);
-                ptr = std::make_unique<instruction::Memory>(std::move(ptrReg), std::nullopt, nullptr, std::nullopt);
+                builder.addValue(std::make_unique<instruction::MovInstruction>(std::move(ptr), std::move(value), mValue->getType()->getOperandSize()));
             }
+            else
+            {
+                if (auto reg = dynamic_cast<instruction::Register*>(ptr.get()))
+                {
+                    (void)ptr.release();
+                    instruction::RegisterPtr ptrReg = instruction::RegisterPtr(reg);
+                    ptr = std::make_unique<instruction::Memory>(std::move(ptrReg), std::nullopt, nullptr, std::nullopt);
+                }
 
-            builder.addValue(std::make_unique<instruction::MovInstruction>(std::move(ptr), std::move(value), mValue->getType()->getOperandSize()));
+                builder.addValue(std::make_unique<instruction::MovInstruction>(std::move(ptr), std::move(value), mValue->getType()->getOperandSize()));
+            }
         }
     }
 
@@ -71,9 +79,10 @@ namespace vipir
         , mPtr(ptr)
         , mValue(value)
     {
+        mRequiresVReg = false;
         if (dynamic_cast<GlobalVar*>(mPtr) && mValue->isConstant() && mValue->getType()->getOperandSize() == codegen::OperandSize::Quad)
         {
-            mRequiresRegister = true;
+            mRequiresVReg = true;
         }
     }
 }

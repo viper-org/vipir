@@ -26,12 +26,12 @@ namespace vipir
                 operatorName = "not";
                 break;
         }
-        stream << std::format("{} %{}, {}", operatorName, mValueId, mOperand->ident());
+        stream << std::format("{} %{}, {}", operatorName, getName(mValueId), mOperand->ident());
     }
 
     std::string UnaryInst::ident() const
     {
-        return std::format("%{}", mValueId);
+        return std::format("%{}", getName(mValueId));
     }
 
     std::vector<Value*> UnaryInst::getOperands()

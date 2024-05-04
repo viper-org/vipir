@@ -20,6 +20,8 @@ namespace vipir
 
         Value* getPointer();
 
+        std::vector<Value*> getOperands() override;
+
     protected:
         void emit(MC::Builder& builder) override;
         std::string ident() const override;

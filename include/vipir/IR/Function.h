@@ -22,12 +22,14 @@ namespace vipir
     class Function : public Global
     {
     friend class IRBuilder;
+    friend class opt::RegAlloc;
     using BasicBlockPtr = std::unique_ptr<BasicBlock>;
     public:
         static Function* Create(FunctionType* type, Module& module, std::string_view name);
 
         FunctionType* getFunctionType() const;
         Argument* getArgument(int index) const;
+        bool usesStack() const;
 
         void insertBasicBlock(BasicBlock* basicBlock);
 
@@ -44,25 +46,9 @@ namespace vipir
         std::vector<ArgumentPtr> mArguments;
 
         std::vector<BasicBlockPtr> mBasicBlockList;
-        std::vector<AllocaInst*> mAllocaList;
 
+        std::vector<std::unique_ptr<opt::VReg> > mVirtualRegs;
         int mTotalStackOffset;
-        void insertAlloca(AllocaInst* alloca);
-        void setLocalStackOffsets();
-
-
-        // This structure represents a value requiring a specific
-        // register and the earliest and latest values that overlap
-        // with it, so the register can be allocated for their lifetimes
-        struct Overlap
-        {
-            Value* value;
-            int start;
-            int end;
-        };
-        void setLiveIntervals();
-        std::vector<Overlap> getOverlaps();
-        void allocateRegisters();
     };
 }
 

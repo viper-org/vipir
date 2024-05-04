@@ -67,12 +67,12 @@ namespace vipir
                 operatorName = "cmp ge";
                 break;
         }
-        stream << std::format("{} %{}, {}, {}", operatorName, mValueId, mLeft->ident(), mRight->ident());
+        stream << std::format("{} %{}, {}, {}", operatorName, getName(mValueId), mLeft->ident(), mRight->ident());
     }
 
     std::string BinaryInst::ident() const
     {
-        return std::format("%{}", mValueId);
+        return std::format("%{}", getName(mValueId));
     }
 
     std::vector<Value*> BinaryInst::getOperands()
@@ -85,8 +85,12 @@ namespace vipir
         auto GenerateInstruction = [&builder, this]<class InstructionT>(){
             instruction::OperandPtr left  = mLeft->getEmittedValue();
             instruction::OperandPtr right = mRight->getEmittedValue();
-            builder.addValue(std::make_unique<InstructionT>(left->clone(), std::move(right), codegen::OperandSize::None));
-            mEmittedValue = std::move(left);
+
+            instruction::OperandPtr operand = mVReg->operand(mType->getOperandSize());
+            builder.addValue(std::make_unique<instruction::MovInstruction>(operand->clone(), std::move(left)));
+
+            builder.addValue(std::make_unique<InstructionT>(operand->clone(), std::move(right), codegen::OperandSize::None));
+            mEmittedValue = std::move(operand);
         };
         switch (mOperator)
         {
@@ -104,19 +108,19 @@ namespace vipir
             case Instruction::IMUL:
             {
                 instruction::OperandPtr left = mLeft->getEmittedValue();
-                instruction::OperandPtr reg = std::make_unique<instruction::Register>(mRegisterID, mType->getOperandSize());
-                builder.addValue(std::make_unique<instruction::MovInstruction>(reg->clone(), std::move(left)));
+                instruction::OperandPtr operand = mVReg->operand(mType->getOperandSize());
+                builder.addValue(std::make_unique<instruction::MovInstruction>(operand->clone(), std::move(left)));
 
                 instruction::OperandPtr right = mRight->getEmittedValue();
                 if (dynamic_cast<instruction::Immediate*>(right.get()))
                 {
-                    builder.addValue(std::make_unique<instruction::IMulInstruction>(reg->clone(), reg->clone(), std::move(right)));
+                    builder.addValue(std::make_unique<instruction::IMulInstruction>(operand->clone(), operand->clone(), std::move(right)));
                 }
                 else
                 {
-                    builder.addValue(std::make_unique<instruction::IMulInstruction>(reg->clone(), std::move(right)));
+                    builder.addValue(std::make_unique<instruction::IMulInstruction>(operand->clone(), std::move(right)));
                 }
-                mEmittedValue = std::move(reg);
+                mEmittedValue = std::move(operand);
                 break;
             }
 
@@ -155,21 +159,20 @@ namespace vipir
         , mValueId(mModule.getNextValueId())
     {
         assert(left->getType() == right->getType());
+
+        mRequiresVReg = false;
         
         switch (mOperator)
         {
-            case Instruction::IMUL:
-            {
-                mRequiresRegister = true;
-            }
-
             case Instruction::ADD:
             case Instruction::SUB:
+            case Instruction::IMUL:
             case Instruction::BWOR:
             case Instruction::BWAND:
             case Instruction::BWXOR:
             {
                 mType = left->getType();
+                mRequiresVReg = true;
                 break;
             }
 

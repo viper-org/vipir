@@ -25,6 +25,6 @@ namespace vipir
 
     void Argument::emit(MC::Builder&)
     {
-        mEmittedValue = std::make_unique<instruction::Register>(mRegisterID, mType->getOperandSize());
+        mEmittedValue = mVReg->operand(mType->getOperandSize());
     }
 }

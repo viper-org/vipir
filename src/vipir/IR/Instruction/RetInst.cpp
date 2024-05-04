@@ -56,7 +56,10 @@ namespace vipir
             }
         }
 
-        builder.addValue(std::make_unique<instruction::LeaveInstruction>());
+        if (mParent->getParent()->usesStack())
+        {
+            builder.addValue(std::make_unique<instruction::LeaveInstruction>());
+        }
         builder.addValue(std::make_unique<instruction::RetInstruction>());
     }
 
@@ -64,13 +67,13 @@ namespace vipir
         : Instruction(parent->getModule(), parent)
         , mReturnValue(returnValue)
     {
+        mRequiresVReg = false;
         if (!mReturnValue)
         {
             assert(mParent->getParent()->getFunctionType()->getReturnType() == Type::GetVoidType());
         }
         else
         {
-            mReturnValue->setPreferredRegister(mModule.abi()->getReturnRegister());
             assert(mReturnValue->getType() == mParent->getParent()->getFunctionType()->getReturnType());
         }
     }

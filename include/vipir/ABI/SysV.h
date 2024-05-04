@@ -14,7 +14,10 @@ namespace vipir
         {
         public:
             int getReturnRegister() const override;
-            int getParameterRegister(int index) const override; 
+            int getParameterRegister(int index) const override;
+            int getStackOffsetRegister() const override;
+            std::vector<int> getGeneralPurposeRegisters() const override;
+            std::vector<int> getCallerSavedRegisters() const override;
         };
     }
 }

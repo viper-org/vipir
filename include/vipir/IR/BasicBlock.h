@@ -21,6 +21,7 @@ namespace vipir
     {
     using ValuePtr = std::unique_ptr<Value>;
     friend class Function;
+    friend class opt::RegAlloc;
     public:
         static BasicBlock* Create(std::string_view name, Function* parent);
 

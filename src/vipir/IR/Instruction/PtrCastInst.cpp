@@ -13,12 +13,12 @@ namespace vipir
 {
     void PtrCastInst::print(std::ostream& stream)
     {
-        stream << std::format("ptr cast {} -> {} %{}", mPtr->ident(), mType->getName(), mValueId);
+        stream << std::format("ptr cast {} -> {} %{}", mPtr->ident(), mType->getName(), getName(mValueId));
     }
 
     std::string PtrCastInst::ident() const
     {
-        return std::format("{} %{}", mType->getName(), mValueId);
+        return std::format("{} %{}", mType->getName(), getName(mValueId));
     }
 
     std::vector<Value*> PtrCastInst::getOperands()

@@ -52,12 +52,11 @@ namespace vipir
 
 
 
-    AllocaInst* IRBuilder::CreateAlloca(Type* allocatedType, std::string_view name)
+    AllocaInst* IRBuilder::CreateAlloca(Type* allocatedType)
     {
-        AllocaInst* alloca = new AllocaInst(mInsertPoint, allocatedType, name);
+        AllocaInst* alloca = new AllocaInst(mInsertPoint, allocatedType);
 
         mInsertPoint->insertValue(alloca);
-        mInsertPoint->getParent()->insertAlloca(alloca);
 
         return alloca;
     }

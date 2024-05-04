@@ -16,12 +16,12 @@ namespace vipir
 {
     void TruncInst::print(std::ostream& stream)
     {
-        stream << std::format("trunc {} -> {} %{}", mValue->ident(), mType->getName(), mValueId);
+        stream << std::format("trunc {} -> {} %{}", mValue->ident(), mType->getName(), getName(mValueId));
     }
 
     std::string TruncInst::ident() const
     {
-        return std::format("{} %{}", mType->getName(), mValueId);
+        return std::format("{} %{}", mType->getName(), getName(mValueId));
     }
 
     std::vector<Value*> TruncInst::getOperands()
@@ -33,22 +33,25 @@ namespace vipir
     void TruncInst::emit(MC::Builder& builder)
     {
         instruction::OperandPtr value = mValue->getEmittedValue();
-        instruction::RegisterPtr reg = std::make_unique<instruction::Register>(mRegisterID, mType->getOperandSize());
+        instruction::OperandPtr operand = mVReg->operand(mType->getOperandSize());
 
         if (auto valueReg = dynamic_cast<instruction::Register*>(value.get()))
         {
             instruction::RegisterPtr truncatedReg = std::make_unique<instruction::Register>(valueReg->getID(), mType->getOperandSize());
-            if (truncatedReg->getID() != reg->getID())
+            if (auto operandReg = dynamic_cast<instruction::Register*>(operand.get()))
             {
-                builder.addValue(std::make_unique<instruction::MovInstruction>(reg->clone(), std::move(truncatedReg)));
+                if (truncatedReg->getID() != operandReg->getID())
+                {
+                    builder.addValue(std::make_unique<instruction::MovInstruction>(operand->clone(), std::move(truncatedReg)));
+                }
             }
         }
         else
         {
-            builder.addValue(std::make_unique<instruction::MovInstruction>(reg->clone(), std::move(value)));
+            builder.addValue(std::make_unique<instruction::MovInstruction>(operand->clone(), std::move(value)));
         }
 
-        mEmittedValue = std::move(reg);
+        mEmittedValue = std::move(operand);
     }
 
 
@@ -62,7 +65,5 @@ namespace vipir
         assert(mValue->getType()->getSizeInBits() > destType->getSizeInBits());
 
         mType = destType;
-
-        mRequiresRegister = true;
     }
 }

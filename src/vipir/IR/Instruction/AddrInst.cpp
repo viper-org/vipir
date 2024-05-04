@@ -19,7 +19,7 @@ namespace vipir
 {
     void AddrInst::print(std::ostream& stream)
     {
-        stream << std::format("addr {} %{}, {}", mType->getName(), mValueId, mPtr->ident());
+        stream << std::format("addr {} %{}, {}", mType->getName(), getName(mValueId), mPtr->ident());
     }
 
     Value* AddrInst::getPointer()
@@ -29,7 +29,7 @@ namespace vipir
 
     std::string AddrInst::ident() const
     {
-        return std::format("%{}", mValueId);
+        return std::format("%{}", getName(mValueId));
     }
 
     void AddrInst::emit(MC::Builder& builder)
@@ -37,20 +37,20 @@ namespace vipir
         codegen::OperandSize size = mType->getOperandSize();
         
         instruction::OperandPtr ptr = mPtr->getEmittedValue();
-        instruction::OperandPtr reg = std::make_unique<instruction::Register>(mRegisterID, size);
+        instruction::OperandPtr operand = mVReg->operand(size);
         if (auto labelOperand = dynamic_cast<instruction::LabelOperand*>(ptr.get()))
         {
             (void)ptr.release();
             instruction::LabelOperandPtr labelPtr = instruction::LabelOperandPtr(labelOperand);
             instruction::RelativePtr rel = std::make_unique<instruction::Relative>(std::move(labelPtr), std::nullopt);
-            builder.addValue(std::make_unique<instruction::LeaInstruction>(reg->clone(), std::move(rel)));
+            builder.addValue(std::make_unique<instruction::LeaInstruction>(operand->clone(), std::move(rel)));
         }
         else
         {
-            builder.addValue(std::make_unique<instruction::LeaInstruction>(reg->clone(), std::move(ptr)));
+            builder.addValue(std::make_unique<instruction::LeaInstruction>(operand->clone(), std::move(ptr)));
         }
 
-        mEmittedValue = std::move(reg);
+        mEmittedValue = std::move(operand);
     }
 
     AddrInst::AddrInst(BasicBlock* parent, Value* ptr)
@@ -59,7 +59,5 @@ namespace vipir
         , mValueId(mModule.getNextValueId())
     {
         mType = mPtr->getType();
-
-        mRequiresRegister = true;
     }
 }

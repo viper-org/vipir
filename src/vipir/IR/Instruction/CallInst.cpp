@@ -30,12 +30,12 @@ namespace vipir
             stream << mParameters.back()->ident();
         }
 
-        stream << std::format("), %{}", mValueId);
+        stream << std::format("), %{}", getName(mValueId));
     }
 
     std::string CallInst::ident() const
     {
-        return std::format("%{}", mValueId);
+        return std::format("%{}", getName(mValueId));
     }
 
     void CallInst::emit(MC::Builder& builder)
@@ -53,13 +53,14 @@ namespace vipir
 
         builder.addValue(std::make_unique<instruction::CallInstruction>(std::move(function)));
         
-        instruction::OperandPtr reg = std::make_unique<instruction::Register>(mRegisterID, size);
-        if (mRegisterID != mModule.abi()->getReturnRegister())
+        instruction::OperandPtr operand = mVReg->operand(mType->getOperandSize());
+        instruction::Register* reg = dynamic_cast<instruction::Register*>(operand.get());
+        if (!reg || reg->getID() != mModule.abi()->getReturnRegister())
         {
             instruction::OperandPtr returnRegister = std::make_unique<instruction::Register>(mModule.abi()->getReturnRegister(), size);
-            builder.addValue(std::make_unique<instruction::MovInstruction>(reg->clone(), std::move(returnRegister)));
+            builder.addValue(std::make_unique<instruction::MovInstruction>(operand->clone(), std::move(returnRegister)));
         }
-        mEmittedValue = std::move(reg);
+        mEmittedValue = std::move(operand);
     }
 
     CallInst::CallInst(BasicBlock* parent, Function* function, std::vector<Value*> parameters)
@@ -70,16 +71,10 @@ namespace vipir
     {
         mType = mFunction->getFunctionType()->getReturnType();
 
-        mRequiresRegister = true;
-        mRegisterSmashes.push_back(mModule.abi()->getReturnRegister());
-
         int index = 0;
         for (auto parameter : mParameters)
         {
-            assert(parameter->getType() == mFunction->getArgument(index)->getType());
-            mRegisterSmashes.push_back(mModule.abi()->getParameterRegister(index));
-
-            index++;
+            assert(parameter->getType() == mFunction->getArgument(index++)->getType());
         }
     }
 }

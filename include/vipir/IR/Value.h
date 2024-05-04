@@ -12,8 +12,11 @@
 
 #include "vipir/MC/Builder.h"
 
+#include "vipir/Optimizer/RegAlloc/VReg.h"
+
 #include "vasm/instruction/Operand.h"
 
+#include <format>
 #include <ostream>
 
 namespace vipir
@@ -25,6 +28,7 @@ namespace vipir
     friend class Module;
     friend class BasicBlock;
     friend class Function;
+    friend class opt::RegAlloc;
     public:
         Value(Module& module) : mModule(module), mType(Type::GetVoidType()) { }
         virtual ~Value() { }
@@ -37,8 +41,9 @@ namespace vipir
         virtual void print(std::ostream& stream) = 0;
         virtual std::string ident() const = 0;
 
-        void setPreferredRegister(int reg) { mPreferredRegisterID = reg; }
-        bool requiresRegister() const { return mRequiresRegister; }
+        bool requiresVReg() const { return mRequiresVReg; }
+
+        std::string getName(int valueId) const { if (mVReg) return std::format("VREG{}", mVReg->getId()); else return std::format("{}", valueId); }
 
         virtual instruction::OperandPtr getEmittedValue() { return mEmittedValue->clone(); }
     
@@ -48,11 +53,10 @@ namespace vipir
         
         instruction::OperandPtr mEmittedValue;
 
-        bool mRequiresRegister{false};
+        opt::VReg* mVReg{0};
+        bool mRequiresVReg{true};
+
         std::pair<int, int> mInterval{-1,-1};
-        int mRegisterID;
-        int mPreferredRegisterID;
-        std::vector<int> mRegisterSmashes;
 
         virtual void emit(MC::Builder& builder) = 0;
     };

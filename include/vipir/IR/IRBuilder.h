@@ -47,7 +47,7 @@ namespace vipir
         RetInst* CreateRet(Value* returnValue);
 
 
-        AllocaInst* CreateAlloca(Type* allocatedType, std::string_view name);
+        AllocaInst* CreateAlloca(Type* allocatedType);
 
 
         StoreInst* CreateStore(Value* ptr, Value* value);

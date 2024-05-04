@@ -4,8 +4,7 @@
 
 #include "vipir/IR/BasicBlock.h"
 
-#include "vasm/instruction/operand/Register.h"
-#include "vasm/instruction/operand/Memory.h"
+#include "vipir/Module.h"
 
 #include <format>
 
@@ -13,7 +12,7 @@ namespace vipir
 {
     void AllocaInst::print(std::ostream& stream)
     {
-        stream << std::format("alloca {}: {}", mName, mAllocatedType->getName());
+        stream << std::format("alloca {}: {}", getName(mValueId), mAllocatedType->getName());
     }
 
     Type* AllocaInst::getAllocatedType()
@@ -23,19 +22,18 @@ namespace vipir
 
     std::string AllocaInst::ident() const
     {
-        return std::format("{} {}", mType->getName(), mName);
+        return std::format("{} {}", mType->getName(), getName(mValueId));
     }
 
     void AllocaInst::emit(MC::Builder& builder)
     {
-        auto base = instruction::Register::Get("rbp");
-        mEmittedValue = std::make_unique<instruction::Memory>(std::move(base), -mStackOffset, nullptr, std::nullopt);
+        mEmittedValue = mVReg->operand(mAllocatedType->getOperandSize());
     }
 
-    AllocaInst::AllocaInst(BasicBlock* parent, Type* allocatedType, std::string_view name)
+    AllocaInst::AllocaInst(BasicBlock* parent, Type* allocatedType)
         : Instruction(parent->getModule(), parent)
         , mAllocatedType(allocatedType)
-        , mName(name)
+        , mValueId(mModule.getNextValueId())
         , mStackOffset(0)
     {
         mType = Type::GetPointerType(mAllocatedType);

@@ -15,12 +15,12 @@ namespace vipir
 {
     void PtrToIntInst::print(std::ostream& stream)
     {
-        stream << std::format("ptrtoint {} -> {} %{}", mValue->ident(), mType->getName(), mValueId);
+        stream << std::format("ptrtoint {} -> {} %{}", mValue->ident(), mType->getName(), getName(mValueId));
     }
 
     std::string PtrToIntInst::ident() const
     {
-        return std::format("{} %{}", mType->getName(), mValueId);
+        return std::format("{} %{}", mType->getName(), getName(mValueId));
     }
 
     std::vector<Value*> PtrToIntInst::getOperands()

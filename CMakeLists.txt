@@ -55,6 +55,9 @@ set(SOURCES
     "src/vipir/MC/CmpOperand.cpp"
     "src/vipir/MC/CompoundOperand.cpp"
 
+    "src/vipir/Optimizer/RegAlloc/RegAlloc.cpp"
+    "src/vipir/Optimizer/RegAlloc/VReg.cpp"
+
     "src/vipir/ABI/SysV.cpp"
 )
 
@@ -105,6 +108,9 @@ set(HEADERS
     "include/vipir/MC/Builder.h"
     "include/vipir/MC/CmpOperand.h"
     "include/vipir/MC/CompoundOperand.h"
+
+    "include/vipir/Optimizer/RegAlloc/RegAlloc.h"
+    "include/vipir/Optimizer/RegAlloc/VReg.h"
 
     "include/vipir/ABI/ABI.h"
     "include/vipir/ABI/SysV.h"

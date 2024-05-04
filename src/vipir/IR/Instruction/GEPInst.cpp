@@ -26,12 +26,12 @@ namespace vipir
 {
     void GEPInst::print(std::ostream& stream)
     {
-        stream << std::format("gep %{}, {}, {}", mValueId, mPtr->ident(), mOffset->ident());
+        stream << std::format("gep %{}, {}, {}", getName(mValueId), mPtr->ident(), mOffset->ident());
     }
 
     std::string GEPInst::ident() const
     {
-        return std::format("%{}", mValueId);
+        return std::format("%{}", getName(mValueId));
     }
 
     std::vector<Value*> GEPInst::getOperands()
@@ -42,7 +42,7 @@ namespace vipir
     void GEPInst::emit(MC::Builder& builder)
     {
         codegen::OperandSize size = mType->getOperandSize();
-        instruction::OperandPtr reg = std::make_unique<instruction::Register>(mRegisterID, size);
+        instruction::OperandPtr operand = mVReg->operand(size);
 
         instruction::OperandPtr ptr = mPtr->getEmittedValue();
         instruction::OperandPtr offset = mOffset->getEmittedValue();
@@ -93,8 +93,8 @@ namespace vipir
             {
                 memory = std::make_unique<instruction::Memory>(instruction::RegisterPtr(ptrReg), disp, nullptr, std::nullopt);
             }
-            builder.addValue(std::make_unique<instruction::LeaInstruction>(reg->clone(), std::move(memory)));
-            mEmittedValue = std::move(reg);
+            builder.addValue(std::make_unique<instruction::LeaInstruction>(operand->clone(), std::move(memory)));
+            mEmittedValue = std::move(operand);
         }
         else if (auto regOffset = dynamic_cast<instruction::Register*>(offset.get()))
         {
@@ -103,8 +103,8 @@ namespace vipir
             (void)offset.release();
 
             instruction::OperandPtr memory = std::make_unique<instruction::Memory>(instruction::RegisterPtr(ptrReg), displacement, instruction::RegisterPtr(regOffset), scale);
-            builder.addValue(std::make_unique<instruction::LeaInstruction>(reg->clone(), std::move(memory)));
-            mEmittedValue = std::move(reg);
+            builder.addValue(std::make_unique<instruction::LeaInstruction>(operand->clone(), std::move(memory)));
+            mEmittedValue = std::move(operand);
         }
     }
 
@@ -133,7 +133,5 @@ namespace vipir
             mAlignment = static_cast<PointerType*>(mType)->getBaseType()->getAlignment();
             assert(mType->isPointerType());
         }
-
-        mRequiresRegister = true;
     }
 }

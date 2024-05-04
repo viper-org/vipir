@@ -26,10 +26,10 @@ namespace vipir
         std::string ident() const override;
 
     private:
-        AllocaInst(BasicBlock* parent, Type* allocatedType, std::string_view name);
+        AllocaInst(BasicBlock* parent, Type* allocatedType);
 
         Type* mAllocatedType;
-        std::string mName;
+        int mValueId;
 
         int mStackOffset;
     };

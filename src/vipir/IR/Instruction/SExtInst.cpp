@@ -16,12 +16,12 @@ namespace vipir
 {
     void SExtInst::print(std::ostream& stream)
     {
-        stream << std::format("sext {} -> {} %{}", mValue->ident(), mType->getName(), mValueId);
+        stream << std::format("sext {} -> {} %{}", mValue->ident(), mType->getName(), getName(mValueId));
     }
 
     std::string SExtInst::ident() const
     {
-        return std::format("{} %{}", mType->getName(), mValueId);
+        return std::format("{} %{}", mType->getName(), getName(mValueId));
     }
 
     std::vector<Value*> SExtInst::getOperands()
@@ -33,11 +33,11 @@ namespace vipir
     void SExtInst::emit(MC::Builder& builder)
     {
         instruction::OperandPtr value = mValue->getEmittedValue();
-        instruction::RegisterPtr reg = std::make_unique<instruction::Register>(mRegisterID, mType->getOperandSize());
+        instruction::OperandPtr operand = mVReg->operand(mType->getOperandSize());
 
-        builder.addValue(std::make_unique<instruction::MovSXInstruction>(reg->clone(), std::move(value)));
+        builder.addValue(std::make_unique<instruction::MovSXInstruction>(operand->clone(), std::move(value)));
 
-        mEmittedValue = std::move(reg);
+        mEmittedValue = std::move(operand);
     }
 
 
@@ -51,7 +51,5 @@ namespace vipir
         assert(mValue->getType()->getSizeInBits() < destType->getSizeInBits());
 
         mType = destType;
-
-        mRequiresRegister = true;
     }
 }
