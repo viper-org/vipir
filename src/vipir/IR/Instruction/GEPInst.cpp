@@ -99,6 +99,7 @@ namespace vipir
             }
             else
             {
+                (void)ptr.release();
                 memory = std::make_unique<instruction::Memory>(instruction::RegisterPtr(ptrReg), disp, nullptr, std::nullopt);
             }
             //builder.addValue(std::make_unique<instruction::LeaInstruction>(operand->clone(), std::move(memory)));

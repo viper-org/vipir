@@ -51,6 +51,12 @@ namespace vipir
         {
             if (dynamic_cast<instruction::Memory*>(ptr.get()))
             {
+                if (dynamic_cast<instruction::Memory*>(operand.get()))
+                {
+                    instruction::RegisterPtr temp = std::make_unique<instruction::Register>(3, mType->getOperandSize());
+                    builder.addValue(std::make_unique<instruction::MovInstruction>(temp->clone(), std::move(ptr)));
+                    ptr = std::move(temp);
+                }
                 builder.addValue(std::make_unique<instruction::MovInstruction>(operand->clone(), std::move(ptr)));
                 mEmittedValue = std::move(operand);
             }
@@ -63,6 +69,12 @@ namespace vipir
         {
             if (dynamic_cast<instruction::Memory*>(ptr.get()) || dynamic_cast<instruction::Relative*>(ptr.get()))
             {
+                if (dynamic_cast<instruction::Memory*>(operand.get()))
+                {
+                    instruction::RegisterPtr temp = std::make_unique<instruction::Register>(3, mType->getOperandSize());
+                    builder.addValue(std::make_unique<instruction::MovInstruction>(temp->clone(), std::move(ptr)));
+                    ptr = std::move(temp);
+                }
                 builder.addValue(std::make_unique<instruction::MovInstruction>(operand->clone(), std::move(ptr)));
             }
             else if (auto regOperand = dynamic_cast<instruction::Register*>(ptr.get()))
@@ -70,6 +82,12 @@ namespace vipir
                 (void)ptr.release();
                 instruction::RegisterPtr ptrReg = instruction::RegisterPtr(regOperand);
                 instruction::OperandPtr memory = std::make_unique<instruction::Memory>(std::move(ptrReg), std::nullopt, nullptr, std::nullopt);
+                if (dynamic_cast<instruction::Memory*>(operand.get()))
+                {
+                    instruction::RegisterPtr temp = std::make_unique<instruction::Register>(3, mType->getOperandSize());
+                    builder.addValue(std::make_unique<instruction::MovInstruction>(temp->clone(), std::move(memory)));
+                    memory = std::move(temp);
+                }
                 builder.addValue(std::make_unique<instruction::MovInstruction>(operand->clone(), std::move(memory)));
             }
             else if (auto labelOperand = dynamic_cast<instruction::LabelOperand*>(ptr.get()))

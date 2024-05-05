@@ -19,7 +19,7 @@ namespace vipir
             setLiveIntervals(function);
 
             std::vector<int> physicalRegisters = abi->getGeneralPurposeRegisters();
-
+            
             std::map<int, VReg*> virtualRegs;
             int virtualRegCount = 1;
 
@@ -30,6 +30,8 @@ namespace vipir
                 function->mVirtualRegs.push_back(std::make_unique<VReg>(id, physicalRegisters[index++]));
                 virtualRegs[id] = function->mVirtualRegs.back().get();
             }
+
+            virtualRegs.erase(3);
 
             auto getNextFreeVReg = [&virtualRegs, &virtualRegCount, function, abi](){
                 if (virtualRegs.empty())
