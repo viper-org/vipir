@@ -61,7 +61,7 @@ namespace vipir
         }
         else
         {
-            if (dynamic_cast<instruction::Memory*>(ptr.get()))
+            if (dynamic_cast<instruction::Memory*>(ptr.get()) || dynamic_cast<instruction::Relative*>(ptr.get()))
             {
                 builder.addValue(std::make_unique<instruction::MovInstruction>(operand->clone(), std::move(ptr)));
             }
