@@ -56,15 +56,16 @@ namespace vipir
             }
             builder.addValue(std::make_unique<instruction::MovInstruction>(std::move(rel), std::move(value), mValue->getType()->getOperandSize()));
         }
+
+        else if (dynamic_cast<GEPInst*>(mValue))
+        {
+            builder.addValue(std::make_unique<instruction::LeaInstruction>(std::move(ptr), std::move(value), mValue->getType()->getOperandSize()));
+        }
         else
         {
             if (dynamic_cast<AllocaInst*>(mPtr))
             {
                 builder.addValue(std::make_unique<instruction::MovInstruction>(std::move(ptr), std::move(value), mValue->getType()->getOperandSize()));
-            }
-            else if (dynamic_cast<GEPInst*>(mPtr))
-            {
-                builder.addValue(std::make_unique<instruction::LeaInstruction>(std::move(ptr), std::move(value), mValue->getType()->getOperandSize()));
             }
             else
             {
