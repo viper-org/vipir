@@ -39,14 +39,13 @@ int main()
 
     auto func = vipir::Function::Create(vipir::FunctionType::Create(i32Type, {}), mod, "test");
 
-    auto func2 = vipir::Function::Create(vipir::FunctionType::Create(i32Type, {}), mod, "main");
+    auto func2 = vipir::Function::Create(vipir::FunctionType::Create(i32Type, {i32Type}), mod, "main");
     auto bb2 = vipir::BasicBlock::Create("", func2);
 
     builder.setInsertPoint(bb2);
 
     auto alloca = builder.CreateAlloca(i32Type);
-    auto val1 = vipir::ConstantInt::Get(mod, 12, i32Type);
-    builder.CreateStore(alloca, val1);
+    builder.CreateStore(alloca, func2->getArgument(0));
 
     auto load = builder.CreateLoad(alloca);
 

@@ -53,6 +53,8 @@ namespace vipir
                 });
             };
 
+            setArguments(function, abi, activeValues, virtualRegs);
+
             for (auto& basicBlock : function->mBasicBlockList)
             {
                 for (auto& value : basicBlock->mValueList)
@@ -191,6 +193,21 @@ namespace vipir
             }
 
             function->mTotalStackOffset = (offset + 15) & ~15; // Align to 16 bytes
+        }
+
+
+        void RegAlloc::setArguments(Function* function, abi::ABI* abi, std::set<Value*, ActiveValueComparator>& activeValues, std::map<int, VReg*>& virtualRegs)
+        {
+            int argumentIndex = 0;
+            for (auto& argument : function->mArguments)
+            {
+                auto it = std::find_if(virtualRegs.begin(), virtualRegs.end(), [argumentIndex, abi](const auto& vreg){
+                    return vreg.second->mPhysicalRegister == abi->getParameterRegister(argumentIndex);
+                });
+                argument->mVReg = it->second;
+                virtualRegs.erase(it);
+                activeValues.insert(argument.get());
+            }
         }
     }
 }

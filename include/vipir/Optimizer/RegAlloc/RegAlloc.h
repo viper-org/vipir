@@ -8,6 +8,7 @@
 #include "vipir/ABI/ABI.h"
 
 #include <map>
+#include <set>
 
 namespace vipir
 {
@@ -29,6 +30,8 @@ namespace vipir
                     return a->mInterval.second <= b->mInterval.second;
                 }
             };
+
+            void setArguments(Function* function, abi::ABI* abi, std::set<Value*, ActiveValueComparator>& activeValues, std::map<int, VReg*>& virtualRegs);
         };
     }
 }
