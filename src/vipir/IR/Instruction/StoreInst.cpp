@@ -2,6 +2,7 @@
 
 #include "vipir/IR/Instruction/StoreInst.h"
 #include "vipir/IR/Instruction/AllocaInst.h"
+#include "vipir/IR/Instruction/GEPInst.h"
 
 #include "vipir/IR/BasicBlock.h"
 #include "vipir/IR/GlobalVar.h"
@@ -12,6 +13,7 @@
 #include "vasm/instruction/operand/Relative.h"
 
 #include "vasm/instruction/twoOperandInstruction/MovInstruction.h"
+#include "vasm/instruction/twoOperandInstruction/LeaInstruction.h"
 #include <format>
 
 namespace vipir
@@ -59,6 +61,10 @@ namespace vipir
             if (dynamic_cast<AllocaInst*>(mPtr))
             {
                 builder.addValue(std::make_unique<instruction::MovInstruction>(std::move(ptr), std::move(value), mValue->getType()->getOperandSize()));
+            }
+            else if (dynamic_cast<GEPInst*>(mPtr))
+            {
+                builder.addValue(std::make_unique<instruction::LeaInstruction>(std::move(ptr), std::move(value), mValue->getType()->getOperandSize()));
             }
             else
             {
