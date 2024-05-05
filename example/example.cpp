@@ -59,7 +59,6 @@ int main()
     builder.CreateRet(ret);
 
     vipir::opt::RegAlloc regalloc;
-    regalloc.assignVirtualRegisters(func2, mod.abi());
     //mod.print(std::cout);
 
     mod.emit(std::cout, vipir::OutputFormat::ELF);

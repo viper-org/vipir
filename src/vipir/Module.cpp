@@ -4,7 +4,12 @@
 #include "vipir/Module.h"
 
 #include "vipir/IR/Instruction/LoadInst.h"
+
+#include "vipir/IR/Function.h"
+
 #include "vipir/MC/Builder.h"
+
+#include "vipir/Optimizer/RegAlloc/RegAlloc.h"
 
 #include "vasm/codegen/Elf.h"
 #include "vasm/codegen/Pe.h"
@@ -77,6 +82,15 @@ namespace vipir
 
     void Module::emit(std::ostream& stream, OutputFormat format) const
     {
+        opt::RegAlloc regalloc;
+        for (const GlobalPtr& global : mGlobals)
+        {
+            if (auto func = dynamic_cast<Function*>(global.get()))
+            {
+                regalloc.assignVirtualRegisters(func, mAbi.get());
+            }
+        }
+
         MC::Builder builder;
         for (const ValuePtr& constant : mConstants)
         {
