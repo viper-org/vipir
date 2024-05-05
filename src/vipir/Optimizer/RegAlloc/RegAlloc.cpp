@@ -3,6 +3,7 @@
 
 #include "vipir/Optimizer/RegAlloc/RegAlloc.h"
 
+#include "vipir/IR/Instruction/AllocaInst.h"
 #include "vipir/IR/Instruction/CallInst.h"
 
 #include <algorithm>
@@ -116,6 +117,8 @@ namespace vipir
                 }
             }
 
+            int end = index;
+
             for (auto bb = function->mBasicBlockList.rbegin(); bb != function->mBasicBlockList.rend(); ++bb)
             {
                 for (auto it = (*bb)->mValueList.rbegin(); it != (*bb)->mValueList.rend(); ++it)
@@ -123,6 +126,12 @@ namespace vipir
                     auto& value = *it;
                     for (auto operand : value->getOperands())
                     {
+                        // AllocaInsts live for the entire function
+                        if (dynamic_cast<AllocaInst*>(operand))
+                        {
+                            operand->mInterval.second = end;
+                        }
+
                         // If we haven't set the last usage yet, this is it
                         if (operand->mInterval.second == -1)
                         {
