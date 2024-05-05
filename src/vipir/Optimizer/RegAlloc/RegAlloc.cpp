@@ -204,6 +204,7 @@ namespace vipir
                 auto it = std::find_if(virtualRegs.begin(), virtualRegs.end(), [argumentIndex, abi](const auto& vreg){
                     return vreg.second->mPhysicalRegister == abi->getParameterRegister(argumentIndex);
                 });
+                ++argumentIndex;
                 argument->mVReg = it->second;
                 virtualRegs.erase(it);
                 activeValues.insert(argument.get());
