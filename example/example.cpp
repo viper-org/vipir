@@ -39,8 +39,6 @@ int main()
     auto voidType = vipir::Type::GetVoidType();
     auto arrayType = vipir::Type::GetArrayType(i32Type, 3);
 
-    auto func = vipir::Function::Create(vipir::FunctionType::Create(i32Type, {i32Type}), mod, "test");
-
     auto func1 = vipir::Function::Create(vipir::FunctionType::Create(i8Type, {i32Type}), mod, "main");
     auto bb1 = vipir::BasicBlock::Create("", func1);
 
@@ -48,14 +46,10 @@ int main()
 
     auto globalstring = vipir::GlobalString::Create(mod, "hi");
 
-    auto alloca = builder.CreateAlloca(i32Type);
-    auto sto = builder.CreateCall(func, {});
-    builder.CreateStore(alloca, sto);
-
     auto addr = builder.CreateAddrOf(globalstring);
 
     auto offset = vipir::ConstantInt::Get(mod, 1, i32Type);
-    auto gep = builder.CreateGEP(addr, offset);
+    auto gep = builder.CreateGEP(addr, func1->getArgument(0));
 
     auto a = builder.CreateLoad(gep);
     builder.CreateRet(a);

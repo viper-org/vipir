@@ -269,15 +269,15 @@ namespace vipir
             instruction::RegisterPtr index = nullptr;
             if (mIndex)
             {
-                instruction::OperandPtr index = mIndex->asmOperand();
-                if (auto imm = dynamic_cast<instruction::Immediate*>(index.get()))
+                instruction::OperandPtr indexOperand = mIndex->asmOperand();
+                if (auto imm = dynamic_cast<instruction::Immediate*>(indexOperand.get()))
                 {
                     if (displacement) *displacement += imm->imm32();
                     else displacement = imm->imm32();
                 }
                 else
                 {
-                    index = instruction::RegisterPtr(static_cast<instruction::Register*>(index.release()));
+                    index = instruction::RegisterPtr(static_cast<instruction::Register*>(indexOperand.release()));
                 }
             }
 
