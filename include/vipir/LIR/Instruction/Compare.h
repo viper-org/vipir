@@ -11,6 +11,7 @@ namespace vipir
     {
         class Compare : public Value
         {
+        friend class opt::Peephole;
         public:
             Compare(OperandPtr left, CMP::Operator op, OperandPtr right);
 

@@ -11,6 +11,7 @@ namespace vipir
     {
         class Ret : public Value
         {
+        friend class opt::Peephole;
         public:
             Ret(bool leave);
 

@@ -11,6 +11,7 @@ namespace vipir
     {
         class BinaryArithmetic : public Value
         {
+        friend class opt::Peephole;
         public:
             enum class Operator
             {
@@ -33,6 +34,7 @@ namespace vipir
 
         class UnaryArithmetic : public Value
         {
+        friend class opt::Peephole;
         public:
             enum class Operator
             {

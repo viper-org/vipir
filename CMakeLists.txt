@@ -57,6 +57,7 @@ set(SOURCES
 
     "src/vipir/Optimizer/RegAlloc/RegAlloc.cpp"
     "src/vipir/Optimizer/RegAlloc/VReg.cpp"
+    "src/vipir/Optimizer/Peephole/Peephole.cpp"
 
     "src/vipir/LIR/Builder.cpp"
     "src/vipir/LIR/Label.cpp"
@@ -124,6 +125,7 @@ set(HEADERS
 
     "include/vipir/Optimizer/RegAlloc/RegAlloc.h"
     "include/vipir/Optimizer/RegAlloc/VReg.h"
+    "include/vipir/Optimizer/Peephole/Peephole.h"
 
     "include/vipir/LIR/Builder.h"
     "include/vipir/LIR/Value.h"

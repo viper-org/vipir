@@ -12,9 +12,9 @@ namespace vipir
 {
     namespace lir
     {
+        using ValuePtr = std::unique_ptr<Value>;
         class Builder
         {
-        using ValuePtr = std::unique_ptr<Value>;
         public:
             void addValue(ValuePtr value);
             void setSection(SectionType sect);

@@ -11,6 +11,7 @@ namespace vipir
     {
         class Jump : public Value
         {
+        friend class opt::Peephole;
         public:
             Jump(OperandPtr dest);
 
@@ -23,6 +24,7 @@ namespace vipir
 
         class CondJump : public Value
         {
+        friend class opt::Peephole;
         public:
             CondJump(OperandPtr dest, OperandPtr condition);
 
@@ -37,6 +39,7 @@ namespace vipir
 
         class Call : public Value
         {
+        friend class opt::Peephole;
         public:
             Call(OperandPtr dest);
 

@@ -11,6 +11,7 @@ namespace vipir
     {
         class Move : public Value
         {
+        friend class opt::Peephole;
         public:
             Move(OperandPtr left, OperandPtr right);
 
@@ -24,6 +25,7 @@ namespace vipir
 
         class MoveIndirect : public Value
         {
+        friend class opt::Peephole;
         public:
             MoveIndirect(OperandPtr left, OperandPtr right);
 

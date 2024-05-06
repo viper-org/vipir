@@ -16,7 +16,7 @@ namespace vipir
             mValues.push_back(std::make_unique<Section>(sect));
         }
 
-        std::vector<Builder::ValuePtr>& Builder::getValues()
+        std::vector<ValuePtr>& Builder::getValues()
         {
             return mValues;
         }

@@ -11,6 +11,8 @@
 
 namespace vipir
 {
+    namespace opt { class Peephole; }
+
     namespace lir
     {
         class Value

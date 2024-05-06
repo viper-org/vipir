@@ -11,6 +11,7 @@ namespace vipir
     {
         class LoadAddress : public Value
         {
+        friend class opt::Peephole;
         public:
             LoadAddress(OperandPtr left, OperandPtr right);
 

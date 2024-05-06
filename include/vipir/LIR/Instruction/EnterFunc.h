@@ -11,6 +11,7 @@ namespace vipir
     {
         class EnterFunc : public Value
         {
+        friend class opt::Peephole;
         public:
             EnterFunc(int stackSize);
 
