@@ -47,9 +47,9 @@ int main()
     auto sto = vipir::ConstantInt::Get(mod, 44, i32Type);
     builder.CreateStore(alloca, sto);
 
-    builder.CreateAddrOf(alloca);
+    auto addr = builder.CreateAddrOf(alloca);
 
-    auto a = builder.CreateLoad(alloca);
+    auto a = builder.CreateLoad(addr);
     builder.CreateRet(a);
 
     //mod.print2(std::cout);

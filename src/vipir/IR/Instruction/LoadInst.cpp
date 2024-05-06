@@ -107,7 +107,10 @@ namespace vipir
         mPtr->lateEmit(builder);
 
         lir::OperandPtr vreg = std::make_unique<lir::VirtualReg>(mVReg, mType->getOperandSize());
-        builder.addValue(std::make_unique<lir::Move>(vreg->clone(), mPtr->getEmittedValue2()));
+        if (dynamic_cast<AllocaInst*>(mPtr))
+            builder.addValue(std::make_unique<lir::Move>(vreg->clone(), mPtr->getEmittedValue2()));
+        else
+            builder.addValue(std::make_unique<lir::MoveIndirect>(vreg->clone(), mPtr->getEmittedValue2()));
         mEmittedValue2 = std::move(vreg);
     }
 
