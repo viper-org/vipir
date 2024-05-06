@@ -56,6 +56,8 @@ int main()
     auto a = builder.CreateLoad(addr);
     builder.CreateRet(a);
 
+    mod.addPass(vipir::Pass::PeepholeOptimization);
+
     //mod.print2(std::cout);
 
     mod.emit2(std::cout, vipir::OutputFormat::ELF);

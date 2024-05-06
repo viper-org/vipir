@@ -10,12 +10,14 @@
 #include "vipir/MC/Builder.h"
 
 #include "vipir/Optimizer/RegAlloc/RegAlloc.h"
+#include "vipir/Optimizer/Peephole/Peephole.h"
 
 #include "vasm/codegen/Elf.h"
 #include "vasm/codegen/Pe.h"
 #include "vasm/codegen/IOutputFormat.h"
 #include "vasm/codegen/builder/OpcodeBuilder.h"
 
+#include <algorithm>
 #include <sstream>
 #include <format>
 
@@ -24,6 +26,11 @@ namespace vipir
     Module::Module(std::string name)
         :mName(std::move(name))
     {
+    }
+
+    void Module::addPass(Pass pass)
+    {
+        mPasses.push_back(pass);
     }
 
     abi::ABI* Module::abi() const
@@ -172,6 +179,11 @@ namespace vipir
             global->emit2(builder);
         }
 
+        if (std::find(mPasses.begin(), mPasses.end(), Pass::PeepholeOptimization) != mPasses.end())
+        {
+            opt::Peephole peephole;
+            peephole.doOptimizations(builder);
+        }
 
         MC::Builder mcBuilder;
         for (auto& value : builder.getValues())

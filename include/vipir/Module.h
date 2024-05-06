@@ -26,6 +26,11 @@ namespace vipir
         PE,
     };
 
+    enum class Pass
+    {
+        PeepholeOptimization
+    };
+
     class Module
     {
     using GlobalPtr = std::unique_ptr<Global>;
@@ -39,6 +44,8 @@ namespace vipir
             assert(mAbi == nullptr);
             mAbi = std::make_unique<T>();
         }
+
+        void addPass(Pass pass);
 
         abi::ABI* abi() const;
         std::string_view getName() const;
@@ -60,6 +67,7 @@ namespace vipir
         std::unique_ptr<abi::ABI> mAbi;
         std::vector<GlobalPtr> mGlobals;
         std::vector<ValuePtr> mConstants;
+        std::vector<Pass> mPasses;
     };
 
     Value* getPointerOperand(Value* value);
