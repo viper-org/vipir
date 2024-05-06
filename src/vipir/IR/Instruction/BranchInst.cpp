@@ -7,6 +7,8 @@
 
 #include "vipir/MC/CmpOperand.h"
 
+#include "vipir/LIR/Instruction/Jump.h"
+
 #include "vasm/instruction/singleOperandInstruction/JmpInstruction.h"
 #include "vasm/instruction/singleOperandInstruction/JccInstruction.h"
 
@@ -49,6 +51,7 @@ namespace vipir
         {
             instruction::OperandPtr condition = mCondition->getEmittedValue();
             CmpOperand* cmp = static_cast<CmpOperand*>(condition.get());
+
             switch (cmp->getOperator())
             {
                 case CmpOperator::EQ:
@@ -90,6 +93,20 @@ namespace vipir
                     break;
                 }
             }
+        }
+    }
+
+    void BranchInst::emit2(lir::Builder& builder)
+    {
+        if (!mFalseBranch) // Unconditional branch won't have a false branch
+        {
+            builder.addValue(std::make_unique<lir::Jump>(mTrueBranch->getEmittedValue2()));
+        }
+        else
+        {
+            mCondition->lateEmit(builder);
+            builder.addValue(std::make_unique<lir::CondJump>(mTrueBranch->getEmittedValue2(), mCondition->getEmittedValue2()));
+            builder.addValue(std::make_unique<lir::Jump>(mFalseBranch->getEmittedValue2()));
         }
     }
 

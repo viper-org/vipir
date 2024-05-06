@@ -23,6 +23,7 @@ namespace vipir
 
     protected:
         void emit(MC::Builder& builder) override;
+        void emit2(lir::Builder& builder) override;
 
     private:
         BranchInst(BasicBlock* parent, BasicBlock* destination); // Unconditional branch

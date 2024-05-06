@@ -85,6 +85,9 @@ namespace vipir
 
     void StoreInst::emit2(lir::Builder& builder)
     {
+        mPtr->lateEmit(builder);
+        mValue->lateEmit(builder);
+
         builder.addValue(std::make_unique<lir::Move>(mPtr->getEmittedValue2(), mValue->getEmittedValue2()));
     }
 

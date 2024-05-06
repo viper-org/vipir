@@ -66,6 +66,7 @@ namespace vipir
     void BasicBlock::setEmittedValue()
     {
         mEmittedValue = std::make_unique<instruction::LabelOperand>(mName);
+        mEmittedValue2 = std::make_unique<lir::Lbl>(mName);
     }
 
     void BasicBlock::emit(MC::Builder& builder)

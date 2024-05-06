@@ -11,6 +11,7 @@
 #include "vipir/Module.h"
 
 #include "vipir/LIR/Instruction/Arithmetic.h"
+#include "vipir/LIR/Instruction/Compare.h"
 #include "vipir/LIR/Instruction/Move.h"
 
 #include "vasm/instruction/twoOperandInstruction/LogicalInstruction.h"
@@ -157,7 +158,10 @@ namespace vipir
 
     void BinaryInst::emit2(lir::Builder& builder)
     {
+
         auto createArithmetic = [&builder, this](lir::Arithmetic::Operator op){
+            mLeft->lateEmit(builder);
+            mRight->lateEmit(builder);
             lir::OperandPtr vreg = std::make_unique<lir::VirtualReg>(mVReg, mType->getOperandSize());
             builder.addValue(std::make_unique<lir::Move>(vreg->clone(), mLeft->getEmittedValue2()));
             builder.addValue(std::make_unique<lir::Arithmetic>(vreg->clone(), op, mRight->getEmittedValue2()));
@@ -171,6 +175,41 @@ namespace vipir
                 break;
             case Instruction::SUB:
                 createArithmetic(lir::Arithmetic::Operator::Sub);
+                break;
+
+            default:
+                break;
+        }
+    }
+
+    void BinaryInst::lateEmit(lir::Builder& builder)
+    {
+        auto createCompare = [&builder, this](lir::CMP::Operator op){
+            mLeft->lateEmit(builder);
+            mRight->lateEmit(builder);
+            builder.addValue(std::make_unique<lir::Compare>(mLeft->getEmittedValue2(), op, mRight->getEmittedValue2()));
+            mEmittedValue2 = std::make_unique<lir::CMP>(op);
+        };
+
+        switch (mOperator)
+        {
+            case Instruction::EQ:
+                createCompare(lir::CMP::Operator::EQ);
+                break;
+            case Instruction::NE:
+                createCompare(lir::CMP::Operator::NE);
+                break;
+            case Instruction::LT:
+                createCompare(lir::CMP::Operator::LT);
+                break;
+            case Instruction::GT:
+                createCompare(lir::CMP::Operator::GT);
+                break;
+            case Instruction::LE:
+                createCompare(lir::CMP::Operator::LE);
+                break;
+            case Instruction::GE:
+                createCompare(lir::CMP::Operator::GE);
                 break;
 
             default:

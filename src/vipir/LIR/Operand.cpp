@@ -3,8 +3,11 @@
 
 #include "vipir/LIR/Operand.h"
 
+#include "vipir/MC/CmpOperand.h"
+
 #include "vasm/instruction/operand/Immediate.h"
 #include "vasm/instruction/operand/Register.h"
+#include "vasm/instruction/operand/Label.h"
 
 #include <format>
 
@@ -108,6 +111,86 @@ namespace vipir
             }
 
             return vreg->mVreg == mVreg && vreg->mSize == mSize;
+        }
+
+
+        Lbl::Lbl(std::string name)
+            : mName(std::move(name))
+        {
+        }
+
+        std::string Lbl::ident() const
+        {
+            return std::format("LBL @{}", mName);
+        }
+
+        instruction::OperandPtr Lbl::asmOperand()
+        {
+            return std::make_unique<instruction::LabelOperand>(mName);
+        }
+
+        OperandPtr Lbl::clone()
+        {
+            return std::make_unique<Lbl>(mName);
+        }
+
+        bool Lbl::operator==(OperandPtr& other)
+        {
+            auto lbl = dynamic_cast<Lbl*>(other.get());
+            if (!lbl) return false;
+
+            return lbl->mName == mName;
+        }
+
+
+        CMP::CMP(Operator op)
+            : mOperator(op)
+        {
+        }
+
+        std::string CMP::ident() const
+        {
+            return "%CMP";
+        }
+
+        instruction::OperandPtr CMP::asmOperand()
+        {
+            CmpOperator op = static_cast<CmpOperator>(mOperator);
+            return std::make_unique<CmpOperand>(op);
+        }
+
+        OperandPtr CMP::clone()
+        {
+            return std::make_unique<CMP>(mOperator);
+        }
+
+        bool CMP::operator==(OperandPtr& other)
+        {
+            auto cmp = dynamic_cast<CMP*>(other.get());
+            if (!cmp) return false;
+
+            return cmp->mOperator == mOperator;
+        }
+
+        std::string CMP::operatorName()
+        {
+            switch (mOperator)
+            {
+                case CMP::Operator::EQ:
+                    return "EQ";
+                case CMP::Operator::NE:
+                    return "NE";
+
+                case CMP::Operator::LT:
+                    return "LT";
+                case CMP::Operator::GT:
+                    return "GT";
+
+                case CMP::Operator::LE:
+                    return "LE";
+                case CMP::Operator::GE:
+                    return "GE";
+            }
         }
     }
 }

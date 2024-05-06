@@ -49,6 +49,7 @@ namespace vipir
 
         virtual instruction::OperandPtr getEmittedValue() { return mEmittedValue->clone(); }
         virtual lir::OperandPtr getEmittedValue2() { return mEmittedValue2->clone(); }
+        virtual void lateEmit(lir::Builder& builder) { }
     
     protected:
         Module& mModule;

@@ -70,6 +70,8 @@ namespace vipir
     {
         if (mReturnValue)
         {
+            mReturnValue->lateEmit(builder);
+
             lir::OperandPtr returnRegister = std::make_unique<lir::PhysicalReg>(mModule.abi()->getReturnRegister(), mReturnValue->getType()->getOperandSize());
             builder.addValue(std::make_unique<lir::Move>(std::move(returnRegister), mReturnValue->getEmittedValue2()));
         }

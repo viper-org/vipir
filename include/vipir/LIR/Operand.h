@@ -74,6 +74,43 @@ namespace vipir
             opt::VReg* mVreg;
             codegen::OperandSize mSize;
         };
+
+        class Lbl : public Operand
+        {
+        public:
+            Lbl(std::string name);
+
+            std::string ident() const override;
+            instruction::OperandPtr asmOperand() override;
+            OperandPtr clone() override;
+            bool operator==(OperandPtr& other) override;
+
+        private:
+            std::string mName;
+        };
+
+        class CMP : public Operand
+        {
+        public:
+            enum class Operator
+            {
+                EQ, NE,
+                LT, GT,
+                LE, GE
+            };
+
+            CMP(Operator op);
+
+            std::string ident() const override;
+            instruction::OperandPtr asmOperand() override;
+            OperandPtr clone() override;
+            bool operator==(OperandPtr& other) override;
+
+            std::string operatorName();
+
+        private:
+            Operator mOperator;
+        };
     }
 }
 

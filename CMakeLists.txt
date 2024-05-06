@@ -64,6 +64,8 @@ set(SOURCES
     "src/vipir/LIR/Instruction/Ret.cpp"
     "src/vipir/LIR/Instruction/Move.cpp"
     "src/vipir/LIR/Instruction/Arithmetic.cpp"
+    "src/vipir/LIR/Instruction/Compare.cpp"
+    "src/vipir/LIR/Instruction/Jump.cpp"
 
     "src/vipir/ABI/SysV.cpp"
 )
@@ -126,6 +128,8 @@ set(HEADERS
     "include/vipir/LIR/Instruction/Ret.h"
     "include/vipir/LIR/Instruction/Move.h"
     "include/vipir/LIR/Instruction/Arithmetic.h"
+    "include/vipir/LIR/Instruction/Compare.h"
+    "include/vipir/LIR/Instruction/Jump.h"
 
     "include/vipir/ABI/ABI.h"
     "include/vipir/ABI/SysV.h"

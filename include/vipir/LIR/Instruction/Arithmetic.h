@@ -1,7 +1,7 @@
 // Copyright 2024 solar-mist
 
-#ifndef VIPIR_LIR_INSTRUCTION_ADD_H
-#define VIPIR_LIR_INSTRUCTION_ADD_H 1
+#ifndef VIPIR_LIR_INSTRUCTION_ARITHMETIC_H
+#define VIPIR_LIR_INSTRUCTION_ARITHMETIC_H 1
 
 #include "vipir/LIR/Value.h"
 
@@ -30,4 +30,4 @@ namespace vipir
     }
 }
 
-#endif // VIPIR_LIR_INSTRUCTION_ADD_H
+#endif // VIPIR_LIR_INSTRUCTION_ARITHMETIC_H

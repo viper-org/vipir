@@ -104,6 +104,8 @@ namespace vipir
 
     void LoadInst::emit2(lir::Builder& builder)
     {
+        mPtr->lateEmit(builder);
+
         lir::OperandPtr vreg = std::make_unique<lir::VirtualReg>(mVReg, mType->getOperandSize());
         builder.addValue(std::make_unique<lir::Move>(vreg->clone(), mPtr->getEmittedValue2()));
         mEmittedValue2 = std::move(vreg);

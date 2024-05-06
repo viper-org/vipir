@@ -24,6 +24,7 @@ namespace vipir
     protected:
         void emit(MC::Builder& builder) override;
         void emit2(lir::Builder& builder) override;
+        void lateEmit(lir::Builder& builder) override;
 
     private:
         BinaryInst(BasicBlock* parent, Value* left, Instruction::BinaryOperators op, Value* right);
