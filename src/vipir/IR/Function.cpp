@@ -119,6 +119,11 @@ namespace vipir
             basicBlock->setEmittedValue();
         }
 
+        for (auto& argument : mArguments)
+        {
+            argument->emit2(builder);
+        }
+
         for (auto& basicBlock : mBasicBlockList)
         {
             basicBlock->emit2(builder);
@@ -132,10 +137,11 @@ namespace vipir
     {
         mType = type;
 
+        int index = 0;
         for (auto type : getFunctionType()->getArgumentTypes())
         {
             std::string id = std::to_string(module.getNextValueId());
-            mArguments.push_back(std::make_unique<Argument>(module, type, std::move(id)));
+            mArguments.push_back(std::make_unique<Argument>(module, type, std::move(id), index));
         }
     }
 }

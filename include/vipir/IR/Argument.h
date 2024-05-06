@@ -16,15 +16,17 @@ namespace vipir
     {
     friend class Function;
     public:
-        Argument(Module& module, Type* type, std::string&& name);
+        Argument(Module& module, Type* type, std::string&& name, int index);
 
         void print(std::ostream& stream) override;
         std::string ident() const override;
     protected:
         void emit(MC::Builder& builder) override;
+        void emit2(lir::Builder& builder) override;
 
     private:
         std::string mName;
+        int mIdx;
     };
 
     using ArgumentPtr = std::unique_ptr<Argument>;
