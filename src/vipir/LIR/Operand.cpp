@@ -3,11 +3,13 @@
 
 #include "vipir/LIR/Operand.h"
 
+#include "vasm/instruction/operand/Relative.h"
 #include "vipir/MC/CmpOperand.h"
 
 #include "vasm/instruction/operand/Immediate.h"
 #include "vasm/instruction/operand/Register.h"
 #include "vasm/instruction/operand/Label.h"
+#include "vasm/instruction/operand/Memory.h"
 
 #include <format>
 
@@ -221,6 +223,78 @@ namespace vipir
                 case CMP::Operator::GE:
                     return "GE";
             }
+        }
+
+
+        Memory::Memory(OperandPtr base, std::optional<int> displacement, OperandPtr index, std::optional<int> scale)
+            : mBase(std::move(base))
+            , mDisplacement(displacement)
+            , mIndex(std::move(index))
+            , mScale(scale)
+        {
+        }
+
+        std::string Memory::ident() const
+        {
+            if (mDisplacement)
+            {
+                if (mIndex)
+                {
+                    auto scale = mScale.value_or(1);
+                    return std::format("({}+{}*{}+{}", mBase->ident(), mIndex->ident(), scale, *mDisplacement);
+                }
+                return std::format("({}+{}", mBase->ident(), *mDisplacement);
+            }
+            if (mIndex)
+            {
+                auto scale = mScale.value_or(1);
+                return std::format("({}+{}*{}", mBase->ident(), mIndex->ident(), scale);
+            }
+            return std::format("({})", mBase->ident());
+        }
+
+        instruction::OperandPtr Memory::asmOperand()
+        {
+            instruction::OperandPtr baseOperand = mBase->asmOperand();
+            if (auto label = dynamic_cast<instruction::LabelOperand*>(baseOperand.get()))
+            {
+                std::string name = std::string(label->getName());
+                std::string location = std::string(label->getLocation());
+                instruction::LabelOperandPtr labelPtr = std::make_unique<instruction::LabelOperand>(std::move(name), std::move(location));
+                return std::make_unique<instruction::Relative>(std::move(labelPtr), mDisplacement);
+            }
+
+            instruction::RegisterPtr base = instruction::RegisterPtr(static_cast<instruction::Register*>(mBase->asmOperand().release()));
+            instruction::RegisterPtr index = nullptr;
+            if (mIndex)
+            {
+                index = instruction::RegisterPtr(static_cast<instruction::Register*>(mIndex->asmOperand().release()));
+            }
+
+            return std::make_unique<instruction::Memory>(std::move(base), mDisplacement, std::move(index), mScale);
+        }
+
+        OperandPtr Memory::clone()
+        {
+            return std::make_unique<Memory>(mBase->clone(), mDisplacement, mIndex->clone(), mScale);
+        }
+
+        bool Memory::operator==(OperandPtr& other)
+        {
+            auto mem = dynamic_cast<Memory*>(other.get());
+            if (!mem) return false;
+
+            return *mem->mBase == mBase && mem->mDisplacement == mDisplacement && *mem->mIndex == mIndex && mem->mScale == mScale;
+        }
+
+        bool Memory::isMemory()
+        {
+            return true;
+        }
+
+        codegen::OperandSize Memory::size()
+        {
+            return codegen::OperandSize::None;
         }
     }
 }

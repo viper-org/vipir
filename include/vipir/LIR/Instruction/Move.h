@@ -22,20 +22,6 @@ namespace vipir
             OperandPtr mLeft;
             OperandPtr mRight;
         };
-
-        class MoveIndirect : public Value
-        {
-        friend class opt::Peephole;
-        public:
-            MoveIndirect(OperandPtr left, OperandPtr right);
-
-            void print(std::ostream& stream) const override;
-            void emit(MC::Builder& builder) override;
-
-        private:
-            OperandPtr mLeft;
-            OperandPtr mRight;
-        };
     }
 }
 

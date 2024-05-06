@@ -40,7 +40,7 @@ int main()
 
     auto func = vipir::Function::Create(vipir::FunctionType::Create(i32Type, {i32Type}), mod, "test");
 
-    auto func1 = vipir::Function::Create(vipir::FunctionType::Create(i8Type, {i32Type}), mod, "main");
+    auto func1 = vipir::Function::Create(vipir::FunctionType::Create(i32Type, {i32Type}), mod, "main");
     auto bb1 = vipir::BasicBlock::Create("", func1);
 
     builder.setInsertPoint(bb1);
@@ -51,7 +51,7 @@ int main()
     auto sto = builder.CreateCall(func, {});
     builder.CreateStore(alloca, sto);
 
-    auto addr = builder.CreateAddrOf(globalstring);
+    auto addr = builder.CreateAddrOf(alloca);
 
     auto a = builder.CreateLoad(addr);
     builder.CreateRet(a);

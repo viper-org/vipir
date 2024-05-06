@@ -117,6 +117,12 @@ namespace vipir
         }
     }
 
+    void GEPInst::emit2(lir::Builder& builder)
+    {
+        mPtr->lateEmit(builder);
+        mOffset->lateEmit(builder);
+    }
+
     GEPInst::GEPInst(BasicBlock* parent, Value* ptr, Value* offset)
         : Instruction(parent->getModule(), parent)
         , mPtr(ptr)
@@ -142,6 +148,6 @@ namespace vipir
             mAlignment = static_cast<PointerType*>(mType)->getBaseType()->getAlignment();
             assert(mType->isPointerType());
         }
-        mRequiresVReg = false;
+        //mRequiresVReg = false;
     }
 }

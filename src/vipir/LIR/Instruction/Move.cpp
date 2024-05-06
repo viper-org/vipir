@@ -30,39 +30,5 @@ namespace vipir
             if (*mLeft == mRight) return;
             builder.addValue(std::make_unique<instruction::MovInstruction>(mLeft->asmOperand(), mRight->asmOperand(), mLeft->size()));
         }
-
-
-        MoveIndirect::MoveIndirect(OperandPtr left, OperandPtr right)
-            : mLeft(std::move(left))
-            , mRight(std::move(right))
-        {
-        }
-
-        void MoveIndirect::print(std::ostream& stream) const
-        {
-            stream << std::format("MOVE INDIRECT {} -> {}\n", mRight->ident(), mLeft->ident());
-        }
-
-        void MoveIndirect::emit(MC::Builder& builder)
-        {
-            instruction::OperandPtr right = mRight->asmOperand();
-            if (mRight->isMemory())
-            {
-                builder.addValue(std::make_unique<instruction::MovInstruction>(mLeft->asmOperand(), mRight->asmOperand()));
-                right = mLeft->asmOperand();
-            }
-
-            if (auto reg = dynamic_cast<instruction::Register*>(right.get()))
-            {
-                int id = reg->getID();
-                codegen::OperandSize size = reg->getSize();
-
-                instruction::RegisterPtr base = std::make_unique<instruction::Register>(id, size);
-
-                right = std::make_unique<instruction::Memory>(std::move(base), std::nullopt, nullptr, std::nullopt);
-            }
-
-            builder.addValue(std::make_unique<instruction::MovInstruction>(mLeft->asmOperand(), std::move(right)));
-        }
     }
 }

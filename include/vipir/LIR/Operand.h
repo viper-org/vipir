@@ -10,6 +10,7 @@
 
 #include <cstdint>
 #include <memory>
+#include <optional>
 #include <string>
 
 namespace vipir
@@ -119,6 +120,25 @@ namespace vipir
 
         private:
             Operator mOperator;
+        };
+
+        class Memory : public Operand
+        {
+        public:
+            Memory(OperandPtr base, std::optional<int> displacement, OperandPtr index, std::optional<int> scale);
+
+            std::string ident() const override;
+            instruction::OperandPtr asmOperand() override;
+            OperandPtr clone() override;
+            bool operator==(OperandPtr& other) override;
+            bool isMemory() override;
+            codegen::OperandSize size() override;
+
+        private:
+            OperandPtr mBase;
+            std::optional<int> mDisplacement;
+            OperandPtr mIndex;
+            std::optional<int> mScale;
         };
     }
 }

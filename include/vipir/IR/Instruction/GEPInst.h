@@ -23,6 +23,7 @@ namespace vipir
 
     protected:
         void emit(MC::Builder& builder) override;
+        void emit2(lir::Builder& builder) override;
 
     private:
         GEPInst(BasicBlock* parent, Value* ptr, Value* offset);
