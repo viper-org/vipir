@@ -128,9 +128,32 @@ namespace vipir
         lir::OperandPtr ptr = mPtr->getEmittedValue2();
         lir::OperandPtr offset = mOffset->getEmittedValue2();
 
-        lir::OperandPtr mem = std::make_unique<lir::Memory>(std::move(ptr), std::nullopt, std::move(offset), mAlignment / 8);
+        int scale = mAlignment / 8;
+
+        if (StructType* structType = dynamic_cast<StructType*>(static_cast<PointerType*>(mPtr->getType())->getBaseType()))
+        {
+            lir::Immediate* immediate = static_cast<lir::Immediate*>(offset.get());
+            int disp = 0;
+            for (int i = 0; i < immediate->value(); ++i)
+            {
+                if (structType->getField(i)->isArrayType())
+                {
+                    ArrayType* arrayType = static_cast<ArrayType*>(structType->getField(i));
+                    disp += std::max(arrayType->getSizeInBits() / 8, (std::size_t)scale);
+                }
+                else
+                {
+                    disp += scale;
+                }
+            }
+
+            offset = std::make_unique<lir::Immediate>(disp);
+            scale = 1;
+        }
+
+        lir::OperandPtr mem = std::make_unique<lir::Memory>(std::move(ptr), std::nullopt, std::move(offset), scale);
         builder.addValue(std::make_unique<lir::LoadAddress>(vreg->clone(), std::move(mem)));
-        mEmittedValue2 = std::move(vreg);
+        mEmittedValue2 = std::make_unique<lir::Memory>(std::move(vreg), std::nullopt, nullptr, std::nullopt);
     }
 
     GEPInst::GEPInst(BasicBlock* parent, Value* ptr, Value* offset)

@@ -48,6 +48,8 @@ namespace vipir
             bool operator==(OperandPtr& other) override;
             codegen::OperandSize size() override;
 
+            std::intmax_t value() const;
+
         private:
             std::intmax_t mValue;
         };

@@ -47,5 +47,6 @@ namespace vipir
         , mForceMemory(false)
     {
         mType = Type::GetPointerType(mAllocatedType);
+        if (mAllocatedType->isStructType()) mForceMemory = true; // Structs cannot fit inside a register
     }
 }

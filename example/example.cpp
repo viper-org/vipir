@@ -37,22 +37,21 @@ int main()
     auto i64Type = vipir::Type::GetIntegerType(64);
     auto i8Type = vipir::Type::GetIntegerType(8);
     auto voidType = vipir::Type::GetVoidType();
-    auto arrayType = vipir::Type::GetArrayType(i32Type, 3);
+    auto structType = vipir::Type::GetStructType({i32Type, i32Type});
 
-    auto func1 = vipir::Function::Create(vipir::FunctionType::Create(i8Type, {i32Type}), mod, "main");
+    auto func1 = vipir::Function::Create(vipir::FunctionType::Create(i32Type, {i32Type}), mod, "main");
     auto bb1 = vipir::BasicBlock::Create("", func1);
 
     builder.setInsertPoint(bb1);
 
-    auto globalstring = vipir::GlobalString::Create(mod, "hi");
+    auto alloca = builder.CreateAlloca(structType);
+    auto gep1 = builder.CreateStructGEP(alloca, 1);
+    builder.CreateStore(gep1, func1->getArgument(0));
 
-    auto addr = builder.CreateAddrOf(globalstring);
+    auto gep2 = builder.CreateStructGEP(alloca, 1);
+    auto retval = builder.CreateLoad(gep2);
 
-    auto offset = vipir::ConstantInt::Get(mod, 1, i32Type);
-    auto gep = builder.CreateGEP(addr, func1->getArgument(0));
-
-    auto a = builder.CreateLoad(gep);
-    builder.CreateRet(a);
+    builder.CreateRet(retval);
 
     mod.addPass(vipir::Pass::PeepholeOptimization);
 

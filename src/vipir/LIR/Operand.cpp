@@ -11,6 +11,7 @@
 #include "vasm/instruction/operand/Label.h"
 #include "vasm/instruction/operand/Memory.h"
 
+#include <cassert>
 #include <format>
 
 namespace vipir
@@ -48,6 +49,11 @@ namespace vipir
         codegen::OperandSize Immediate::size()
         {
             return codegen::OperandSize::Quad;
+        }
+        
+        std::intmax_t Immediate::value() const
+        {
+            return mValue;
         }
 
 
@@ -264,8 +270,25 @@ namespace vipir
                 return std::make_unique<instruction::Relative>(std::move(labelPtr), mDisplacement);
             }
 
-            instruction::RegisterPtr base = instruction::RegisterPtr(static_cast<instruction::Register*>(mBase->asmOperand().release()));
+            instruction::RegisterPtr base;
             std::optional<int> displacement = mDisplacement;
+
+            if (auto reg = dynamic_cast<instruction::Register*>(baseOperand.get()))
+            {
+                base = instruction::RegisterPtr(static_cast<instruction::Register*>(baseOperand.release()));
+            }
+            else if (auto mem = dynamic_cast<instruction::Memory*>(baseOperand.get()))
+            {
+                assert(mem->getIndex() == nullptr);
+                assert(mem->getScale().value_or(0) == 0);
+                base = std::make_unique<instruction::Register>(mem->getBase()->getID(), mem->getBase()->getSize());
+                if (mem->getDisplacement())
+                {
+                    if (displacement) *displacement += *mem->getDisplacement();
+                    else displacement = *mem->getDisplacement();
+                }
+            }
+
             instruction::RegisterPtr index = nullptr;
             if (mIndex)
             {
@@ -286,7 +309,9 @@ namespace vipir
 
         OperandPtr Memory::clone()
         {
-            return std::make_unique<Memory>(mBase->clone(), mDisplacement, mIndex->clone(), mScale);
+            lir::OperandPtr index;
+            if (mIndex) index = mIndex->clone();
+            return std::make_unique<Memory>(mBase->clone(), mDisplacement, std::move(index), mScale);
         }
 
         bool Memory::operator==(OperandPtr& other)
