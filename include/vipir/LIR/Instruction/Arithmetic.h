@@ -9,7 +9,7 @@ namespace vipir
 {
     namespace lir
     {
-        class Arithmetic : public Value
+        class BinaryArithmetic : public Value
         {
         public:
             enum class Operator
@@ -19,7 +19,7 @@ namespace vipir
                 BWAnd, BWOr, BWXor
             };
 
-            Arithmetic(OperandPtr left, Operator op, OperandPtr right);
+            BinaryArithmetic(OperandPtr left, Operator op, OperandPtr right);
 
             void print(std::ostream& stream) const override;
             void emit(MC::Builder& builder) override;
@@ -28,6 +28,26 @@ namespace vipir
             OperandPtr mLeft;
             Operator mOperator;
             OperandPtr mRight;
+        };
+
+
+        class UnaryArithmetic : public Value
+        {
+        public:
+            enum class Operator
+            {
+                Not,
+                Neg
+            };
+
+            UnaryArithmetic(OperandPtr operand, Operator op);
+
+            void print(std::ostream& stream) const override;
+            void emit(MC::Builder& builder) override;
+
+        private:
+            OperandPtr mOperand;
+            Operator mOperator;
         };
     }
 }

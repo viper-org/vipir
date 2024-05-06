@@ -4,7 +4,7 @@
 #include "vipir/LIR/Instruction/Arithmetic.h"
 
 #include "vasm/instruction/twoOperandInstruction/LogicalInstruction.h"
-#include "vasm/instruction/twoOperandInstruction/MovInstruction.h"
+#include "vasm/instruction/singleOperandInstruction/Grp4Instruction.h"
 
 #include <format>
 
@@ -12,14 +12,14 @@ namespace vipir
 {
     namespace lir
     {
-        Arithmetic::Arithmetic(OperandPtr left, Operator op, OperandPtr right)
+        BinaryArithmetic::BinaryArithmetic(OperandPtr left, Operator op, OperandPtr right)
             : mLeft(std::move(left))
             , mOperator(op)
             , mRight(std::move(right))
         {
         }
 
-        void Arithmetic::print(std::ostream& stream) const
+        void BinaryArithmetic::print(std::ostream& stream) const
         {
             std::string operatorName;
             std::string symbol;
@@ -50,7 +50,7 @@ namespace vipir
             stream << std::format("{} {} {} {} -> {}\n", operatorName, mLeft->ident(), symbol, mRight->ident(), mLeft->ident());
         }
 
-        void Arithmetic::emit(MC::Builder& builder)
+        void BinaryArithmetic::emit(MC::Builder& builder)
         {
             auto createInstruction = [&builder, this]<class InstT>(){
                 builder.addValue(std::make_unique<InstT>(mLeft->asmOperand(), mRight->asmOperand()));
@@ -73,6 +73,48 @@ namespace vipir
                     break;
                 case Operator::BWXor:
                     createInstruction.template operator()<instruction::XorInstruction>();
+                    break;
+            }
+        }
+
+
+        UnaryArithmetic::UnaryArithmetic(OperandPtr operand, Operator op)
+            : mOperand(std::move(operand))
+            , mOperator(op)
+        {
+        }
+
+        void UnaryArithmetic::print(std::ostream& stream) const
+        {
+            std::string operatorName;
+            switch (mOperator)
+            {
+                case Operator::Not:
+                    operatorName = "NOT";
+                    break;
+
+                case Operator::Neg:
+                    operatorName = "NEG";
+                    break;
+            }
+
+            stream << std::format("{} {} -> {}", operatorName, mOperand->ident(), mOperand->ident());
+        }
+
+        void UnaryArithmetic::emit(MC::Builder& builder)
+        {
+            auto createInstruction = [&builder, this]<class InstT>(){
+                builder.addValue(std::make_unique<InstT>(mOperand->asmOperand()));
+            };
+
+            switch (mOperator)
+            {
+                case Operator::Not:
+                    createInstruction.template operator()<instruction::NotInstruction>();
+                    break;
+
+                case Operator::Neg:
+                    createInstruction.template operator()<instruction::NegInstruction>();
                     break;
             }
         }

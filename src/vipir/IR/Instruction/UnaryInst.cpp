@@ -7,6 +7,9 @@
 
 #include "vipir/Module.h"
 
+#include "vipir/LIR/Instruction/Arithmetic.h"
+#include "vipir/LIR/Instruction/Move.h"
+
 #include "vasm/instruction/singleOperandInstruction/Grp4Instruction.h"
 
 #include <cassert>
@@ -60,6 +63,27 @@ namespace vipir
         }
     }
 
+    void UnaryInst::emit2(lir::Builder& builder)
+    {
+        auto createUnary = [&builder, this](lir::UnaryArithmetic::Operator op){
+            mOperand->lateEmit(builder);
+            lir::OperandPtr vreg = std::make_unique<lir::VirtualReg>(mVReg, mType->getOperandSize());
+            builder.addValue(std::make_unique<lir::Move>(vreg->clone(), mOperand->getEmittedValue2()));
+            builder.addValue(std::make_unique<lir::UnaryArithmetic>(vreg->clone(), op));
+            mEmittedValue2 = std::move(vreg);
+        };
+
+        switch (mOperator)
+        {
+            case Instruction::NEG:
+                createUnary(lir::UnaryArithmetic::Operator::Neg);
+                break;
+            case Instruction::NOT:
+                createUnary(lir::UnaryArithmetic::Operator::Not);
+                break;
+        }
+    }
+
     UnaryInst::UnaryInst(BasicBlock* parent, Value* operand, Instruction::UnaryOperators op)
         : Instruction(parent->getParent()->getModule(), parent)
         , mOperand(operand)
@@ -70,7 +94,7 @@ namespace vipir
         {
             case Instruction::NEG:
                 mType = mOperand->getType();
-            case NOT:
+            case Instruction::NOT:
                 mType = mOperand->getType();
         }
     }

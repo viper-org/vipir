@@ -159,32 +159,32 @@ namespace vipir
     void BinaryInst::emit2(lir::Builder& builder)
     {
 
-        auto createArithmetic = [&builder, this](lir::Arithmetic::Operator op){
+        auto createArithmetic = [&builder, this](lir::BinaryArithmetic::Operator op){
             mLeft->lateEmit(builder);
             mRight->lateEmit(builder);
             lir::OperandPtr vreg = std::make_unique<lir::VirtualReg>(mVReg, mType->getOperandSize());
             builder.addValue(std::make_unique<lir::Move>(vreg->clone(), mLeft->getEmittedValue2()));
-            builder.addValue(std::make_unique<lir::Arithmetic>(vreg->clone(), op, mRight->getEmittedValue2()));
+            builder.addValue(std::make_unique<lir::BinaryArithmetic>(vreg->clone(), op, mRight->getEmittedValue2()));
             mEmittedValue2 = std::move(vreg);
         };
         
         switch (mOperator)
         {
             case Instruction::ADD:
-                createArithmetic(lir::Arithmetic::Operator::Add);
+                createArithmetic(lir::BinaryArithmetic::Operator::Add);
                 break;
             case Instruction::SUB:
-                createArithmetic(lir::Arithmetic::Operator::Sub);
+                createArithmetic(lir::BinaryArithmetic::Operator::Sub);
                 break;
 
             case Instruction::BWAND:
-                createArithmetic(lir::Arithmetic::Operator::BWAnd);
+                createArithmetic(lir::BinaryArithmetic::Operator::BWAnd);
                 break;
             case Instruction::BWOR:
-                createArithmetic(lir::Arithmetic::Operator::BWOr);
+                createArithmetic(lir::BinaryArithmetic::Operator::BWOr);
                 break;
             case Instruction::BWXOR:
-                createArithmetic(lir::Arithmetic::Operator::BWXor);
+                createArithmetic(lir::BinaryArithmetic::Operator::BWXor);
                 break;
 
             default:
