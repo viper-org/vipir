@@ -21,6 +21,18 @@ namespace vipir
             std::string mName;
             bool mGlobal;
         };
+
+        class ExternLabel : public Value
+        {
+        public:
+            ExternLabel(std::string name);
+
+            void print(std::ostream& stream) const override;
+            void emit(MC::Builder& builder) override;
+        
+        private:
+            std::string mName;
+        };
     }
 }
 

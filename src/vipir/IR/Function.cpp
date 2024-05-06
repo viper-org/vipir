@@ -5,6 +5,7 @@
 #include "vipir/Module.h"
 
 #include "vipir/LIR/Label.h"
+#include "vipir/LIR/Instruction/EnterFunc.h"
 
 #include "vasm/instruction/Label.h"
 #include "vasm/instruction/Directive.h"
@@ -112,9 +113,20 @@ namespace vipir
 
     void Function::emit2(lir::Builder& builder)
     {
-        mEmittedValue2 = std::make_unique<lir::Lbl>(mName);
+        if (mBasicBlockList.empty())
+        {
+            mEmittedValue2 = std::make_unique<lir::Lbl>(mName);
+            builder.addValue(std::make_unique<lir::ExternLabel>(mName));
+            return;
+        }
 
+        mEmittedValue2 = std::make_unique<lir::Lbl>(mName);
         builder.addValue(std::make_unique<lir::Label>(mName, true));
+
+        if (mTotalStackOffset > 0) // There are local variables
+        {
+            builder.addValue(std::make_unique<lir::EnterFunc>(mTotalStackOffset));
+        }
 
         for (auto& basicBlock : mBasicBlockList)
         {

@@ -67,6 +67,7 @@ set(SOURCES
     "src/vipir/LIR/Instruction/Compare.cpp"
     "src/vipir/LIR/Instruction/Jump.cpp"
     "src/vipir/LIR/Instruction/LoadAddress.cpp"
+    "src/vipir/LIR/Instruction/EnterFunc.cpp"
 
     "src/vipir/ABI/SysV.cpp"
 )
@@ -132,6 +133,7 @@ set(HEADERS
     "include/vipir/LIR/Instruction/Compare.h"
     "include/vipir/LIR/Instruction/Jump.h"
     "include/vipir/LIR/Instruction/LoadAddress.h"
+    "include/vipir/LIR/Instruction/EnterFunc.h"
 
     "include/vipir/ABI/ABI.h"
     "include/vipir/ABI/SysV.h"

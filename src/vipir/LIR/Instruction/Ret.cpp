@@ -10,7 +10,8 @@ namespace vipir
 {
     namespace lir
     {
-        Ret::Ret()
+        Ret::Ret(bool leave)
+            : mLeave(leave)
         {
         }
 
@@ -21,6 +22,10 @@ namespace vipir
 
         void Ret::emit(MC::Builder& builder)
         {
+            if (mLeave)
+            {
+                builder.addValue(std::make_unique<instruction::LeaveInstruction>());
+            }
             builder.addValue(std::make_unique<instruction::RetInstruction>());
         }
     }

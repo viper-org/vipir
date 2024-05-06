@@ -1,7 +1,7 @@
 // Copyright 2024 solar-mist
 
-#ifndef VIPIR_LIR_INSTRUCTION_RET_H
-#define VIPIR_LIR_INSTRUCTION_RET_H 1
+#ifndef VIPIR_LIR_INSTRUCTION_ENTER_FUNC_H
+#define VIPIR_LIR_INSTRUCTION_ENTER_FUNC_H 1
 
 #include "vipir/LIR/Value.h"
 
@@ -9,18 +9,18 @@ namespace vipir
 {
     namespace lir
     {
-        class Ret : public Value
+        class EnterFunc : public Value
         {
         public:
-            Ret(bool leave);
+            EnterFunc(int stackSize);
 
             void print(std::ostream& stream) const override;
             void emit(MC::Builder& builder) override;
 
         private:
-            bool mLeave;
+            int mStackSize;
         };
     }
 }
 
-#endif // VIPIR_LIR_INSTRUCTION_RET_H
+#endif // VIPIR_LIR_INSTRUCTION_ENTER_FUNC_H
