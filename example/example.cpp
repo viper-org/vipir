@@ -1,4 +1,4 @@
-
+#include "vipir/IR/GlobalString.h"
 #include "vipir/Module.h"
 
 #include "vipir/IR/Function.h"
@@ -40,16 +40,18 @@ int main()
 
     auto func = vipir::Function::Create(vipir::FunctionType::Create(i32Type, {i32Type}), mod, "test");
 
-    auto func1 = vipir::Function::Create(vipir::FunctionType::Create(i32Type, {i32Type}), mod, "main");
+    auto func1 = vipir::Function::Create(vipir::FunctionType::Create(i8Type, {i32Type}), mod, "main");
     auto bb1 = vipir::BasicBlock::Create("", func1);
 
     builder.setInsertPoint(bb1);
+
+    auto globalstring = vipir::GlobalString::Create(mod, "hi");
 
     auto alloca = builder.CreateAlloca(i32Type);
     auto sto = builder.CreateCall(func, {});
     builder.CreateStore(alloca, sto);
 
-    auto addr = builder.CreateAddrOf(alloca);
+    auto addr = builder.CreateAddrOf(globalstring);
 
     auto a = builder.CreateLoad(addr);
     builder.CreateRet(a);

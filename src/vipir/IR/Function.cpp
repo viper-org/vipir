@@ -113,6 +113,8 @@ namespace vipir
 
     void Function::emit2(lir::Builder& builder)
     {
+        builder.setSection(lir::SectionType::Code);
+
         if (mBasicBlockList.empty())
         {
             mEmittedValue2 = std::make_unique<lir::Lbl>(mName);

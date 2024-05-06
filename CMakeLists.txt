@@ -60,6 +60,8 @@ set(SOURCES
 
     "src/vipir/LIR/Builder.cpp"
     "src/vipir/LIR/Label.cpp"
+    "src/vipir/LIR/Section.cpp"
+    "src/vipir/LIR/Global.cpp"
     "src/vipir/LIR/Operand.cpp"
     "src/vipir/LIR/Instruction/Ret.cpp"
     "src/vipir/LIR/Instruction/Move.cpp"
@@ -127,6 +129,8 @@ set(HEADERS
     "include/vipir/LIR/Value.h"
     "include/vipir/LIR/Operand.h"
     "include/vipir/LIR/Label.h"
+    "include/vipir/LIR/Section.h"
+    "include/vipir/LIR/Global.h"
     "include/vipir/LIR/Instruction/Ret.h"
     "include/vipir/LIR/Instruction/Move.h"
     "include/vipir/LIR/Instruction/Arithmetic.h"

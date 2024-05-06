@@ -4,6 +4,7 @@
 #define VIPIR_LIR_BUILDER_H 1
 
 #include "vipir/LIR/Value.h"
+#include "vipir/LIR/Section.h"
 
 #include <memory>
 
@@ -16,6 +17,7 @@ namespace vipir
         using ValuePtr = std::unique_ptr<Value>;
         public:
             void addValue(ValuePtr value);
+            void setSection(SectionType sect);
 
             std::vector<ValuePtr>& getValues();
 
