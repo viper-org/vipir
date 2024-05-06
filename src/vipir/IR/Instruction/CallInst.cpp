@@ -5,7 +5,11 @@
 #include "vipir/IR/BasicBlock.h"
 #include "vipir/IR/Function.h"
 
+#include "vipir/LIR/Operand.h"
 #include "vipir/Module.h"
+
+#include "vipir/LIR/Instruction/Move.h"
+#include "vipir/LIR/Instruction/Jump.h"
 
 #include "vasm/instruction/operand/Register.h"
 
@@ -61,6 +65,30 @@ namespace vipir
             builder.addValue(std::make_unique<instruction::MovInstruction>(operand->clone(), std::move(returnRegister)));
         }
         mEmittedValue = std::move(operand);
+    }
+
+    void CallInst::emit2(lir::Builder& builder)
+    {
+        mFunction->lateEmit(builder);
+
+        lir::OperandPtr function = mFunction->getEmittedValue2();
+        codegen::OperandSize size = mType->getOperandSize();
+
+        int index = 0;
+        for (auto parameter : mParameters)
+        {
+            parameter->lateEmit(builder);
+            lir::OperandPtr value = parameter->getEmittedValue2();
+            lir::OperandPtr reg = std::make_unique<lir::PhysicalReg>(mModule.abi()->getParameterRegister(index++), parameter->getType()->getOperandSize());
+            builder.addValue(std::make_unique<lir::Move>(std::move(reg), std::move(value)));
+        }
+
+        builder.addValue(std::make_unique<lir::Call>(std::move(function)));
+
+        lir::OperandPtr vreg = std::make_unique<lir::VirtualReg>(mVReg, mType->getOperandSize());
+        lir::OperandPtr returnRegister = std::make_unique<lir::PhysicalReg>(mModule.abi()->getReturnRegister(), mType->getOperandSize());
+        builder.addValue(std::make_unique<lir::Move>(vreg->clone(), std::move(returnRegister)));
+        mEmittedValue2 = std::move(vreg);
     }
 
     CallInst::CallInst(BasicBlock* parent, Function* function, std::vector<Value*> parameters)

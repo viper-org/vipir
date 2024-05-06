@@ -33,6 +33,19 @@ namespace vipir
             OperandPtr mDest;
             OperandPtr mCondition;
         };
+
+
+        class Call : public Value
+        {
+        public:
+            Call(OperandPtr dest);
+
+            void print(std::ostream& stream) const override;
+            void emit(MC::Builder& builder) override;
+
+        private:
+            OperandPtr mDest;
+        };
     }
 }
 

@@ -112,6 +112,8 @@ namespace vipir
 
     void Function::emit2(lir::Builder& builder)
     {
+        mEmittedValue2 = std::make_unique<lir::Lbl>(mName);
+
         builder.addValue(std::make_unique<lir::Label>(mName, true));
 
         for (auto& basicBlock : mBasicBlockList)

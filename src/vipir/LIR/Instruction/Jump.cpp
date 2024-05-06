@@ -3,9 +3,11 @@
 
 #include "vipir/LIR/Instruction/Jump.h"
 
+#include "vipir/MC/CmpOperand.h"
+
 #include "vasm/instruction/singleOperandInstruction/JmpInstruction.h"
 #include "vasm/instruction/singleOperandInstruction/JccInstruction.h"
-#include "vipir/MC/CmpOperand.h"
+#include "vasm/instruction/singleOperandInstruction/CallInstruction.h"
 
 #include <format>
 
@@ -66,6 +68,23 @@ namespace vipir
                     builder.addValue(std::make_unique<instruction::JgeInstruction>(mDest->asmOperand()));
                     break;
             }
+        }
+
+
+
+        Call::Call(OperandPtr dest)
+            : mDest(std::move(dest))
+        {
+        }
+
+        void Call::print(std::ostream& stream) const
+        {
+            stream << std::format("CALL {}", mDest->ident());
+        }
+
+        void Call::emit(MC::Builder& builder)
+        {
+            builder.addValue(std::make_unique<instruction::CallInstruction>(mDest->asmOperand()));
         }
     }
 }
