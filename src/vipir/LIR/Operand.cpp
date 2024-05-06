@@ -265,13 +265,23 @@ namespace vipir
             }
 
             instruction::RegisterPtr base = instruction::RegisterPtr(static_cast<instruction::Register*>(mBase->asmOperand().release()));
+            std::optional<int> displacement = mDisplacement;
             instruction::RegisterPtr index = nullptr;
             if (mIndex)
             {
-                index = instruction::RegisterPtr(static_cast<instruction::Register*>(mIndex->asmOperand().release()));
+                instruction::OperandPtr index = mIndex->asmOperand();
+                if (auto imm = dynamic_cast<instruction::Immediate*>(index.get()))
+                {
+                    if (displacement) *displacement += imm->imm32();
+                    else displacement = imm->imm32();
+                }
+                else
+                {
+                    index = instruction::RegisterPtr(static_cast<instruction::Register*>(index.release()));
+                }
             }
 
-            return std::make_unique<instruction::Memory>(std::move(base), mDisplacement, std::move(index), mScale);
+            return std::make_unique<instruction::Memory>(std::move(base), displacement, std::move(index), mScale);
         }
 
         OperandPtr Memory::clone()

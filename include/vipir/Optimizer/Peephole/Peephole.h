@@ -16,6 +16,7 @@ namespace vipir
         
         private:
             bool checkDoubleMove(lir::ValuePtr& first, lir::ValuePtr& second);
+            bool checkLeaMove(lir::ValuePtr& first, lir::ValuePtr& second);
         };
     }
 }

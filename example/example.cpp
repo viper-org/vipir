@@ -13,6 +13,7 @@
 #include "vipir/IR/Instruction/CallInst.h"
 #include "vipir/IR/Instruction/BinaryInst.h"
 #include "vipir/IR/Instruction/LoadInst.h"
+#include "vipir/IR/Instruction/GEPInst.h"
 
 #include "vipir/Optimizer/RegAlloc/RegAlloc.h"
 #include "vipir/Type/FunctionType.h"
@@ -40,7 +41,7 @@ int main()
 
     auto func = vipir::Function::Create(vipir::FunctionType::Create(i32Type, {i32Type}), mod, "test");
 
-    auto func1 = vipir::Function::Create(vipir::FunctionType::Create(i32Type, {i32Type}), mod, "main");
+    auto func1 = vipir::Function::Create(vipir::FunctionType::Create(i8Type, {i32Type}), mod, "main");
     auto bb1 = vipir::BasicBlock::Create("", func1);
 
     builder.setInsertPoint(bb1);
@@ -51,9 +52,12 @@ int main()
     auto sto = builder.CreateCall(func, {});
     builder.CreateStore(alloca, sto);
 
-    auto addr = builder.CreateAddrOf(alloca);
+    auto addr = builder.CreateAddrOf(globalstring);
 
-    auto a = builder.CreateLoad(addr);
+    auto offset = vipir::ConstantInt::Get(mod, 1, i32Type);
+    auto gep = builder.CreateGEP(addr, offset);
+
+    auto a = builder.CreateLoad(gep);
     builder.CreateRet(a);
 
     mod.addPass(vipir::Pass::PeepholeOptimization);

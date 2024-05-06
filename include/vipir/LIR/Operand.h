@@ -15,12 +15,15 @@
 
 namespace vipir
 {
+    namespace opt { class Peephole; }
+
     namespace lir
     {
         class Operand;
         using OperandPtr = std::unique_ptr<Operand>;
         class Operand
         {
+        friend class opt::Peephole;
         public:
             virtual std::string ident() const = 0;
 
@@ -35,6 +38,7 @@ namespace vipir
 
         class Immediate : public Operand
         {
+        friend class opt::Peephole;
         public:
             Immediate(std::intmax_t value);
 
@@ -50,6 +54,7 @@ namespace vipir
 
         class PhysicalReg : public Operand
         {
+        friend class opt::Peephole;
         friend class VirtualReg;
         public:
             PhysicalReg(int id, codegen::OperandSize size);
@@ -67,6 +72,7 @@ namespace vipir
 
         class VirtualReg : public Operand
         {
+        friend class opt::Peephole;
         friend class PhysicalReg;
         public:
             VirtualReg(opt::VReg* reg, codegen::OperandSize size);
@@ -100,6 +106,7 @@ namespace vipir
 
         class CMP : public Operand
         {
+        friend class opt::Peephole;
         public:
             enum class Operator
             {
@@ -124,6 +131,7 @@ namespace vipir
 
         class Memory : public Operand
         {
+        friend class opt::Peephole;
         public:
             Memory(OperandPtr base, std::optional<int> displacement, OperandPtr index, std::optional<int> scale);
 

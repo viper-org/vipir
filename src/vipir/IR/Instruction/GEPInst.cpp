@@ -12,6 +12,8 @@
 
 #include "vipir/Module.h"
 
+#include "vipir/LIR/Instruction/LoadAddress.h"
+
 #include "vasm/instruction/operand/Register.h"
 #include "vasm/instruction/operand/Immediate.h"
 #include "vasm/instruction/operand/Memory.h"
@@ -121,6 +123,14 @@ namespace vipir
     {
         mPtr->lateEmit(builder);
         mOffset->lateEmit(builder);
+
+        lir::OperandPtr vreg = std::make_unique<lir::VirtualReg>(mVReg, mType->getOperandSize());
+        lir::OperandPtr ptr = mPtr->getEmittedValue2();
+        lir::OperandPtr offset = mOffset->getEmittedValue2();
+
+        lir::OperandPtr mem = std::make_unique<lir::Memory>(std::move(ptr), std::nullopt, std::move(offset), mAlignment / 8);
+        builder.addValue(std::make_unique<lir::LoadAddress>(vreg->clone(), std::move(mem)));
+        mEmittedValue2 = std::move(vreg);
     }
 
     GEPInst::GEPInst(BasicBlock* parent, Value* ptr, Value* offset)
