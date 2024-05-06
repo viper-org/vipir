@@ -14,7 +14,9 @@ namespace vipir
         public:
             enum class Operator
             {
-                Add, Sub
+                Add, Sub,
+
+                BWAnd, BWOr, BWXor
             };
 
             Arithmetic(OperandPtr left, Operator op, OperandPtr right);

@@ -33,6 +33,19 @@ namespace vipir
                     operatorName = "SUB";
                     symbol = "-";
                     break;
+
+                case Operator::BWAnd:
+                    operatorName = "AND";
+                    symbol = "&";
+                    break;
+                case Operator::BWOr:
+                    operatorName = "OR";
+                    symbol = "|";
+                    break;
+                case Operator::BWXor:
+                    operatorName = "XOR";
+                    symbol = "^";
+                    break;
             }
             stream << std::format("{} {} {} {} -> {}\n", operatorName, mLeft->ident(), symbol, mRight->ident(), mLeft->ident());
         }
@@ -50,6 +63,16 @@ namespace vipir
                     break;
                 case Operator::Sub:
                     createInstruction.template operator()<instruction::SubInstruction>();
+                    break;
+
+                case Operator::BWAnd:
+                    createInstruction.template operator()<instruction::AndInstruction>();
+                    break;
+                case Operator::BWOr:
+                    createInstruction.template operator()<instruction::OrInstruction>();
+                    break;
+                case Operator::BWXor:
+                    createInstruction.template operator()<instruction::XorInstruction>();
                     break;
             }
         }

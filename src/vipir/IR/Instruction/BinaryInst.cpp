@@ -177,6 +177,16 @@ namespace vipir
                 createArithmetic(lir::Arithmetic::Operator::Sub);
                 break;
 
+            case Instruction::BWAND:
+                createArithmetic(lir::Arithmetic::Operator::BWAnd);
+                break;
+            case Instruction::BWOR:
+                createArithmetic(lir::Arithmetic::Operator::BWOr);
+                break;
+            case Instruction::BWXOR:
+                createArithmetic(lir::Arithmetic::Operator::BWXor);
+                break;
+
             default:
                 break;
         }
