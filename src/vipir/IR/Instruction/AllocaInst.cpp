@@ -30,6 +30,11 @@ namespace vipir
         mEmittedValue = mVReg->operand(mAllocatedType->getOperandSize());
     }
 
+    void AllocaInst::emit2(lir::Builder& builder)
+    {
+        mEmittedValue2 = std::make_unique<lir::VirtualReg>(mVReg, mAllocatedType->getOperandSize());
+    }
+
     AllocaInst::AllocaInst(BasicBlock* parent, Type* allocatedType)
         : Instruction(parent->getModule(), parent)
         , mAllocatedType(allocatedType)

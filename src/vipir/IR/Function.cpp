@@ -4,6 +4,8 @@
 
 #include "vipir/Module.h"
 
+#include "vipir/LIR/Label.h"
+
 #include "vasm/instruction/Label.h"
 #include "vasm/instruction/Directive.h"
 #include "vasm/instruction/operand/Register.h"
@@ -105,6 +107,16 @@ namespace vipir
         for (auto& basicBlock : mBasicBlockList)
         {
             basicBlock->emit(builder);
+        }
+    }
+
+    void Function::emit2(lir::Builder& builder)
+    {
+        builder.addValue(std::make_unique<lir::Label>(mName, true));
+
+        for (auto& basicBlock : mBasicBlockList)
+        {
+            basicBlock->emit2(builder);
         }
     }
 

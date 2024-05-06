@@ -29,6 +29,7 @@ namespace vipir
 
     protected:
         void emit(MC::Builder& builder) override;
+        void emit2(lir::Builder& builder) override;
 
     private:
         ConstantInt(BasicBlock* parent, intmax_t value, Type* type);

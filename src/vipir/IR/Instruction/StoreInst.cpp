@@ -7,6 +7,8 @@
 #include "vipir/IR/BasicBlock.h"
 #include "vipir/IR/GlobalVar.h"
 
+#include "vipir/LIR/Instruction/Move.h"
+
 #include "vasm/instruction/operand/Register.h"
 #include "vasm/instruction/operand/Memory.h"
 #include "vasm/instruction/operand/Label.h"
@@ -79,6 +81,11 @@ namespace vipir
                 builder.addValue(std::make_unique<instruction::MovInstruction>(std::move(ptr), std::move(value), mValue->getType()->getOperandSize()));
             }
         }
+    }
+
+    void StoreInst::emit2(lir::Builder& builder)
+    {
+        builder.addValue(std::make_unique<lir::Move>(mPtr->getEmittedValue2(), mValue->getEmittedValue2()));
     }
 
     StoreInst::StoreInst(BasicBlock* parent, Value* ptr, Value* value)

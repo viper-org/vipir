@@ -50,8 +50,10 @@ namespace vipir
         void insertConstant(Value* constant);
 
         void print(std::ostream& stream) const;
+        void print2(std::ostream& stream) const;
 
         void emit(std::ostream& stream, OutputFormat outputFormat) const;
+        void emit2(std::ostream& stream, OutputFormat outputFormat);
 
     private:
         std::string mName;

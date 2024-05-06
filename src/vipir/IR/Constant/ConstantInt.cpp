@@ -45,6 +45,11 @@ namespace vipir
         mEmittedValue = std::make_unique<instruction::Immediate>(mValue);
     }
 
+    void ConstantInt::emit2(lir::Builder& builder)
+    {
+        mEmittedValue2 = std::make_unique<lir::Immediate>(mValue);
+    }
+
     ConstantInt::ConstantInt(BasicBlock* parent, intmax_t value, Type* type)
         : Value(parent->getModule())
         , mValue(value)

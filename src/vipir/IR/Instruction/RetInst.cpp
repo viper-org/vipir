@@ -7,6 +7,9 @@
 
 #include "vipir/Module.h"
 
+#include "vipir/LIR/Instruction/Ret.h"
+#include "vipir/LIR/Instruction/Move.h"
+
 #include "vasm/instruction/operand/Register.h"
 
 #include "vasm/instruction/NoOperandInstruction.h"
@@ -61,6 +64,16 @@ namespace vipir
             builder.addValue(std::make_unique<instruction::LeaveInstruction>());
         }
         builder.addValue(std::make_unique<instruction::RetInstruction>());
+    }
+
+    void RetInst::emit2(lir::Builder& builder)
+    {
+        if (mReturnValue)
+        {
+            lir::OperandPtr returnRegister = std::make_unique<lir::PhysicalReg>(mModule.abi()->getReturnRegister(), mReturnValue->getType()->getOperandSize());
+            builder.addValue(std::make_unique<lir::Move>(std::move(returnRegister), mReturnValue->getEmittedValue2()));
+        }
+        builder.addValue(std::make_unique<lir::Ret>());
     }
 
     RetInst::RetInst(BasicBlock* parent, Value* returnValue)

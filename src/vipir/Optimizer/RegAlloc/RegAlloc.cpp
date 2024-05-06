@@ -123,6 +123,7 @@ namespace vipir
             {
                 for (auto it = (*bb)->mValueList.rbegin(); it != (*bb)->mValueList.rend(); ++it)
                 {
+                    index--;
                     auto& value = *it;
                     for (auto operand : value->getOperands())
                     {
@@ -138,7 +139,6 @@ namespace vipir
                             operand->mInterval.second = index;
                         }
                     }
-                    index--;
                 }
             }
 

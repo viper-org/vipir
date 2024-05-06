@@ -35,30 +35,25 @@ int main()
     auto i32Type = vipir::Type::GetIntegerType(32);
     auto i64Type = vipir::Type::GetIntegerType(64);
     auto i8Type = vipir::Type::GetIntegerType(8);
+    auto voidType = vipir::Type::GetVoidType();
     auto arrayType = vipir::Type::GetArrayType(i32Type, 3);
 
-    auto func = vipir::Function::Create(vipir::FunctionType::Create(i32Type, {}), mod, "test");
-
-    auto func2 = vipir::Function::Create(vipir::FunctionType::Create(i32Type, {i32Type}), mod, "main");
+    auto func2 = vipir::Function::Create(vipir::FunctionType::Create(i32Type, {}), mod, "main");
     auto bb2 = vipir::BasicBlock::Create("", func2);
 
     builder.setInsertPoint(bb2);
 
     auto alloca = builder.CreateAlloca(i32Type);
-    builder.CreateStore(alloca, func2->getArgument(0));
+    auto sto = vipir::ConstantInt::Get(mod, 69, i32Type);
+    builder.CreateStore(alloca, sto);
 
-    auto load = builder.CreateLoad(alloca);
+    auto a = builder.CreateLoad(alloca);
+    auto b = vipir::ConstantInt::Get(mod, 44, i32Type);
+    auto retval = builder.CreateAdd(a, b);
 
-    auto b = builder.CreateCall(func, {});
+    builder.CreateRet(retval);
 
-    auto mul = builder.CreateIMul(load, b);
-    builder.CreateStore(alloca, mul);
-    auto ret = builder.CreateLoad(alloca);
-
-    builder.CreateRet(ret);
-
-    vipir::opt::RegAlloc regalloc;
     //mod.print(std::cout);
 
-    mod.emit(std::cout, vipir::OutputFormat::ELF);
+    mod.emit2(std::cout, vipir::OutputFormat::ELF);
 }

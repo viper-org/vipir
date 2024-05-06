@@ -38,6 +38,7 @@ namespace vipir
 
     protected:
         void emit(MC::Builder& builder) override;
+        void emit2(lir::Builder& builder) override;
 
     private:
         Function(FunctionType* type, Module& module, std::string_view name);

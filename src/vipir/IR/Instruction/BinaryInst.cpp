@@ -7,7 +7,10 @@
 #include "vipir/IR/Function.h"
 
 #include "vipir/MC/CmpOperand.h"
+
 #include "vipir/Module.h"
+
+#include "vipir/LIR/Instruction/Add.h"
 
 #include "vasm/instruction/twoOperandInstruction/LogicalInstruction.h"
 #include "vasm/instruction/twoOperandInstruction/MovInstruction.h"
@@ -147,6 +150,23 @@ namespace vipir
             case Instruction::LE:
             case Instruction::GE:
                 mBuilder = &builder;
+                break;
+        }
+    }
+
+    void BinaryInst::emit2(lir::Builder& builder)
+    {
+        switch (mOperator)
+        {
+            case Instruction::ADD:
+            {
+                lir::OperandPtr vreg = std::make_unique<lir::VirtualReg>(mVReg, mType->getOperandSize());
+                builder.addValue(std::make_unique<lir::Add>(vreg->clone(), mLeft->getEmittedValue2(), mRight->getEmittedValue2()));
+                mEmittedValue2 = std::move(vreg);
+                break;
+            }
+
+            default:
                 break;
         }
     }

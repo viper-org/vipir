@@ -58,6 +58,13 @@ set(SOURCES
     "src/vipir/Optimizer/RegAlloc/RegAlloc.cpp"
     "src/vipir/Optimizer/RegAlloc/VReg.cpp"
 
+    "src/vipir/LIR/Builder.cpp"
+    "src/vipir/LIR/Label.cpp"
+    "src/vipir/LIR/Operand.cpp"
+    "src/vipir/LIR/Instruction/Ret.cpp"
+    "src/vipir/LIR/Instruction/Move.cpp"
+    "src/vipir/LIR/Instruction/Add.cpp"
+
     "src/vipir/ABI/SysV.cpp"
 )
 
@@ -111,6 +118,14 @@ set(HEADERS
 
     "include/vipir/Optimizer/RegAlloc/RegAlloc.h"
     "include/vipir/Optimizer/RegAlloc/VReg.h"
+
+    "include/vipir/LIR/Builder.h"
+    "include/vipir/LIR/Value.h"
+    "include/vipir/LIR/Operand.h"
+    "include/vipir/LIR/Label.h"
+    "include/vipir/LIR/Instruction/Ret.h"
+    "include/vipir/LIR/Instruction/Move.h"
+    "include/vipir/LIR/Instruction/Add.h"
 
     "include/vipir/ABI/ABI.h"
     "include/vipir/ABI/SysV.h"

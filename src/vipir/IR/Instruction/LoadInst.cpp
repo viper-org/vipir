@@ -5,6 +5,7 @@
 
 #include "vipir/IR/BasicBlock.h"
 
+#include "vipir/LIR/Instruction/Move.h"
 #include "vipir/Module.h"
 
 #include "vasm/instruction/twoOperandInstruction/MovInstruction.h"
@@ -81,6 +82,13 @@ namespace vipir
             }
             mEmittedValue = std::move(operand);
         }
+    }
+
+    void LoadInst::emit2(lir::Builder& builder)
+    {
+        lir::OperandPtr vreg = std::make_unique<lir::VirtualReg>(mVReg, mType->getOperandSize());
+        builder.addValue(std::make_unique<lir::Move>(vreg->clone(), mPtr->getEmittedValue2()));
+        mEmittedValue2 = std::move(vreg);
     }
 
     LoadInst::LoadInst(BasicBlock* parent, Value* ptr)

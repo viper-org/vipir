@@ -14,6 +14,8 @@
 
 #include "vipir/Optimizer/RegAlloc/VReg.h"
 
+#include "vipir/LIR/Builder.h"
+
 #include "vasm/instruction/Operand.h"
 
 #include <format>
@@ -46,12 +48,14 @@ namespace vipir
         std::string getName(int valueId) const { if (mVReg) return std::format("VREG{}", mVReg->getId()); else return std::format("{}", valueId); }
 
         virtual instruction::OperandPtr getEmittedValue() { return mEmittedValue->clone(); }
+        virtual lir::OperandPtr getEmittedValue2() { return mEmittedValue2->clone(); }
     
     protected:
         Module& mModule;
         Type* mType;
         
         instruction::OperandPtr mEmittedValue;
+        lir::OperandPtr mEmittedValue2;
 
         opt::VReg* mVReg{0};
         bool mRequiresVReg{true};
@@ -59,6 +63,7 @@ namespace vipir
         std::pair<int, int> mInterval{-1,-1};
 
         virtual void emit(MC::Builder& builder) = 0;
+        virtual void emit2(lir::Builder& builder) { }
     };
 }
 
