@@ -63,7 +63,7 @@ set(SOURCES
     "src/vipir/LIR/Operand.cpp"
     "src/vipir/LIR/Instruction/Ret.cpp"
     "src/vipir/LIR/Instruction/Move.cpp"
-    "src/vipir/LIR/Instruction/Add.cpp"
+    "src/vipir/LIR/Instruction/Arithmetic.cpp"
 
     "src/vipir/ABI/SysV.cpp"
 )
@@ -125,7 +125,7 @@ set(HEADERS
     "include/vipir/LIR/Label.h"
     "include/vipir/LIR/Instruction/Ret.h"
     "include/vipir/LIR/Instruction/Move.h"
-    "include/vipir/LIR/Instruction/Add.h"
+    "include/vipir/LIR/Instruction/Arithmetic.h"
 
     "include/vipir/ABI/ABI.h"
     "include/vipir/ABI/SysV.h"

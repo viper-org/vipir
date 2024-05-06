@@ -65,7 +65,12 @@ namespace vipir
         bool PhysicalReg::operator==(OperandPtr& other)
         {
             auto preg = dynamic_cast<PhysicalReg*>(other.get());
-            if (!preg) return false;
+            if (!preg)
+            {
+                auto vreg = dynamic_cast<VirtualReg*>(other.get());
+                if (!vreg) return false;
+                return vreg->mSize == mSize && !vreg->mVreg->onStack() && vreg->mVreg->getPhysicalRegister() == mId;
+            }
 
             return preg->mId == mId && preg->mSize == mSize;
         }
@@ -95,7 +100,12 @@ namespace vipir
         bool VirtualReg::operator==(OperandPtr& other)
         {
             auto vreg = dynamic_cast<VirtualReg*>(other.get());
-            if (!vreg) return false;
+            if (!vreg)
+            {
+                auto preg = dynamic_cast<PhysicalReg*>(other.get());
+                if (!preg) return false;
+                return mSize == preg->mSize && !mVreg->onStack() && mVreg->getPhysicalRegister() == preg->mId;
+            }
 
             return vreg->mVreg == mVreg && vreg->mSize == mSize;
         }

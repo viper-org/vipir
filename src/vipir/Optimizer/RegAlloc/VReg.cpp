@@ -42,5 +42,20 @@ namespace vipir
         {
             return mId;
         }
+
+        bool VReg::onStack() const
+        {
+            return mOnStack;
+        }
+
+        int VReg::getPhysicalRegister() const
+        {
+            return mPhysicalRegister;
+        }
+
+        int VReg::getStackOffset() const
+        {
+            return mStackOffset;
+        }
     }
 }

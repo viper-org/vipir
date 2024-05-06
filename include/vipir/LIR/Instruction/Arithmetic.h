@@ -9,17 +9,22 @@ namespace vipir
 {
     namespace lir
     {
-        class Add : public Value
+        class Arithmetic : public Value
         {
         public:
-            Add(OperandPtr dest, OperandPtr left, OperandPtr right);
+            enum class Operator
+            {
+                Add, Sub
+            };
+
+            Arithmetic(OperandPtr left, Operator op, OperandPtr right);
 
             void print(std::ostream& stream) const override;
             void emit(MC::Builder& builder) override;
 
         private:
-            OperandPtr mDest;
             OperandPtr mLeft;
+            Operator mOperator;
             OperandPtr mRight;
         };
     }

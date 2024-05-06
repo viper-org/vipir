@@ -49,11 +49,11 @@ int main()
 
     auto a = builder.CreateLoad(alloca);
     auto b = vipir::ConstantInt::Get(mod, 44, i32Type);
-    auto retval = builder.CreateAdd(a, b);
+    auto retval = builder.CreateSub(a, b);
 
     builder.CreateRet(retval);
 
-    //mod.print(std::cout);
+    //mod.print2(std::cout);
 
     mod.emit2(std::cout, vipir::OutputFormat::ELF);
 }

@@ -10,7 +10,8 @@
 
 #include "vipir/Module.h"
 
-#include "vipir/LIR/Instruction/Add.h"
+#include "vipir/LIR/Instruction/Arithmetic.h"
+#include "vipir/LIR/Instruction/Move.h"
 
 #include "vasm/instruction/twoOperandInstruction/LogicalInstruction.h"
 #include "vasm/instruction/twoOperandInstruction/MovInstruction.h"
@@ -156,15 +157,21 @@ namespace vipir
 
     void BinaryInst::emit2(lir::Builder& builder)
     {
+        auto createArithmetic = [&builder, this](lir::Arithmetic::Operator op){
+            lir::OperandPtr vreg = std::make_unique<lir::VirtualReg>(mVReg, mType->getOperandSize());
+            builder.addValue(std::make_unique<lir::Move>(vreg->clone(), mLeft->getEmittedValue2()));
+            builder.addValue(std::make_unique<lir::Arithmetic>(vreg->clone(), op, mRight->getEmittedValue2()));
+            mEmittedValue2 = std::move(vreg);
+        };
+        
         switch (mOperator)
         {
             case Instruction::ADD:
-            {
-                lir::OperandPtr vreg = std::make_unique<lir::VirtualReg>(mVReg, mType->getOperandSize());
-                builder.addValue(std::make_unique<lir::Add>(vreg->clone(), mLeft->getEmittedValue2(), mRight->getEmittedValue2()));
-                mEmittedValue2 = std::move(vreg);
+                createArithmetic(lir::Arithmetic::Operator::Add);
                 break;
-            }
+            case Instruction::SUB:
+                createArithmetic(lir::Arithmetic::Operator::Sub);
+                break;
 
             default:
                 break;

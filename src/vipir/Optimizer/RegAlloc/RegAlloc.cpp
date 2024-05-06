@@ -117,7 +117,6 @@ namespace vipir
                 }
             }
 
-            int end = index;
 
             for (auto bb = function->mBasicBlockList.rbegin(); bb != function->mBasicBlockList.rend(); ++bb)
             {
@@ -127,12 +126,6 @@ namespace vipir
                     auto& value = *it;
                     for (auto operand : value->getOperands())
                     {
-                        // AllocaInsts live for the entire function
-                        if (dynamic_cast<AllocaInst*>(operand))
-                        {
-                            operand->mInterval.second = end;
-                        }
-
                         // If we haven't set the last usage yet, this is it
                         if (operand->mInterval.second == -1)
                         {

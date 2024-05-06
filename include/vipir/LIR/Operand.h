@@ -45,6 +45,7 @@ namespace vipir
 
         class PhysicalReg : public Operand
         {
+        friend class VirtualReg;
         public:
             PhysicalReg(int id, codegen::OperandSize size);
 
@@ -60,6 +61,7 @@ namespace vipir
 
         class VirtualReg : public Operand
         {
+        friend class PhysicalReg;
         public:
             VirtualReg(opt::VReg* reg, codegen::OperandSize size);
 
