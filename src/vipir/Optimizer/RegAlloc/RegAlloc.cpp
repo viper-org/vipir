@@ -39,7 +39,7 @@ namespace vipir
             auto getNextFreeVReg = [&virtualRegs, &virtualRegCount, abi, createStackVReg](bool requireMemory){
                 if (virtualRegs.empty())
                 {
-                    createStackVReg();
+                    return createStackVReg();
                 }
                 if (requireMemory)
                 {
@@ -47,6 +47,7 @@ namespace vipir
                         return vreg.second->mOnStack;
                     });
                     if (it == virtualRegs.end()) return createStackVReg();
+                    return it->second;
                 }
                 VReg* reg = virtualRegs.begin()->second;
                 virtualRegs.erase(virtualRegs.begin());
@@ -94,8 +95,11 @@ namespace vipir
                         for (auto value : activeValues)
                         {
                             auto callerSavedIt = std::find(callerSaved.begin(), callerSaved.end(), value->mVReg->mPhysicalRegister);
-                            if (callerSavedIt != callerSaved.end()) destroyedRegisters.push_back(value->mVReg);
-                            value->mVReg = getNextFreeVReg(false);
+                            if (callerSavedIt != callerSaved.end())
+                            {
+                                destroyedRegisters.push_back(value->mVReg);
+                                value->mVReg = getNextFreeVReg(false);
+                            }
                         }
 
                         // allow all of the caller-saved registers to be reused again
