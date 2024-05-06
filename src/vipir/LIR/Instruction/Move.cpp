@@ -25,7 +25,7 @@ namespace vipir
         void Move::emit(MC::Builder& builder)
         {
             if (*mLeft == mRight) return;
-            builder.addValue(std::make_unique<instruction::MovInstruction>(mLeft->asmOperand(), mRight->asmOperand()));
+            builder.addValue(std::make_unique<instruction::MovInstruction>(mLeft->asmOperand(), mRight->asmOperand(), mLeft->size()));
         }
     }
 }

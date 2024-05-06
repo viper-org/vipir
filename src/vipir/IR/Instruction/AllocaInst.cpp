@@ -20,6 +20,11 @@ namespace vipir
         return mAllocatedType;
     }
 
+    void AllocaInst::forceMemory()
+    {
+        mForceMemory = true;
+    }
+
     std::string AllocaInst::ident() const
     {
         return std::format("{} {}", mType->getName(), getName(mValueId));
@@ -39,7 +44,7 @@ namespace vipir
         : Instruction(parent->getModule(), parent)
         , mAllocatedType(allocatedType)
         , mValueId(mModule.getNextValueId())
-        , mStackOffset(0)
+        , mForceMemory(false)
     {
         mType = Type::GetPointerType(mAllocatedType);
     }

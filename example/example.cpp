@@ -38,34 +38,19 @@ int main()
     auto voidType = vipir::Type::GetVoidType();
     auto arrayType = vipir::Type::GetArrayType(i32Type, 3);
 
-    auto func = vipir::Function::Create(vipir::FunctionType::Create(i32Type, {i32Type}), mod, "test");
-    auto bb = vipir::BasicBlock::Create("", func);
-    builder.setInsertPoint(bb);
-    builder.CreateRet(func->getArgument(0));
-
     auto func1 = vipir::Function::Create(vipir::FunctionType::Create(i32Type, {i32Type}), mod, "main");
     auto bb1 = vipir::BasicBlock::Create("", func1);
-    auto bb3 = vipir::BasicBlock::Create("", func1);
-    auto bb2 = vipir::BasicBlock::Create("", func1);
 
     builder.setInsertPoint(bb1);
 
     auto alloca = builder.CreateAlloca(i32Type);
-    auto call = builder.CreateCall(func, {func1->getArgument(0)});
-    builder.CreateStore(alloca, call);
+    auto sto = vipir::ConstantInt::Get(mod, 44, i32Type);
+    builder.CreateStore(alloca, sto);
+
+    builder.CreateAddrOf(alloca);
 
     auto a = builder.CreateLoad(alloca);
-    auto b = vipir::ConstantInt::Get(mod, 44, i32Type);
-    auto cmp = builder.CreateCmpNE(a, b);
-    builder.CreateCondBr(cmp, bb2, bb3);
-
-    builder.setInsertPoint(bb2);
-    auto retval2 = vipir::ConstantInt::Get(mod, 22, i32Type);
-    builder.CreateRet(retval2);
-
-    builder.setInsertPoint(bb3);
-    auto retval3 = vipir::ConstantInt::Get(mod, 11, i32Type);
-    builder.CreateRet(retval3);
+    builder.CreateRet(a);
 
     //mod.print2(std::cout);
 

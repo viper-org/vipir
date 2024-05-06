@@ -31,11 +31,22 @@ namespace vipir
                 virtualRegs[id] = function->mVirtualRegs.back().get();
             }
 
-            auto getNextFreeVReg = [&virtualRegs, &virtualRegCount, function, abi](){
+            auto createStackVReg = [&virtualRegs, &virtualRegCount, function, abi](){
+                function->mVirtualRegs.push_back(std::make_unique<VReg>(virtualRegCount++, abi->getStackOffsetRegister(), 0));
+                return function->mVirtualRegs.back().get();
+            };
+
+            auto getNextFreeVReg = [&virtualRegs, &virtualRegCount, abi, createStackVReg](bool requireMemory){
                 if (virtualRegs.empty())
                 {
-                    function->mVirtualRegs.push_back(std::make_unique<VReg>(virtualRegCount++, abi->getStackOffsetRegister(), 0));
-                    return function->mVirtualRegs.back().get();
+                    createStackVReg();
+                }
+                if (requireMemory)
+                {
+                    auto it = std::find_if(virtualRegs.begin(), virtualRegs.end(), [](const auto& vreg){
+                        return vreg.second->mOnStack;
+                    });
+                    if (it == virtualRegs.end()) return createStackVReg();
                 }
                 VReg* reg = virtualRegs.begin()->second;
                 virtualRegs.erase(virtualRegs.begin());
@@ -84,7 +95,7 @@ namespace vipir
                         {
                             auto callerSavedIt = std::find(callerSaved.begin(), callerSaved.end(), value->mVReg->mPhysicalRegister);
                             if (callerSavedIt != callerSaved.end()) destroyedRegisters.push_back(value->mVReg);
-                            value->mVReg = getNextFreeVReg();
+                            value->mVReg = getNextFreeVReg(false);
                         }
 
                         // allow all of the caller-saved registers to be reused again
@@ -95,8 +106,13 @@ namespace vipir
                     }
                     if (value->requiresVReg())
                     {
+                        bool requireMemory = false;
+                        if (auto alloca = dynamic_cast<AllocaInst*>(value.get()))
+                        {
+                            if (alloca->mForceMemory) requireMemory = true;
+                        }
                         activeValues.insert(value.get());
-                        value->mVReg = getNextFreeVReg();
+                        value->mVReg = getNextFreeVReg(requireMemory);
                     }
                 }
             }

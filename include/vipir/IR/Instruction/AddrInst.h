@@ -17,12 +17,13 @@ namespace vipir
     friend class IRBuilder;
     public:
         void print(std::ostream& stream) override;
+        std::string ident() const override;
 
         Value* getPointer();
 
     protected:
         void emit(MC::Builder& builder) override;
-        std::string ident() const override;
+        void emit2(lir::Builder& builder) override;
 
     private:
         AddrInst(BasicBlock* parent, Value* ptr);

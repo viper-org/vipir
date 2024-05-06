@@ -15,11 +15,13 @@ namespace vipir
     class AllocaInst : public Instruction
     {
     friend class IRBuilder;
-    friend class Function; // So stack offset can be set
+    friend class opt::RegAlloc;
     public:
         void print(std::ostream& stream) override;
 
         Type* getAllocatedType();
+
+        void forceMemory();
 
     protected:
         void emit(MC::Builder& builder) override;
@@ -32,7 +34,7 @@ namespace vipir
         Type* mAllocatedType;
         int mValueId;
 
-        int mStackOffset;
+        bool mForceMemory;
     };
 }
 

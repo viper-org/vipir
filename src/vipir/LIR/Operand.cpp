@@ -43,6 +43,11 @@ namespace vipir
             return imm->mValue == mValue;
         }
 
+        codegen::OperandSize Immediate::size()
+        {
+            return codegen::OperandSize::Quad;
+        }
+
 
         PhysicalReg::PhysicalReg(int id, codegen::OperandSize size)
             : mId(id)
@@ -76,6 +81,11 @@ namespace vipir
             }
 
             return preg->mId == mId && preg->mSize == mSize;
+        }
+
+        codegen::OperandSize PhysicalReg::size()
+        {
+            return mSize;
         }
 
 
@@ -113,6 +123,16 @@ namespace vipir
             return vreg->mVreg == mVreg && vreg->mSize == mSize;
         }
 
+        bool VirtualReg::isMemory()
+        {
+            return mVreg->onStack();
+        }
+
+        codegen::OperandSize VirtualReg::size()
+        {
+            return mSize;
+        }
+
 
         Lbl::Lbl(std::string name)
             : mName(std::move(name))
@@ -140,6 +160,11 @@ namespace vipir
             if (!lbl) return false;
 
             return lbl->mName == mName;
+        }
+
+        codegen::OperandSize Lbl::size()
+        {
+            return codegen::OperandSize::None;
         }
 
 
@@ -170,6 +195,11 @@ namespace vipir
             if (!cmp) return false;
 
             return cmp->mOperator == mOperator;
+        }
+
+        codegen::OperandSize CMP::size()
+        {
+            return codegen::OperandSize::None;
         }
 
         std::string CMP::operatorName()

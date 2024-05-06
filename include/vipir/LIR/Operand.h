@@ -27,6 +27,9 @@ namespace vipir
 
             virtual OperandPtr clone() = 0;
             virtual bool operator==(OperandPtr& other) = 0;
+
+            virtual bool isMemory() { return false; }
+            virtual codegen::OperandSize size() = 0;
         };
 
         class Immediate : public Operand
@@ -38,6 +41,7 @@ namespace vipir
             instruction::OperandPtr asmOperand() override;
             OperandPtr clone() override;
             bool operator==(OperandPtr& other) override;
+            codegen::OperandSize size() override;
 
         private:
             std::intmax_t mValue;
@@ -53,6 +57,7 @@ namespace vipir
             instruction::OperandPtr asmOperand() override;
             OperandPtr clone() override;
             bool operator==(OperandPtr& other) override;
+            codegen::OperandSize size() override;
 
         private:
             int mId;
@@ -69,6 +74,8 @@ namespace vipir
             instruction::OperandPtr asmOperand() override;
             OperandPtr clone() override;
             bool operator==(OperandPtr& other) override;
+            bool isMemory() override;
+            codegen::OperandSize size() override;
 
         private:
             opt::VReg* mVreg;
@@ -84,6 +91,7 @@ namespace vipir
             instruction::OperandPtr asmOperand() override;
             OperandPtr clone() override;
             bool operator==(OperandPtr& other) override;
+            codegen::OperandSize size() override;
 
         private:
             std::string mName;
@@ -105,6 +113,7 @@ namespace vipir
             instruction::OperandPtr asmOperand() override;
             OperandPtr clone() override;
             bool operator==(OperandPtr& other) override;
+            codegen::OperandSize size() override;
 
             std::string operatorName();
 

@@ -1,10 +1,13 @@
 // Copyright 2024 solar-mist
 
 #include "vipir/IR/Instruction/AddrInst.h"
+#include "vipir/IR/Instruction/AllocaInst.h"
 
 #include "vipir/IR/BasicBlock.h"
 
 #include "vipir/Module.h"
+
+#include "vipir/LIR/Instruction/LoadAddress.h"
 
 #include "vasm/instruction/operand/Register.h"
 #include "vasm/instruction/operand/Relative.h"
@@ -53,11 +56,27 @@ namespace vipir
         mEmittedValue = std::move(operand);
     }
 
+    void AddrInst::emit2(lir::Builder& builder)
+    {
+        mPtr->lateEmit(builder);
+
+        lir::OperandPtr ptr = mPtr->getEmittedValue2();
+        lir::OperandPtr vreg = std::make_unique<lir::VirtualReg>(mVReg, mType->getOperandSize());
+        builder.addValue(std::make_unique<lir::LoadAddress>(vreg->clone(), std::move(ptr)));
+
+        mEmittedValue2 = std::move(vreg);
+    }
+
     AddrInst::AddrInst(BasicBlock* parent, Value* ptr)
         : Instruction(parent->getModule(), parent)
         , mPtr(ptr)
         , mValueId(mModule.getNextValueId())
     {
         mType = mPtr->getType();
+
+        if (auto alloca = dynamic_cast<AllocaInst*>(mPtr))
+        {
+            alloca->forceMemory();
+        }
     }
 }
