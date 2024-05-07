@@ -118,7 +118,7 @@ namespace vipir
         for (auto type : getFunctionType()->getArgumentTypes())
         {
             std::string id = std::to_string(module.getNextValueId());
-            mArguments.push_back(std::make_unique<Argument>(module, type, std::move(id), index));
+            mArguments.push_back(std::make_unique<Argument>(module, type, std::move(id), index++));
         }
     }
 }
