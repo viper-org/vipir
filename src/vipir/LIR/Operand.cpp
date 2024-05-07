@@ -232,8 +232,9 @@ namespace vipir
         }
 
 
-        Memory::Memory(OperandPtr base, std::optional<int> displacement, OperandPtr index, std::optional<int> scale)
-            : mBase(std::move(base))
+        Memory::Memory(codegen::OperandSize size, OperandPtr base, std::optional<int> displacement, OperandPtr index, std::optional<int> scale)
+            : mSize(size)
+            , mBase(std::move(base))
             , mDisplacement(displacement)
             , mIndex(std::move(index))
             , mScale(scale)
@@ -311,7 +312,7 @@ namespace vipir
         {
             lir::OperandPtr index;
             if (mIndex) index = mIndex->clone();
-            return std::make_unique<Memory>(mBase->clone(), mDisplacement, std::move(index), mScale);
+            return std::make_unique<Memory>(mSize, mBase->clone(), mDisplacement, std::move(index), mScale);
         }
 
         bool Memory::operator==(OperandPtr& other)
@@ -329,7 +330,7 @@ namespace vipir
 
         codegen::OperandSize Memory::size()
         {
-            return codegen::OperandSize::None;
+            return mSize;
         }
     }
 }

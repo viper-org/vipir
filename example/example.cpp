@@ -46,7 +46,8 @@ int main()
 
     auto alloca = builder.CreateAlloca(structType);
     auto gep1 = builder.CreateStructGEP(alloca, 1);
-    builder.CreateStore(gep1, func1->getArgument(0));
+    auto sto = vipir::ConstantInt::Get(mod, 23, i32Type);
+    builder.CreateStore(gep1, sto);
 
     auto gep2 = builder.CreateStructGEP(alloca, 1);
     auto retval = builder.CreateLoad(gep2);

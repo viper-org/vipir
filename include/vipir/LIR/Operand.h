@@ -135,7 +135,7 @@ namespace vipir
         {
         friend class opt::Peephole;
         public:
-            Memory(OperandPtr base, std::optional<int> displacement, OperandPtr index, std::optional<int> scale);
+            Memory(codegen::OperandSize size, OperandPtr base, std::optional<int> displacement, OperandPtr index, std::optional<int> scale);
 
             std::string ident() const override;
             instruction::OperandPtr asmOperand() override;
@@ -145,6 +145,7 @@ namespace vipir
             codegen::OperandSize size() override;
 
         private:
+            codegen::OperandSize mSize;
             OperandPtr mBase;
             std::optional<int> mDisplacement;
             OperandPtr mIndex;

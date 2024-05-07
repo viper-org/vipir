@@ -183,9 +183,12 @@ namespace vipir
                         });
                         if (it != function->mVirtualRegs.end())
                         {
-                            if (value->getType()->getSizeInBits() > (*it)->mSize)
+                            int size = value->getType()->getSizeInBits();
+                            if (auto alloca = dynamic_cast<AllocaInst*>(value.get()))
+                                size = alloca->getAllocatedType()->getSizeInBits();
+                            if (size > (*it)->mSize)
                             {
-                                (*it)->mSize = value->getType()->getSizeInBits();
+                                (*it)->mSize = size;
                             }
                         }
                     }
