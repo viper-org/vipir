@@ -97,6 +97,7 @@ namespace vipir
         : Value(parent->getModule())
         , mName(name)
         , mParent(parent)
+        , mLoopEnd(nullptr)
     {
     }
 }
