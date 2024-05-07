@@ -20,6 +20,19 @@ namespace vipir
         private:
             std::string mValue;
         };
+
+        class GlobalDecl : public Value
+        {
+        public:
+            GlobalDecl(OperandPtr value, codegen::OperandSize size);
+
+            void print(std::ostream& stream) const override;
+            void emit(MC::Builder& builder) override;
+        
+        private:
+            OperandPtr mValue;
+            codegen::OperandSize mSize;
+        };
     }
 }
 

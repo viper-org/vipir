@@ -23,8 +23,10 @@ namespace vipir
 
     protected:
         void emit(MC::Builder& builder) override;
+        void emit2(lir::Builder& builder) override;
 
         void emitConstant(MC::Builder& builder, Type* type, instruction::OperandPtr value);
+        void emitConstant2(lir::Builder& builder, Type* type, lir::OperandPtr value);
 
     private:
         GlobalVar(Module& module, Type* type);

@@ -39,6 +39,11 @@ namespace vipir
         mEmittedValue = std::make_unique<instruction::Immediate>(0);
     }
 
+    void ConstantNullPtr::emit2(lir::Builder& builder)
+    {
+        mEmittedValue2 = std::make_unique<lir::Immediate>(0);
+    }
+
     ConstantNullPtr::ConstantNullPtr(Module& module, Type* type)
         : Value(module)
     {

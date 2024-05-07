@@ -11,6 +11,9 @@
 
 #include "vipir/MC/CompoundOperand.h"
 
+#include "vipir/LIR/Label.h"
+#include "vipir/LIR/Global.h"
+
 #include "vasm/instruction/Label.h"
 #include "vasm/instruction/operand/Label.h"
 
@@ -43,6 +46,20 @@ namespace vipir
         instruction::OperandPtr initVal = mInitialValue->getEmittedValue();
 
         emitConstant(builder, static_cast<PointerType*>(mType)->getBaseType(), std::move(initVal));
+    }
+
+    void GlobalVar::emit2(lir::Builder& builder)
+    {
+        mInitialValue->lateEmit(builder);
+
+        builder.setSection(lir::SectionType::Data);
+
+        mEmittedValue2 = std::make_unique<lir::Lbl>(std::to_string(mValueId));
+        builder.addValue(std::make_unique<lir::Label>(std::to_string(mValueId), false));
+
+        lir::OperandPtr init = mInitialValue->getEmittedValue2();
+
+        emitConstant2(builder, static_cast<PointerType*>(mType)->getBaseType(), std::move(init));
     }
 
     void GlobalVar::emitConstant(MC::Builder& builder, Type* type, instruction::OperandPtr value)
@@ -103,6 +120,51 @@ namespace vipir
                 case codegen::OperandSize::None:
                     break;
             }
+        }
+    }
+
+    void GlobalVar::emitConstant2(lir::Builder& builder, Type* type, lir::OperandPtr value)
+    {
+        if (auto compoundOperand = dynamic_cast<lir::Compound*>(value.get()))
+        {
+            codegen::OperandSize size;
+            if (auto arrayType = dynamic_cast<ArrayType*>(type))
+            {
+                for (auto& value : compoundOperand->getValues())
+                {
+                    emitConstant2(builder, arrayType->getBaseType(), std::move(value));
+                }
+            }
+            else
+            {
+                StructType* structType = static_cast<StructType*>(type);
+
+                auto notArray = [](Type* type) { return !type->isArrayType(); };
+                auto largestElement = std::max_element(structType->getFields().begin(), structType->getFields().end(), [](auto a, auto b){
+                    return a->getSizeInBits() < b->getSizeInBits();
+                });
+                auto fieldsNotArray = structType->getFields() | std::views::filter(notArray);
+                auto largestNotArray = std::max_element(fieldsNotArray.begin(), fieldsNotArray.end(), [](auto a, auto b){
+                    return a->getSizeInBits() < b->getSizeInBits();
+                });
+
+                int index = 0;
+                for (auto& value : compoundOperand->getValues())
+                {
+                    if ((*largestElement)->isArrayType() && structType->getField(index++) != *largestElement)
+                    {
+                        emitConstant2(builder, *largestNotArray, std::move(value));
+                    }
+                    else
+                    {
+                        emitConstant2(builder, *largestElement, std::move(value));
+                    }
+                }
+            }
+        }
+        else
+        {
+            builder.addValue(std::make_unique<lir::GlobalDecl>(std::move(value), type->getOperandSize()));
         }
     }
 

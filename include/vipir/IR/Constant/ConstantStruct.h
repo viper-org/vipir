@@ -28,6 +28,7 @@ namespace vipir
 
     protected:
         void emit(MC::Builder& builder) override;
+        void emit2(lir::Builder& builder) override;
 
     private:
         ConstantStruct(Module& module, Type* type, std::vector<Value*> values);

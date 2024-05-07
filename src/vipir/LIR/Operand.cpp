@@ -3,12 +3,13 @@
 
 #include "vipir/LIR/Operand.h"
 
-#include "vasm/instruction/operand/Relative.h"
 #include "vipir/MC/CmpOperand.h"
+#include "vipir/MC/CompoundOperand.h"
 
 #include "vasm/instruction/operand/Immediate.h"
 #include "vasm/instruction/operand/Register.h"
 #include "vasm/instruction/operand/Label.h"
+#include "vasm/instruction/operand/Relative.h"
 #include "vasm/instruction/operand/Memory.h"
 
 #include <cassert>
@@ -296,8 +297,8 @@ namespace vipir
                 instruction::OperandPtr indexOperand = mIndex->asmOperand();
                 if (auto imm = dynamic_cast<instruction::Immediate*>(indexOperand.get()))
                 {
-                    if (displacement) *displacement += imm->imm32();
-                    else displacement = imm->imm32();
+                    if (displacement) *displacement += imm->imm32() * mScale.value_or(1);
+                    else displacement = imm->imm32() * mScale.value_or(1);
                 }
                 else
                 {
@@ -331,6 +332,68 @@ namespace vipir
         codegen::OperandSize Memory::size()
         {
             return mSize;
+        }
+
+
+        Compound::Compound(std::vector<OperandPtr> values)
+            : mValues(std::move(values))
+        {
+        }
+
+        std::string Compound::ident() const
+        {
+            std::string ret = "COMPOUND { ";
+            for (auto& value : mValues)
+            {
+                ret += value->ident() + " ";
+            }
+            return ret + "}";
+        }
+
+        instruction::OperandPtr Compound::asmOperand()
+        {
+            std::vector<instruction::OperandPtr> values;
+            for (auto& value : mValues)
+            {
+                values.push_back(value->asmOperand());
+            }
+
+            return std::make_unique<CompoundOperand>(std::move(values));
+        }
+
+        OperandPtr Compound::clone()
+        {
+            std::vector<OperandPtr> values;
+            for (auto& value : mValues)
+            {
+                values.push_back(value->clone());
+            }
+
+            return std::make_unique<Compound>(std::move(values));
+        }
+
+        bool Compound::operator==(OperandPtr& other)
+        {
+            auto compound = dynamic_cast<Compound*>(other.get());
+            if (!compound) return false;
+
+            if (mValues.size() != compound->mValues.size()) return false;
+
+            for (int i = 0; i < mValues.size(); ++i)
+            {
+                if (*mValues[i] != compound->mValues[i]) return false;
+            }
+            return true;
+        }
+
+        codegen::OperandSize Compound::size()
+        {
+            return codegen::OperandSize::None;
+        }
+
+        std::vector<OperandPtr>& Compound::getValues()
+        {
+            return mValues;
         }
     }
 }

@@ -30,6 +30,11 @@ namespace vipir
         mEmittedValue = std::make_unique<instruction::Immediate>(static_cast<int>(mValue));
     }
 
+    void ConstantBool::emit2(lir::Builder& builder)
+    {
+        mEmittedValue2 = std::make_unique<lir::Immediate>(static_cast<int>(mValue));
+    }
+
     ConstantBool::ConstantBool(BasicBlock* parent, bool value)
         : Value(parent->getModule())
         , mValue(value)

@@ -29,5 +29,37 @@ namespace vipir
             instruction::OperandPtr string = std::make_unique<instruction::String>(mValue);
             builder.addValue(std::make_unique<instruction::DeclInstruction<codegen::OperandSize::Byte> >(std::move(string)));
         }
+
+        GlobalDecl::GlobalDecl(OperandPtr value, codegen::OperandSize size)
+            : mValue(std::move(value))
+            , mSize(size)
+        {
+        }
+
+        void GlobalDecl::print(std::ostream& stream) const
+        {
+            stream << std::format("DECL {}", mValue->ident());
+        }
+
+        void GlobalDecl::emit(MC::Builder& builder)
+        {
+            switch(mSize)
+            {
+                case codegen::OperandSize::Byte:
+                    builder.addValue(std::make_unique<instruction::DeclInstruction<codegen::OperandSize::Byte> >(mValue->asmOperand()));
+                    break;
+                case codegen::OperandSize::Word:
+                    builder.addValue(std::make_unique<instruction::DeclInstruction<codegen::OperandSize::Word> >(mValue->asmOperand()));
+                    break;
+                case codegen::OperandSize::Long:
+                    builder.addValue(std::make_unique<instruction::DeclInstruction<codegen::OperandSize::Long> >(mValue->asmOperand()));
+                    break;
+                case codegen::OperandSize::Quad:
+                    builder.addValue(std::make_unique<instruction::DeclInstruction<codegen::OperandSize::Quad> >(mValue->asmOperand()));
+                    break;
+                case codegen::OperandSize::None:
+                    break;
+            }
+        }
     }
 }

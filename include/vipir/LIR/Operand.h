@@ -12,6 +12,7 @@
 #include <memory>
 #include <optional>
 #include <string>
+#include <vector>
 
 namespace vipir
 {
@@ -150,6 +151,24 @@ namespace vipir
             std::optional<int> mDisplacement;
             OperandPtr mIndex;
             std::optional<int> mScale;
+        };
+
+        class Compound : public Operand
+        {
+        friend class opt::Peephole;
+        public:
+            Compound(std::vector<OperandPtr> values);
+
+            std::string ident() const override;
+            instruction::OperandPtr asmOperand() override;
+            OperandPtr clone() override;
+            bool operator==(OperandPtr& other) override;
+            codegen::OperandSize size() override;
+
+            std::vector<OperandPtr>& getValues();
+
+        private:
+            std::vector<OperandPtr> mValues;
         };
     }
 }
