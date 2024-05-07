@@ -13,13 +13,14 @@ namespace vipir
         {
         friend class opt::Peephole;
         public:
-            Ret(bool leave);
+            Ret(bool leave, std::vector<int> calleeSaved);
 
             void print(std::ostream& stream) const override;
             void emit(MC::Builder& builder) override;
 
         private:
             bool mLeave;
+            std::vector<int> mCalleeSaved;
         };
     }
 }

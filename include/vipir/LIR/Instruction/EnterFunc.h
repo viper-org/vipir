@@ -13,13 +13,14 @@ namespace vipir
         {
         friend class opt::Peephole;
         public:
-            EnterFunc(int stackSize);
+            EnterFunc(int stackSize, std::vector<int> calleeSaved);
 
             void print(std::ostream& stream) const override;
             void emit(MC::Builder& builder) override;
 
         private:
             int mStackSize;
+            std::vector<int> mCalleeSaved;
         };
     }
 }

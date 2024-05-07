@@ -5,9 +5,9 @@
 
 #include "vipir/MC/CmpOperand.h"
 
-#include "vasm/instruction/singleOperandInstruction/PushInstruction.h"
 #include "vasm/instruction/twoOperandInstruction/MovInstruction.h"
 #include "vasm/instruction/twoOperandInstruction/LogicalInstruction.h"
+#include "vasm/instruction/singleOperandInstruction/PushInstruction.h"
 
 #include "vasm/instruction/operand/Register.h"
 #include "vasm/instruction/operand/Immediate.h"
@@ -18,8 +18,9 @@ namespace vipir
 {
     namespace lir
     {
-        EnterFunc::EnterFunc(int stackSize)
+        EnterFunc::EnterFunc(int stackSize, std::vector<int> calleeSaved)
             : mStackSize(stackSize)
+            , mCalleeSaved(std::move(calleeSaved))
         {
         }
 
@@ -30,11 +31,21 @@ namespace vipir
 
         void EnterFunc::emit(MC::Builder& builder)
         {
-            builder.addValue(std::make_unique<instruction::PushInstruction>(instruction::Register::Get("rbp")));
-            builder.addValue(std::make_unique<instruction::MovInstruction>(instruction::Register::Get("rbp"), instruction::Register::Get("rsp")));
-            instruction::OperandPtr reg = instruction::Register::Get("rsp");
-            instruction::OperandPtr stackOffset = std::make_unique<instruction::Immediate>(mStackSize);
-            builder.addValue(std::make_unique<instruction::SubInstruction>(std::move(reg), std::move(stackOffset)));
+            if (mStackSize)
+            {
+                builder.addValue(std::make_unique<instruction::PushInstruction>(instruction::Register::Get("rbp")));
+                builder.addValue(std::make_unique<instruction::MovInstruction>(instruction::Register::Get("rbp"), instruction::Register::Get("rsp")));
+                
+                instruction::OperandPtr reg = instruction::Register::Get("rsp");
+                instruction::OperandPtr stackOffset = std::make_unique<instruction::Immediate>(mStackSize);
+                builder.addValue(std::make_unique<instruction::SubInstruction>(std::move(reg), std::move(stackOffset)));
+            }
+
+            for (auto calleeSaved : mCalleeSaved)
+            {
+                instruction::OperandPtr reg = std::make_unique<instruction::Register>(calleeSaved, codegen::OperandSize::Quad);
+                builder.addValue(std::make_unique<instruction::PushInstruction>(std::move(reg)));
+            }
         }
     }
 }

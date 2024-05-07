@@ -30,6 +30,7 @@ namespace vipir
         FunctionType* getFunctionType() const;
         Argument* getArgument(int index) const;
         bool usesStack() const;
+        std::vector<int> getCalleeSaved();
 
         void insertBasicBlock(BasicBlock* basicBlock);
 
@@ -49,6 +50,7 @@ namespace vipir
 
         std::vector<std::unique_ptr<opt::VReg> > mVirtualRegs;
         int mTotalStackOffset;
+        std::vector<int> mCalleeSaved;
     };
 }
 

@@ -58,6 +58,7 @@ int main()
     auto init = vipir::ConstantStruct::Get(mod, structType, {init1, init2});
     global->setInitialValue(init);
 
+
     auto gep1 = builder.CreateStructGEP(global, 0);
     auto offset = vipir::ConstantInt::Get(mod, 1, i32Type);
     auto gep2 = builder.CreateGEP(gep1, offset);

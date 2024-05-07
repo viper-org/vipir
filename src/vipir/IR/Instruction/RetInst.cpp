@@ -53,7 +53,7 @@ namespace vipir
             lir::OperandPtr returnRegister = std::make_unique<lir::PhysicalReg>(mModule.abi()->getReturnRegister(), mReturnValue->getType()->getOperandSize());
             builder.addValue(std::make_unique<lir::Move>(std::move(returnRegister), mReturnValue->getEmittedValue()));
         }
-        builder.addValue(std::make_unique<lir::Ret>(mParent->getParent()->usesStack()));
+        builder.addValue(std::make_unique<lir::Ret>(mParent->getParent()->usesStack(), mParent->getParent()->getCalleeSaved()));
     }
 
     RetInst::RetInst(BasicBlock* parent, Value* returnValue)

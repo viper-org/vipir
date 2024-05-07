@@ -18,6 +18,7 @@ namespace vipir
             int getStackOffsetRegister() const override;
             std::vector<int> getGeneralPurposeRegisters() const override;
             std::vector<int> getCallerSavedRegisters() const override;
+            std::vector<int> getCalleeSavedRegisters() const override;
         };
     }
 }

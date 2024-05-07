@@ -48,6 +48,11 @@ namespace vipir
         return mTotalStackOffset > 0;
     }
 
+    std::vector<int> Function::getCalleeSaved()
+    {
+        return mCalleeSaved;
+    }
+
     void Function::insertBasicBlock(BasicBlock* basicBlock)
     {
         mBasicBlockList.push_back(BasicBlockPtr(basicBlock));
@@ -85,11 +90,21 @@ namespace vipir
 
         mEmittedValue = std::make_unique<lir::Lbl>(mName);
         builder.addValue(std::make_unique<lir::Label>(mName, true));
-
-        if (mTotalStackOffset > 0) // There are local variables
+        
+        std::vector<int> abiCalleeSaved = mModule.abi()->getCalleeSavedRegisters();
+        for (auto& vreg : mVirtualRegs)
         {
-            builder.addValue(std::make_unique<lir::EnterFunc>(mTotalStackOffset));
+            if (!vreg->onStack())
+            {
+                auto it = std::find(abiCalleeSaved.begin(), abiCalleeSaved.end(), vreg->getPhysicalRegister());
+                if (it != abiCalleeSaved.end()) mCalleeSaved.push_back(vreg->getPhysicalRegister());
+            }
         }
+        if (mCalleeSaved.size() % 2 != 0)
+        { // Keep stack aligned to 16 bytes
+            mTotalStackOffset += 8;
+        }
+        builder.addValue(std::make_unique<lir::EnterFunc>(mTotalStackOffset, mCalleeSaved));
 
         for (auto& basicBlock : mBasicBlockList)
         {
