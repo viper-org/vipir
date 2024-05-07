@@ -40,5 +40,29 @@ namespace vipir
             }
             builder.addValue(std::make_unique<instruction::MovInstruction>(std::move(left), mRight->asmOperand(), mLeft->size()));
         }
+
+
+        MoveSX::MoveSX(OperandPtr left, OperandPtr right)
+            : mLeft(std::move(left))
+            , mRight(std::move(right))
+        {
+        }
+
+        void MoveSX::print(std::ostream& stream) const
+        {
+            stream << std::format("MOVE {} -> {}\n", mRight->ident(), mLeft->ident());
+        }
+
+        void MoveSX::emit(MC::Builder& builder)
+        {
+            instruction::OperandPtr left = mLeft->asmOperand();
+            if (auto label = dynamic_cast<instruction::LabelOperand*>(left.get()))
+            {
+                (void)left.release();
+                instruction::LabelOperandPtr lbl = instruction::LabelOperandPtr(label);
+                left = std::make_unique<instruction::Relative>(std::move(lbl), std::nullopt);
+            }
+            builder.addValue(std::make_unique<instruction::MovSXInstruction>(std::move(left), mRight->asmOperand(), mLeft->size()));
+        }
     }
 }

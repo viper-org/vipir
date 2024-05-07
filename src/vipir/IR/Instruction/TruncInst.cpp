@@ -7,6 +7,8 @@
 
 #include "vipir/Module.h"
 
+#include "vipir/LIR/Instruction/Move.h"
+
 #include "vasm/instruction/operand/Register.h"
 #include "vasm/instruction/twoOperandInstruction/MovInstruction.h"
 
@@ -52,6 +54,16 @@ namespace vipir
         }
 
         mEmittedValue = std::move(operand);
+    }
+
+    void TruncInst::emit2(lir::Builder& builder)
+    {
+        lir::OperandPtr value = mValue->getEmittedValue2();
+        lir::OperandPtr vreg = std::make_unique<lir::VirtualReg>(mVReg, mType->getOperandSize());
+
+        builder.addValue(std::make_unique<lir::Move>(vreg->clone(), std::move(value)));
+
+        mEmittedValue2 = std::move(vreg);
     }
 
 

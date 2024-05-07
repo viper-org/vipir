@@ -22,6 +22,20 @@ namespace vipir
             OperandPtr mLeft;
             OperandPtr mRight;
         };
+
+        class MoveSX : public Value
+        {
+        friend class opt::Peephole;
+        public:
+            MoveSX(OperandPtr left, OperandPtr right);
+
+            void print(std::ostream& stream) const override;
+            void emit(MC::Builder& builder) override;
+
+        private:
+            OperandPtr mLeft;
+            OperandPtr mRight;
+        };
     }
 }
 

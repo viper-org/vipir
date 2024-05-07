@@ -7,6 +7,8 @@
 
 #include "vipir/Module.h"
 
+#include "vipir/LIR/Instruction/Move.h"
+
 #include "vasm/instruction/operand/Register.h"
 
 #include <format>
@@ -32,6 +34,13 @@ namespace vipir
     void PtrToIntInst::emit(MC::Builder& builder)
     {
         mEmittedValue = mValue->getEmittedValue();
+    }
+
+    void PtrToIntInst::emit2(lir::Builder& builder)
+    {
+        lir::OperandPtr vreg = std::make_unique<lir::VirtualReg>(mVReg, mType->getOperandSize());
+        builder.addValue(std::make_unique<lir::Move>(vreg->clone(), mValue->getEmittedValue2()));
+        mEmittedValue2 = std::move(vreg);
     }
 
 

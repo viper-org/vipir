@@ -86,10 +86,10 @@ namespace vipir
             {
                 auto vreg = dynamic_cast<VirtualReg*>(other.get());
                 if (!vreg) return false;
-                return vreg->mSize == mSize && !vreg->mVreg->onStack() && vreg->mVreg->getPhysicalRegister() == mId;
+                return !vreg->mVreg->onStack() && vreg->mVreg->getPhysicalRegister() == mId;
             }
 
-            return preg->mId == mId && preg->mSize == mSize;
+            return preg->mId == mId;
         }
 
         codegen::OperandSize PhysicalReg::size()
@@ -126,10 +126,10 @@ namespace vipir
             {
                 auto preg = dynamic_cast<PhysicalReg*>(other.get());
                 if (!preg) return false;
-                return mSize == preg->mSize && !mVreg->onStack() && mVreg->getPhysicalRegister() == preg->mId;
+                return !mVreg->onStack() && mVreg->getPhysicalRegister() == preg->mId;
             }
 
-            return vreg->mVreg == mVreg && vreg->mSize == mSize;
+            return vreg->mVreg == mVreg;
         }
 
         bool VirtualReg::isMemory()

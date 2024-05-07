@@ -7,6 +7,8 @@
 
 #include "vipir/Module.h"
 
+#include "vipir/LIR/Instruction/Move.h"
+
 #include <format>
 
 namespace vipir
@@ -30,6 +32,13 @@ namespace vipir
     void PtrCastInst::emit(MC::Builder& builder)
     {
         mEmittedValue = mPtr->getEmittedValue();
+    }
+
+    void PtrCastInst::emit2(lir::Builder& builder)
+    {
+        lir::OperandPtr vreg = std::make_unique<lir::VirtualReg>(mVReg, mType->getOperandSize());
+        builder.addValue(std::make_unique<lir::Move>(vreg->clone(), mPtr->getEmittedValue2()));
+        mEmittedValue2 = std::move(vreg);
     }
 
 
