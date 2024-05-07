@@ -13,6 +13,8 @@
 #include "vipir/Module.h"
 
 #include "vipir/LIR/Instruction/LoadAddress.h"
+#include "vipir/LIR/Instruction/Arithmetic.h"
+#include "vipir/LIR/Instruction/Move.h"
 
 #include "vasm/instruction/operand/Register.h"
 #include "vasm/instruction/operand/Immediate.h"
@@ -72,6 +74,18 @@ namespace vipir
 
             offset = nullptr;
             scale = 1;
+        }
+
+        if (PointerType* pointerType = dynamic_cast<PointerType*>(static_cast<PointerType*>(mPtr->getType())->getBaseType()))
+        {
+            if (StructType* structType = dynamic_cast<StructType*>(pointerType->getBaseType()))
+            {
+                scale = 1;
+                lir::OperandPtr scale = std::make_unique<lir::Immediate>(structType->getSizeInBits() / 8);
+                builder.addValue(std::make_unique<lir::Move>(vreg->clone(), std::move(offset)));
+                builder.addValue(std::make_unique<lir::BinaryArithmetic>(vreg->clone(), lir::BinaryArithmetic::Operator::IMul, std::move(scale)));
+                offset = vreg->clone();
+            }
         }
 
         codegen::OperandSize size = static_cast<PointerType*>(mType)->getBaseType()->getOperandSize();
