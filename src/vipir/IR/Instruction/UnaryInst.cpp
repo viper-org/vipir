@@ -42,35 +42,15 @@ namespace vipir
         return {mOperand};
     }
 
-    void UnaryInst::emit(MC::Builder& builder)
-    {
-        switch (mOperator)
-        {
-            case Instruction::NEG:
-            {
-                instruction::OperandPtr operand = mOperand->getEmittedValue();
-                builder.addValue(std::make_unique<instruction::NegInstruction>(operand->clone()));
-                mEmittedValue = std::move(operand);
-                break;
-            }
-            case Instruction::NOT:
-            {
-                instruction::OperandPtr operand = mOperand->getEmittedValue();
-                builder.addValue(std::make_unique<instruction::NotInstruction>(operand->clone()));
-                mEmittedValue = std::move(operand);
-                break;
-            }
-        }
-    }
 
-    void UnaryInst::emit2(lir::Builder& builder)
+    void UnaryInst::emit(lir::Builder& builder)
     {
         auto createUnary = [&builder, this](lir::UnaryArithmetic::Operator op){
             mOperand->lateEmit(builder);
             lir::OperandPtr vreg = std::make_unique<lir::VirtualReg>(mVReg, mType->getOperandSize());
-            builder.addValue(std::make_unique<lir::Move>(vreg->clone(), mOperand->getEmittedValue2()));
+            builder.addValue(std::make_unique<lir::Move>(vreg->clone(), mOperand->getEmittedValue()));
             builder.addValue(std::make_unique<lir::UnaryArithmetic>(vreg->clone(), op));
-            mEmittedValue2 = std::move(vreg);
+            mEmittedValue = std::move(vreg);
         };
 
         switch (mOperator)

@@ -38,21 +38,11 @@ namespace vipir
         return std::format("str @{}", mValueId);
     }
 
-    void GlobalString::emit(MC::Builder& builder)
-    {
-        builder.addValue(std::make_unique<instruction::SectionDirective>(".data"));
-        
-        mEmittedValue = std::make_unique<instruction::LabelOperand>(std::to_string(mValueId));
 
-        builder.addValue(std::make_unique<instruction::Label>(std::to_string(mValueId), false));
-        instruction::OperandPtr string = std::make_unique<instruction::String>(mValue + '\0');
-        builder.addValue(std::make_unique<instruction::DeclInstruction<codegen::OperandSize::Byte> >(std::move(string)));
-    }
-
-    void GlobalString::emit2(lir::Builder& builder)
+    void GlobalString::emit(lir::Builder& builder)
     {
         builder.setSection(lir::SectionType::Data);
-        mEmittedValue2 = std::make_unique<lir::Lbl>(std::to_string(mValueId));
+        mEmittedValue = std::make_unique<lir::Lbl>(std::to_string(mValueId));
 
         builder.addValue(std::make_unique<lir::Label>(std::to_string(mValueId), false));
         builder.addValue(std::make_unique<lir::GlobalString>(mValue));

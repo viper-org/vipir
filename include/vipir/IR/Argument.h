@@ -21,8 +21,7 @@ namespace vipir
         void print(std::ostream& stream) override;
         std::string ident() const override;
     protected:
-        void emit(MC::Builder& builder) override;
-        void emit2(lir::Builder& builder) override;
+        void emit(lir::Builder& builder) override;
 
     private:
         std::string mName;

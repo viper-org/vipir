@@ -34,14 +34,9 @@ namespace vipir
         return true;
     }
 
-    void ConstantNullPtr::emit(MC::Builder& builder)
+    void ConstantNullPtr::emit(lir::Builder& builder)
     {
-        mEmittedValue = std::make_unique<instruction::Immediate>(0);
-    }
-
-    void ConstantNullPtr::emit2(lir::Builder& builder)
-    {
-        mEmittedValue2 = std::make_unique<lir::Immediate>(0);
+        mEmittedValue = std::make_unique<lir::Immediate>(0);
     }
 
     ConstantNullPtr::ConstantNullPtr(Module& module, Type* type)

@@ -85,87 +85,16 @@ namespace vipir
         return {mLeft, mRight};
     }
 
-    void BinaryInst::emit(MC::Builder& builder)
-    {
-        auto GenerateInstruction = [&builder, this]<class InstructionT>(){
-            instruction::OperandPtr left  = mLeft->getEmittedValue();
-            instruction::OperandPtr right = mRight->getEmittedValue();
-
-            instruction::OperandPtr operand = mVReg->operand(mType->getOperandSize());
-            builder.addValue(std::make_unique<instruction::MovInstruction>(operand->clone(), std::move(left)));
-
-            builder.addValue(std::make_unique<InstructionT>(operand->clone(), std::move(right), codegen::OperandSize::None));
-            mEmittedValue = std::move(operand);
-        };
-        switch (mOperator)
-        {
-            case Instruction::ADD:
-            {
-                GenerateInstruction.template operator()<instruction::AddInstruction>();
-                break;
-            }
-            case Instruction::SUB:
-            {
-                GenerateInstruction.template operator()<instruction::SubInstruction>();
-                break;
-            }
-
-            case Instruction::IMUL:
-            {
-                instruction::OperandPtr left = mLeft->getEmittedValue();
-                instruction::OperandPtr operand = mVReg->operand(mType->getOperandSize());
-                builder.addValue(std::make_unique<instruction::MovInstruction>(operand->clone(), std::move(left)));
-
-                instruction::OperandPtr right = mRight->getEmittedValue();
-                if (dynamic_cast<instruction::Immediate*>(right.get()))
-                {
-                    builder.addValue(std::make_unique<instruction::IMulInstruction>(operand->clone(), operand->clone(), std::move(right)));
-                }
-                else
-                {
-                    builder.addValue(std::make_unique<instruction::IMulInstruction>(operand->clone(), std::move(right)));
-                }
-                mEmittedValue = std::move(operand);
-                break;
-            }
-
-            case Instruction::BWOR:
-            {
-                GenerateInstruction.template operator()<instruction::OrInstruction>();
-                break;
-            }
-            case Instruction::BWAND:
-            {
-                GenerateInstruction.template operator()<instruction::AndInstruction>();
-                break;
-            }
-            case Instruction::BWXOR:
-            {
-                GenerateInstruction.template operator()<instruction::XorInstruction>();
-                break;
-            }
-
-            case Instruction::EQ:
-            case Instruction::NE:
-            case Instruction::LT:
-            case Instruction::GT:
-            case Instruction::LE:
-            case Instruction::GE:
-                mBuilder = &builder;
-                break;
-        }
-    }
-
-    void BinaryInst::emit2(lir::Builder& builder)
+    void BinaryInst::emit(lir::Builder& builder)
     {
 
         auto createArithmetic = [&builder, this](lir::BinaryArithmetic::Operator op){
             mLeft->lateEmit(builder);
             mRight->lateEmit(builder);
             lir::OperandPtr vreg = std::make_unique<lir::VirtualReg>(mVReg, mType->getOperandSize());
-            builder.addValue(std::make_unique<lir::Move>(vreg->clone(), mLeft->getEmittedValue2()));
-            builder.addValue(std::make_unique<lir::BinaryArithmetic>(vreg->clone(), op, mRight->getEmittedValue2()));
-            mEmittedValue2 = std::move(vreg);
+            builder.addValue(std::make_unique<lir::Move>(vreg->clone(), mLeft->getEmittedValue()));
+            builder.addValue(std::make_unique<lir::BinaryArithmetic>(vreg->clone(), op, mRight->getEmittedValue()));
+            mEmittedValue = std::move(vreg);
         };
         
         switch (mOperator)
@@ -201,8 +130,8 @@ namespace vipir
         auto createCompare = [&builder, this](lir::CMP::Operator op){
             mLeft->lateEmit(builder);
             mRight->lateEmit(builder);
-            builder.addValue(std::make_unique<lir::Compare>(mLeft->getEmittedValue2(), op, mRight->getEmittedValue2()));
-            mEmittedValue2 = std::make_unique<lir::CMP>(op);
+            builder.addValue(std::make_unique<lir::Compare>(mLeft->getEmittedValue(), op, mRight->getEmittedValue()));
+            mEmittedValue = std::make_unique<lir::CMP>(op);
         };
 
         switch (mOperator)
@@ -267,44 +196,5 @@ namespace vipir
                 break;
             }
         }
-    }
-
-    instruction::OperandPtr BinaryInst::getEmittedValue()
-    {
-        auto GenerateCmp = [this](CmpOperator op){
-            instruction::OperandPtr left  = mLeft->getEmittedValue();
-            instruction::OperandPtr right = mRight->getEmittedValue();
-            mBuilder->addValue(std::make_unique<instruction::CmpInstruction>(std::move(left), std::move(right), codegen::OperandSize::None));
-            mEmittedValue = std::make_unique<CmpOperand>(op);
-        };
-
-        switch (mOperator)
-        {
-            case Instruction::EQ:
-                GenerateCmp(CmpOperator::EQ);
-                break;
-            case Instruction::NE:
-                GenerateCmp(CmpOperator::NE);
-                break;
-
-            case Instruction::LT:
-                GenerateCmp(CmpOperator::LT);
-                break;
-            case Instruction::GT:
-                GenerateCmp(CmpOperator::GT);
-                break;
-
-            case Instruction::LE:
-                GenerateCmp(CmpOperator::LE);
-                break;
-            case Instruction::GE:
-                GenerateCmp(CmpOperator::GE);
-                break;
-
-            default:
-                break;
-        }
-
-        return mEmittedValue->clone();
     }
 }

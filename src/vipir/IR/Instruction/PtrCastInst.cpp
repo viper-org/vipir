@@ -28,17 +28,12 @@ namespace vipir
         return {mPtr};
     }
 
-    
-    void PtrCastInst::emit(MC::Builder& builder)
-    {
-        mEmittedValue = mPtr->getEmittedValue();
-    }
 
-    void PtrCastInst::emit2(lir::Builder& builder)
+    void PtrCastInst::emit(lir::Builder& builder)
     {
         lir::OperandPtr vreg = std::make_unique<lir::VirtualReg>(mVReg, mType->getOperandSize());
-        builder.addValue(std::make_unique<lir::Move>(vreg->clone(), mPtr->getEmittedValue2()));
-        mEmittedValue2 = std::move(vreg);
+        builder.addValue(std::make_unique<lir::Move>(vreg->clone(), mPtr->getEmittedValue()));
+        mEmittedValue = std::move(vreg);
     }
 
 

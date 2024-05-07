@@ -22,8 +22,7 @@ namespace vipir
         Value* getPointer();
 
     protected:
-        void emit(MC::Builder& builder) override;
-        void emit2(lir::Builder& builder) override;
+        void emit(lir::Builder& builder) override;
 
     private:
         AddrInst(BasicBlock* parent, Value* ptr);

@@ -23,8 +23,7 @@ namespace vipir
         std::vector<Value*> getOperands() override;
 
     protected:
-        void emit(MC::Builder& builder) override;
-        void emit2(lir::Builder& builder) override;
+        void emit(lir::Builder& builder) override;
         std::string ident() const override;
 
     private:

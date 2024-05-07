@@ -37,8 +37,7 @@ namespace vipir
         std::string ident() const override;
 
     protected:
-        void emit(MC::Builder& builder) override;
-        void emit2(lir::Builder& builder) override;
+        void emit(lir::Builder& builder) override;
 
     private:
         Function(FunctionType* type, Module& module, std::string_view name);

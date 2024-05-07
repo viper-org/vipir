@@ -38,27 +38,16 @@ namespace vipir
         return true;
     }
 
-    void ConstantStruct::emit(MC::Builder& builder)
-    {
-        std::vector<instruction::OperandPtr> values;
-        for (auto value : mValues)
-        {
-            values.push_back(value->getEmittedValue());
-        }
-
-        mEmittedValue = std::make_unique<CompoundOperand>(std::move(values));
-    }
-
-    void ConstantStruct::emit2(lir::Builder& builder)
+    void ConstantStruct::emit(lir::Builder& builder)
     {
         std::vector<lir::OperandPtr> values;
         for (auto value : mValues)
         {
             value->lateEmit(builder);
-            values.push_back(value->getEmittedValue2());
+            values.push_back(value->getEmittedValue());
         }
 
-        mEmittedValue2 = std::make_unique<lir::Compound>(std::move(values));
+        mEmittedValue = std::make_unique<lir::Compound>(std::move(values));
     }
 
     ConstantStruct::ConstantStruct(Module& module, Type* type, std::vector<Value*> values)

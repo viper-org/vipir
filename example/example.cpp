@@ -71,5 +71,5 @@ int main()
 
     //mod.print2(std::cout);
 
-    mod.emit2(std::cout, vipir::OutputFormat::ELF);
+    mod.emit(std::cout, vipir::OutputFormat::ELF);
 }

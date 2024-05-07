@@ -27,8 +27,7 @@ namespace vipir
         bool isConstant() const override;
 
     protected:
-        void emit(MC::Builder& builder) override;
-        void emit2(lir::Builder& builder) override;
+        void emit(lir::Builder& builder) override;
 
     private:
         ConstantArray(Module& module, Type* type, std::vector<Value*> values);

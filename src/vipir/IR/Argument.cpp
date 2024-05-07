@@ -28,14 +28,9 @@ namespace vipir
         return "%" + mName;
     }
 
-    void Argument::emit(MC::Builder&)
-    {
-        mEmittedValue = mVReg->operand(mType->getOperandSize());
-    }
-
-    void Argument::emit2(lir::Builder&)
+    void Argument::emit(lir::Builder&)
     {
         int registerId = mModule.abi()->getParameterRegister(mIdx);
-        mEmittedValue2 = std::make_unique<lir::PhysicalReg>(registerId, mType->getOperandSize());
+        mEmittedValue = std::make_unique<lir::PhysicalReg>(registerId, mType->getOperandSize());
     }
 }

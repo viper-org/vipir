@@ -30,14 +30,9 @@ namespace vipir
         return std::format("{} {}", mType->getName(), getName(mValueId));
     }
 
-    void AllocaInst::emit(MC::Builder& builder)
+    void AllocaInst::emit(lir::Builder& builder)
     {
-        mEmittedValue = mVReg->operand(mAllocatedType->getOperandSize());
-    }
-
-    void AllocaInst::emit2(lir::Builder& builder)
-    {
-        mEmittedValue2 = std::make_unique<lir::VirtualReg>(mVReg, mAllocatedType->getOperandSize());
+        mEmittedValue = std::make_unique<lir::VirtualReg>(mVReg, mAllocatedType->getOperandSize());
     }
 
     AllocaInst::AllocaInst(BasicBlock* parent, Type* allocatedType)

@@ -35,8 +35,7 @@ namespace vipir
 
     protected:
         void setEmittedValue();
-        void emit(MC::Builder& builder) override;
-        void emit2(lir::Builder& builder) override;
+        void emit(lir::Builder& builder) override;
 
     private:
         BasicBlock(std::string_view name, Function* parent);

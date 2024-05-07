@@ -32,24 +32,14 @@ namespace vipir
     }
 
     
-    void SExtInst::emit(MC::Builder& builder)
+    void SExtInst::emit(lir::Builder& builder)
     {
-        instruction::OperandPtr value = mValue->getEmittedValue();
-        instruction::OperandPtr operand = mVReg->operand(mType->getOperandSize());
-
-        builder.addValue(std::make_unique<instruction::MovSXInstruction>(operand->clone(), std::move(value)));
-
-        mEmittedValue = std::move(operand);
-    }
-    
-    void SExtInst::emit2(lir::Builder& builder)
-    {
-        lir::OperandPtr value = mValue->getEmittedValue2();
+        lir::OperandPtr value = mValue->getEmittedValue();
         lir::OperandPtr vreg = std::make_unique<lir::VirtualReg>(mVReg, mType->getOperandSize());
 
         builder.addValue(std::make_unique<lir::MoveSX>(vreg->clone(), std::move(value)));
 
-        mEmittedValue2 = std::move(vreg);
+        mEmittedValue = std::move(vreg);
     }
 
 

@@ -72,27 +72,23 @@ namespace vipir
         return "@" + mName;
     }
 
-    void Function::emit(MC::Builder& builder)
+    void Function::emit(lir::Builder& builder)
     {
-        builder.addValue(std::make_unique<instruction::SectionDirective>(".text"));
+        builder.setSection(lir::SectionType::Code);
 
-        if (mBasicBlockList.empty()) // Function declaration
+        if (mBasicBlockList.empty())
         {
-            mEmittedValue = std::make_unique<instruction::LabelOperand>(mName, "plt");
-            builder.addValue(std::make_unique<instruction::ExternDirective>(mName));
+            mEmittedValue = std::make_unique<lir::Lbl>(mName);
+            builder.addValue(std::make_unique<lir::ExternLabel>(mName));
             return;
         }
-        mEmittedValue = std::make_unique<instruction::LabelOperand>(mName);
 
-        builder.addValue(std::make_unique<instruction::Label>(mName, true));
+        mEmittedValue = std::make_unique<lir::Lbl>(mName);
+        builder.addValue(std::make_unique<lir::Label>(mName, true));
 
         if (mTotalStackOffset > 0) // There are local variables
         {
-            builder.addValue(std::make_unique<instruction::PushInstruction>(instruction::Register::Get("rbp")));
-            builder.addValue(std::make_unique<instruction::MovInstruction>(instruction::Register::Get("rbp"), instruction::Register::Get("rsp")));
-            instruction::OperandPtr reg = instruction::Register::Get("rsp");
-            instruction::OperandPtr stackOffset = std::make_unique<instruction::Immediate>(mTotalStackOffset);
-            builder.addValue(std::make_unique<instruction::SubInstruction>(std::move(reg), std::move(stackOffset)));
+            builder.addValue(std::make_unique<lir::EnterFunc>(mTotalStackOffset));
         }
 
         for (auto& basicBlock : mBasicBlockList)
@@ -108,41 +104,6 @@ namespace vipir
         for (auto& basicBlock : mBasicBlockList)
         {
             basicBlock->emit(builder);
-        }
-    }
-
-    void Function::emit2(lir::Builder& builder)
-    {
-        builder.setSection(lir::SectionType::Code);
-
-        if (mBasicBlockList.empty())
-        {
-            mEmittedValue2 = std::make_unique<lir::Lbl>(mName);
-            builder.addValue(std::make_unique<lir::ExternLabel>(mName));
-            return;
-        }
-
-        mEmittedValue2 = std::make_unique<lir::Lbl>(mName);
-        builder.addValue(std::make_unique<lir::Label>(mName, true));
-
-        if (mTotalStackOffset > 0) // There are local variables
-        {
-            builder.addValue(std::make_unique<lir::EnterFunc>(mTotalStackOffset));
-        }
-
-        for (auto& basicBlock : mBasicBlockList)
-        {
-            basicBlock->setEmittedValue();
-        }
-
-        for (auto& argument : mArguments)
-        {
-            argument->emit2(builder);
-        }
-
-        for (auto& basicBlock : mBasicBlockList)
-        {
-            basicBlock->emit2(builder);
         }
     }
 

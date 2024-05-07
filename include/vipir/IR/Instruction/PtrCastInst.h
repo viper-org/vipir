@@ -22,8 +22,7 @@ namespace vipir
         std::vector<Value*> getOperands() override;
 
     protected:
-        void emit(MC::Builder& builder) override;
-        void emit2(lir::Builder& builder) override;
+        void emit(lir::Builder& builder) override;
 
     private:
         PtrCastInst(BasicBlock* parent, Value* ptr, Type* destType);

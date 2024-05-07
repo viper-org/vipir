@@ -35,60 +35,13 @@ namespace vipir
         return "%undef";
     }
 
-    void StoreInst::emit(MC::Builder& builder)
-    {
-        instruction::OperandPtr ptr   = mPtr->getEmittedValue();
-        instruction::OperandPtr value = mValue->getEmittedValue();
 
-        if (auto labelOperand = dynamic_cast<instruction::LabelOperand*>(ptr.get()))
-        {
-            (void)ptr.release();
-            instruction::LabelOperandPtr labelPtr = instruction::LabelOperandPtr(labelOperand);
-            instruction::RelativePtr rel = std::make_unique<instruction::Relative>(std::move(labelPtr), std::nullopt);
-            
-            if (dynamic_cast<instruction::Immediate*>(value.get()))
-            {
-                // mov [rel], imm64 does not exist so we need to move it into a register first
-                if (mValue->getType()->getOperandSize() == codegen::OperandSize::Quad)
-                {
-                    instruction::OperandPtr operand = mVReg->operand(codegen::OperandSize::Quad);
-                    builder.addValue(std::make_unique<instruction::MovInstruction>(operand->clone(), std::move(value)));
-                    value = std::move(operand);
-                }
-            }
-            builder.addValue(std::make_unique<instruction::MovInstruction>(std::move(rel), std::move(value), mValue->getType()->getOperandSize()));
-        }
-
-        else if (dynamic_cast<GEPInst*>(mValue))
-        {
-            builder.addValue(std::make_unique<instruction::LeaInstruction>(std::move(ptr), std::move(value), mValue->getType()->getOperandSize()));
-        }
-        else
-        {
-            if (dynamic_cast<AllocaInst*>(mPtr))
-            {
-                builder.addValue(std::make_unique<instruction::MovInstruction>(std::move(ptr), std::move(value), mValue->getType()->getOperandSize()));
-            }
-            else
-            {
-                if (auto reg = dynamic_cast<instruction::Register*>(ptr.get()))
-                {
-                    (void)ptr.release();
-                    instruction::RegisterPtr ptrReg = instruction::RegisterPtr(reg);
-                    ptr = std::make_unique<instruction::Memory>(std::move(ptrReg), std::nullopt, nullptr, std::nullopt);
-                }
-
-                builder.addValue(std::make_unique<instruction::MovInstruction>(std::move(ptr), std::move(value), mValue->getType()->getOperandSize()));
-            }
-        }
-    }
-
-    void StoreInst::emit2(lir::Builder& builder)
+    void StoreInst::emit(lir::Builder& builder)
     {
         mPtr->lateEmit(builder);
         mValue->lateEmit(builder);
 
-        builder.addValue(std::make_unique<lir::Move>(mPtr->getEmittedValue2(), mValue->getEmittedValue2()));
+        builder.addValue(std::make_unique<lir::Move>(mPtr->getEmittedValue(), mValue->getEmittedValue()));
     }
 
     StoreInst::StoreInst(BasicBlock* parent, Value* ptr, Value* value)

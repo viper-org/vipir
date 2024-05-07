@@ -22,14 +22,11 @@ namespace vipir
         std::vector<Value*> getOperands() override;
 
     protected:
-        void emit(MC::Builder& builder) override;
-        void emit2(lir::Builder& builder) override;
+        void emit(lir::Builder& builder) override;
         void lateEmit(lir::Builder& builder) override;
 
     private:
         BinaryInst(BasicBlock* parent, Value* left, Instruction::BinaryOperators op, Value* right);
-
-        instruction::OperandPtr getEmittedValue() override;
 
         Value* mLeft;
         Instruction::BinaryOperators mOperator;

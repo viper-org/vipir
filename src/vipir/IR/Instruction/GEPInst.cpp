@@ -41,92 +41,14 @@ namespace vipir
         return std::vector<Value*>{mPtr, mOffset};
     }
 
-    void GEPInst::emit(MC::Builder& builder)
-    {
-        codegen::OperandSize size = mType->getOperandSize();
-        //instruction::OperandPtr operand = mVReg->operand(size);
-
-        instruction::OperandPtr ptr = mPtr->getEmittedValue();
-        instruction::OperandPtr offset = mOffset->getEmittedValue();
-
-        instruction::Register* ptrReg = dynamic_cast<instruction::Register*>(ptr.get());
-        instruction::Memory* ptrMem = dynamic_cast<instruction::Memory*>(ptr.get());
-        instruction::LabelOperand* ptrLabel = dynamic_cast<instruction::LabelOperand*>(ptr.get());
-        instruction::Relative* ptrRel = dynamic_cast<instruction::Relative*>(ptr.get());
-        std::optional<int> displacement;
-        if (ptrMem)
-        {
-            ptrReg = ptrMem->getBase();
-            displacement = ptrMem->getDisplacement();
-        }
-
-        int scale = mAlignment / 8;
-
-        if (auto immediate = dynamic_cast<instruction::Immediate*>(offset.get()))
-        {
-            int disp = immediate->imm64() * scale;
-            if (displacement) disp += *displacement;
-            (void)ptr.release();
-
-            
-            if (StructType* structType = dynamic_cast<StructType*>(static_cast<PointerType*>(mPtr->getType())->getBaseType()))
-            {
-                disp = displacement.value_or(0);
-                for (int i = 0; i < immediate->imm64(); ++i)
-                {
-                    if (structType->getField(i)->isArrayType())
-                    {
-                        ArrayType* arrayType = static_cast<ArrayType*>(structType->getField(i));
-                        disp += std::max(arrayType->getSizeInBits() / 8, (std::size_t)scale);
-                    }
-                    else
-                    {
-                        disp += scale;
-                    }
-                }
-            }
-            
-            instruction::OperandPtr memory;
-            if (ptrLabel)
-            {
-                (void)ptr.release();
-                memory = std::make_unique<instruction::Relative>(instruction::LabelOperandPtr(ptrLabel), disp);
-            }
-            else if (ptrRel)
-            {
-                auto label = ptrRel->getLabel();
-                disp += *ptrRel->getDisplacement();
-                (void)ptr.release();
-                memory = std::make_unique<instruction::Relative>(instruction::LabelOperandPtr(label), disp);
-            }
-            else
-            {
-                (void)ptr.release();
-                memory = std::make_unique<instruction::Memory>(instruction::RegisterPtr(ptrReg), disp, nullptr, std::nullopt);
-            }
-            //builder.addValue(std::make_unique<instruction::LeaInstruction>(operand->clone(), std::move(memory)));
-            mEmittedValue = std::move(memory);
-        }
-        else if (auto regOffset = dynamic_cast<instruction::Register*>(offset.get()))
-        {
-            (void)ptr.release();
-            instruction::Register* index = regOffset;
-            (void)offset.release();
-
-            instruction::OperandPtr memory = std::make_unique<instruction::Memory>(instruction::RegisterPtr(ptrReg), displacement, instruction::RegisterPtr(regOffset), scale);
-            //builder.addValue(std::make_unique<instruction::LeaInstruction>(operand->clone(), std::move(memory)));
-            mEmittedValue = std::move(memory);
-        }
-    }
-
-    void GEPInst::emit2(lir::Builder& builder)
+    void GEPInst::emit(lir::Builder& builder)
     {
         mPtr->lateEmit(builder);
         mOffset->lateEmit(builder);
 
         lir::OperandPtr vreg = std::make_unique<lir::VirtualReg>(mVReg, mType->getOperandSize());
-        lir::OperandPtr ptr = mPtr->getEmittedValue2();
-        lir::OperandPtr offset = mOffset->getEmittedValue2();
+        lir::OperandPtr ptr = mPtr->getEmittedValue();
+        lir::OperandPtr offset = mOffset->getEmittedValue();
 
         int scale = mAlignment / 8;
         
@@ -155,7 +77,7 @@ namespace vipir
 
         lir::OperandPtr mem = std::make_unique<lir::Memory>(mType->getOperandSize(), std::move(ptr), displacement, std::move(offset), scale);
         builder.addValue(std::make_unique<lir::LoadAddress>(vreg->clone(), std::move(mem)));
-        mEmittedValue2 = std::make_unique<lir::Memory>(size, std::move(vreg), std::nullopt, nullptr, std::nullopt);
+        mEmittedValue = std::make_unique<lir::Memory>(size, std::move(vreg), std::nullopt, nullptr, std::nullopt);
     }
 
     GEPInst::GEPInst(BasicBlock* parent, Value* ptr, Value* offset)

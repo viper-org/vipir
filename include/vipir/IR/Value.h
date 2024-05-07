@@ -47,24 +47,21 @@ namespace vipir
 
         std::string getName(int valueId) const { if (mVReg) return std::format("VREG{}", mVReg->getId()); else return std::format("{}", valueId); }
 
-        virtual instruction::OperandPtr getEmittedValue() { return mEmittedValue->clone(); }
-        virtual lir::OperandPtr getEmittedValue2() { return mEmittedValue2->clone(); }
+        virtual lir::OperandPtr getEmittedValue() { return mEmittedValue->clone(); }
         virtual void lateEmit(lir::Builder& builder) { }
     
     protected:
         Module& mModule;
         Type* mType;
         
-        instruction::OperandPtr mEmittedValue;
-        lir::OperandPtr mEmittedValue2;
+        lir::OperandPtr mEmittedValue;
 
         opt::VReg* mVReg{0};
         bool mRequiresVReg{true};
 
         std::pair<int, int> mInterval{-1,-1};
 
-        virtual void emit(MC::Builder& builder) = 0;
-        virtual void emit2(lir::Builder& builder) { }
+        virtual void emit(lir::Builder& builder) = 0;
     };
 }
 

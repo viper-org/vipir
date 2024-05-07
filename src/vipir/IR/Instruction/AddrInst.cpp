@@ -35,36 +35,15 @@ namespace vipir
         return std::format("%{}", getName(mValueId));
     }
 
-    void AddrInst::emit(MC::Builder& builder)
-    {
-        codegen::OperandSize size = mType->getOperandSize();
-        
-        instruction::OperandPtr ptr = mPtr->getEmittedValue();
-        instruction::OperandPtr operand = mVReg->operand(size);
-        if (auto labelOperand = dynamic_cast<instruction::LabelOperand*>(ptr.get()))
-        {
-            (void)ptr.release();
-            instruction::LabelOperandPtr labelPtr = instruction::LabelOperandPtr(labelOperand);
-            instruction::RelativePtr rel = std::make_unique<instruction::Relative>(std::move(labelPtr), std::nullopt);
-            builder.addValue(std::make_unique<instruction::LeaInstruction>(operand->clone(), std::move(rel)));
-        }
-        else
-        {
-            builder.addValue(std::make_unique<instruction::LeaInstruction>(operand->clone(), std::move(ptr)));
-        }
-
-        mEmittedValue = std::move(operand);
-    }
-
-    void AddrInst::emit2(lir::Builder& builder)
+    void AddrInst::emit(lir::Builder& builder)
     {
         mPtr->lateEmit(builder);
 
-        lir::OperandPtr ptr = mPtr->getEmittedValue2();
+        lir::OperandPtr ptr = mPtr->getEmittedValue();
         lir::OperandPtr vreg = std::make_unique<lir::VirtualReg>(mVReg, mType->getOperandSize());
         builder.addValue(std::make_unique<lir::LoadAddress>(vreg->clone(), std::move(ptr)));
 
-        mEmittedValue2 = std::move(vreg);
+        mEmittedValue = std::move(vreg);
     }
 
     AddrInst::AddrInst(BasicBlock* parent, Value* ptr)

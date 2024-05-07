@@ -41,78 +41,18 @@ namespace vipir
         return std::format("%{}", getName(mValueId));
     }
 
-    void LoadInst::emit(MC::Builder& builder)
-    {
-        codegen::OperandSize size = mType->getOperandSize();
-        
-        instruction::OperandPtr ptr = mPtr->getEmittedValue();
-        instruction::OperandPtr operand = mVReg->operand(size);
 
-        if (dynamic_cast<AllocaInst*>(mPtr))
-        {
-            if (dynamic_cast<instruction::Memory*>(ptr.get()))
-            {
-                if (dynamic_cast<instruction::Memory*>(operand.get()))
-                {
-                    instruction::RegisterPtr temp = std::make_unique<instruction::Register>(3, mType->getOperandSize());
-                    builder.addValue(std::make_unique<instruction::MovInstruction>(temp->clone(), std::move(ptr)));
-                    ptr = std::move(temp);
-                }
-                builder.addValue(std::make_unique<instruction::MovInstruction>(operand->clone(), std::move(ptr)));
-                mEmittedValue = std::move(operand);
-            }
-            else
-            {
-                mEmittedValue = std::move(ptr);
-            }
-        }
-        else
-        {
-            if (dynamic_cast<instruction::Memory*>(ptr.get()) || dynamic_cast<instruction::Relative*>(ptr.get()))
-            {
-                if (dynamic_cast<instruction::Memory*>(operand.get()))
-                {
-                    instruction::RegisterPtr temp = std::make_unique<instruction::Register>(3, mType->getOperandSize());
-                    builder.addValue(std::make_unique<instruction::MovInstruction>(temp->clone(), std::move(ptr)));
-                    ptr = std::move(temp);
-                }
-                builder.addValue(std::make_unique<instruction::MovInstruction>(operand->clone(), std::move(ptr)));
-            }
-            else if (auto regOperand = dynamic_cast<instruction::Register*>(ptr.get()))
-            {
-                (void)ptr.release();
-                instruction::RegisterPtr ptrReg = instruction::RegisterPtr(regOperand);
-                instruction::OperandPtr memory = std::make_unique<instruction::Memory>(std::move(ptrReg), std::nullopt, nullptr, std::nullopt);
-                if (dynamic_cast<instruction::Memory*>(operand.get()))
-                {
-                    instruction::RegisterPtr temp = std::make_unique<instruction::Register>(3, mType->getOperandSize());
-                    builder.addValue(std::make_unique<instruction::MovInstruction>(temp->clone(), std::move(memory)));
-                    memory = std::move(temp);
-                }
-                builder.addValue(std::make_unique<instruction::MovInstruction>(operand->clone(), std::move(memory)));
-            }
-            else if (auto labelOperand = dynamic_cast<instruction::LabelOperand*>(ptr.get()))
-            {
-                (void)ptr.release();
-                instruction::LabelOperandPtr labelPtr = instruction::LabelOperandPtr(labelOperand);
-                instruction::RelativePtr rel = std::make_unique<instruction::Relative>(std::move(labelPtr), std::nullopt);
-                builder.addValue(std::make_unique<instruction::MovInstruction>(operand->clone(), std::move(rel)));
-            }
-            mEmittedValue = std::move(operand);
-        }
-    }
-
-    void LoadInst::emit2(lir::Builder& builder)
+    void LoadInst::emit(lir::Builder& builder)
     {
         mPtr->lateEmit(builder);
 
         lir::OperandPtr vreg = std::make_unique<lir::VirtualReg>(mVReg, mType->getOperandSize());
-        lir::OperandPtr mem = mPtr->getEmittedValue2();
+        lir::OperandPtr mem = mPtr->getEmittedValue();
         if (!dynamic_cast<AllocaInst*>(mPtr))
             mem = std::make_unique<lir::Memory>(mType->getOperandSize(), std::move(mem), std::nullopt, nullptr, std::nullopt);
         
         builder.addValue(std::make_unique<lir::Move>(vreg->clone(), std::move(mem)));
-        mEmittedValue2 = std::move(vreg);
+        mEmittedValue = std::move(vreg);
     }
 
     LoadInst::LoadInst(BasicBlock* parent, Value* ptr)

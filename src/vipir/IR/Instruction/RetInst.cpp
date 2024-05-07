@@ -43,37 +43,15 @@ namespace vipir
         return "%undef";
     }
 
-    void RetInst::emit(MC::Builder& builder)
-    {
-        if (mReturnValue)
-        {
-            instruction::OperandPtr returnValue = mReturnValue->getEmittedValue();
-            if (returnValue)
-            {
-                instruction::Register* returnRegister = dynamic_cast<instruction::Register*>(returnValue.get());
-                if (!returnRegister || returnRegister->getID() != mModule.abi()->getReturnRegister())
-                {
-                    instruction::OperandPtr reg = std::make_unique<instruction::Register>(mModule.abi()->getReturnRegister(), mReturnValue->getType()->getOperandSize());
-                    builder.addValue(std::make_unique<instruction::MovInstruction>(std::move(reg), std::move(returnValue)));
-                }
-            }
-        }
 
-        if (mParent->getParent()->usesStack())
-        {
-            builder.addValue(std::make_unique<instruction::LeaveInstruction>());
-        }
-        builder.addValue(std::make_unique<instruction::RetInstruction>());
-    }
-
-    void RetInst::emit2(lir::Builder& builder)
+    void RetInst::emit(lir::Builder& builder)
     {
         if (mReturnValue)
         {
             mReturnValue->lateEmit(builder);
 
             lir::OperandPtr returnRegister = std::make_unique<lir::PhysicalReg>(mModule.abi()->getReturnRegister(), mReturnValue->getType()->getOperandSize());
-            builder.addValue(std::make_unique<lir::Move>(std::move(returnRegister), mReturnValue->getEmittedValue2()));
+            builder.addValue(std::make_unique<lir::Move>(std::move(returnRegister), mReturnValue->getEmittedValue()));
         }
         builder.addValue(std::make_unique<lir::Ret>(mParent->getParent()->usesStack()));
     }

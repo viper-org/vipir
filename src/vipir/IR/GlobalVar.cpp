@@ -36,91 +36,19 @@ namespace vipir
         return std::format("{} @{}", mType->getName(), mValueId);
     }
 
-    void GlobalVar::emit(MC::Builder& builder)
-    {
-        builder.addValue(std::make_unique<instruction::SectionDirective>(".data"));
 
-        mEmittedValue = std::make_unique<instruction::LabelOperand>(std::to_string(mValueId));
-        builder.addValue(std::make_unique<instruction::Label>(std::to_string(mValueId), false));
-
-        instruction::OperandPtr initVal = mInitialValue->getEmittedValue();
-
-        emitConstant(builder, static_cast<PointerType*>(mType)->getBaseType(), std::move(initVal));
-    }
-
-    void GlobalVar::emit2(lir::Builder& builder)
+    void GlobalVar::emit(lir::Builder& builder)
     {
         mInitialValue->lateEmit(builder);
 
         builder.setSection(lir::SectionType::Data);
 
-        mEmittedValue2 = std::make_unique<lir::Lbl>(std::to_string(mValueId));
+        mEmittedValue = std::make_unique<lir::Lbl>(std::to_string(mValueId));
         builder.addValue(std::make_unique<lir::Label>(std::to_string(mValueId), false));
 
-        lir::OperandPtr init = mInitialValue->getEmittedValue2();
+        lir::OperandPtr init = mInitialValue->getEmittedValue();
 
         emitConstant2(builder, static_cast<PointerType*>(mType)->getBaseType(), std::move(init));
-    }
-
-    void GlobalVar::emitConstant(MC::Builder& builder, Type* type, instruction::OperandPtr value)
-    {
-        if (auto compoundOperand = dynamic_cast<CompoundOperand*>(value.get()))
-        {
-            codegen::OperandSize size;
-            if (auto arrayType = dynamic_cast<ArrayType*>(type))
-            {
-                for (auto& value : compoundOperand->getValues())
-                {
-                    emitConstant(builder, arrayType->getBaseType(), std::move(value));
-                }
-            }
-            else
-            {
-                StructType* structType = static_cast<StructType*>(type);
-
-                auto notArray = [](Type* type) { return !type->isArrayType(); };
-                auto largestElement = std::max_element(structType->getFields().begin(), structType->getFields().end(), [](auto a, auto b){
-                    return a->getSizeInBits() < b->getSizeInBits();
-                });
-                auto fieldsNotArray = structType->getFields() | std::views::filter(notArray);
-                auto largestNotArray = std::max_element(fieldsNotArray.begin(), fieldsNotArray.end(), [](auto a, auto b){
-                    return a->getSizeInBits() < b->getSizeInBits();
-                });
-
-                int index = 0;
-                for (auto& value : compoundOperand->getValues())
-                {
-                    if ((*largestElement)->isArrayType() && structType->getField(index++) != *largestElement)
-                    {
-                        emitConstant(builder, *largestNotArray, std::move(value));
-                    }
-                    else
-                    {
-                        emitConstant(builder, *largestElement, std::move(value));
-                    }
-                }
-            }
-        }
-        else
-        {
-            switch(type->getOperandSize())
-            {
-                case codegen::OperandSize::Byte:
-                    builder.addValue(std::make_unique<instruction::DeclInstruction<codegen::OperandSize::Byte> >(std::move(value)));
-                    break;
-                case codegen::OperandSize::Word:
-                    builder.addValue(std::make_unique<instruction::DeclInstruction<codegen::OperandSize::Word> >(std::move(value)));
-                    break;
-                case codegen::OperandSize::Long:
-                    builder.addValue(std::make_unique<instruction::DeclInstruction<codegen::OperandSize::Long> >(std::move(value)));
-                    break;
-                case codegen::OperandSize::Quad:
-                    builder.addValue(std::make_unique<instruction::DeclInstruction<codegen::OperandSize::Quad> >(std::move(value)));
-                    break;
-                case codegen::OperandSize::None:
-                    break;
-            }
-        }
     }
 
     void GlobalVar::emitConstant2(lir::Builder& builder, Type* type, lir::OperandPtr value)

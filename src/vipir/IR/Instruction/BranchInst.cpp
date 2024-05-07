@@ -41,72 +41,17 @@ namespace vipir
     }
 
 
-    void BranchInst::emit(MC::Builder& builder)
+    void BranchInst::emit(lir::Builder& builder)
     {
         if (!mFalseBranch) // Unconditional branch won't have a false branch
         {
-            builder.addValue(std::make_unique<instruction::JmpInstruction>(std::move(mTrueBranch->getEmittedValue())));
-        }
-        else
-        {
-            instruction::OperandPtr condition = mCondition->getEmittedValue();
-            CmpOperand* cmp = static_cast<CmpOperand*>(condition.get());
-
-            switch (cmp->getOperator())
-            {
-                case CmpOperator::EQ:
-                {
-                    builder.addValue(std::make_unique<instruction::JeInstruction>(std::move(mTrueBranch->getEmittedValue())));
-                    builder.addValue(std::make_unique<instruction::JmpInstruction>(std::move(mFalseBranch->getEmittedValue())));
-                    break;
-                }
-                case CmpOperator::NE:
-                {
-                    builder.addValue(std::make_unique<instruction::JneInstruction>(std::move(mTrueBranch->getEmittedValue())));
-                    builder.addValue(std::make_unique<instruction::JmpInstruction>(std::move(mFalseBranch->getEmittedValue())));
-                    break;
-                }
-
-                case CmpOperator::LT:
-                {
-                    builder.addValue(std::make_unique<instruction::JlInstruction>(std::move(mTrueBranch->getEmittedValue())));
-                    builder.addValue(std::make_unique<instruction::JmpInstruction>(std::move(mFalseBranch->getEmittedValue())));
-                    break;
-                }
-                case CmpOperator::GT:
-                {
-                    builder.addValue(std::make_unique<instruction::JgInstruction>(std::move(mTrueBranch->getEmittedValue())));
-                    builder.addValue(std::make_unique<instruction::JmpInstruction>(std::move(mFalseBranch->getEmittedValue())));
-                    break;
-                }
-
-                case CmpOperator::LE:
-                {
-                    builder.addValue(std::make_unique<instruction::JleInstruction>(std::move(mTrueBranch->getEmittedValue())));
-                    builder.addValue(std::make_unique<instruction::JmpInstruction>(std::move(mFalseBranch->getEmittedValue())));
-                    break;
-                }
-                case CmpOperator::GE:
-                {
-                    builder.addValue(std::make_unique<instruction::JgeInstruction>(std::move(mTrueBranch->getEmittedValue())));
-                    builder.addValue(std::make_unique<instruction::JmpInstruction>(std::move(mFalseBranch->getEmittedValue())));
-                    break;
-                }
-            }
-        }
-    }
-
-    void BranchInst::emit2(lir::Builder& builder)
-    {
-        if (!mFalseBranch) // Unconditional branch won't have a false branch
-        {
-            builder.addValue(std::make_unique<lir::Jump>(mTrueBranch->getEmittedValue2()));
+            builder.addValue(std::make_unique<lir::Jump>(mTrueBranch->getEmittedValue()));
         }
         else
         {
             mCondition->lateEmit(builder);
-            builder.addValue(std::make_unique<lir::CondJump>(mTrueBranch->getEmittedValue2(), mCondition->getEmittedValue2()));
-            builder.addValue(std::make_unique<lir::Jump>(mFalseBranch->getEmittedValue2()));
+            builder.addValue(std::make_unique<lir::CondJump>(mTrueBranch->getEmittedValue(), mCondition->getEmittedValue()));
+            builder.addValue(std::make_unique<lir::Jump>(mFalseBranch->getEmittedValue()));
         }
     }
 

@@ -87,7 +87,8 @@ namespace vipir
         }
     }
 
-    void Module::emit(std::ostream& stream, OutputFormat format) const
+
+    void Module::printLIR(std::ostream& stream) const
     {
         opt::RegAlloc regalloc;
         for (const GlobalPtr& global : mGlobals)
@@ -98,7 +99,7 @@ namespace vipir
             }
         }
 
-        MC::Builder builder;
+        lir::Builder builder;
         for (const ValuePtr& constant : mConstants)
         {
             constant->emit(builder);
@@ -108,57 +109,13 @@ namespace vipir
             global->emit(builder);
         }
 
-        std::unique_ptr<codegen::IOutputFormat> outputFormat;
-        switch(format)
-        {
-            case OutputFormat::ELF:
-                outputFormat = std::make_unique<codegen::ELFFormat>(mName);
-                break;
-            case OutputFormat::PE:
-                outputFormat = std::make_unique<codegen::PEFormat>(mName);
-                break;
-        }
-
-        codegen::OpcodeBuilder opcodeBuilder = codegen::OpcodeBuilder(outputFormat.get(), mName);
-
-        for (const auto& value : builder.getValues())
-        {
-            value->emit(opcodeBuilder, opcodeBuilder.getSection());
-        }
-
-        opcodeBuilder.patchForwardLabels();
-
-        outputFormat->print(stream);
-    }
-
-    void Module::print2(std::ostream& stream) const
-    {
-        opt::RegAlloc regalloc;
-        for (const GlobalPtr& global : mGlobals)
-        {
-            if (auto func = dynamic_cast<Function*>(global.get()))
-            {
-                regalloc.assignVirtualRegisters(func, mAbi.get());
-            }
-        }
-
-        lir::Builder builder;
-        for (const ValuePtr& constant : mConstants)
-        {
-            constant->emit2(builder);
-        }
-        for (const GlobalPtr& global : mGlobals)
-        {
-            global->emit2(builder);
-        }
-
         for (auto& value : builder.getValues())
         {
             value->print(stream);
         }
     }
 
-    void Module::emit2(std::ostream& stream, OutputFormat format)
+    void Module::emit(std::ostream& stream, OutputFormat format)
     {
         opt::RegAlloc regalloc;
         for (const GlobalPtr& global : mGlobals)
@@ -172,11 +129,11 @@ namespace vipir
         lir::Builder builder;
         for (const ValuePtr& constant : mConstants)
         {
-            constant->emit2(builder);
+            constant->emit(builder);
         }
         for (const GlobalPtr& global : mGlobals)
         {
-            global->emit2(builder);
+            global->emit(builder);
         }
 
         if (std::find(mPasses.begin(), mPasses.end(), Pass::PeepholeOptimization) != mPasses.end())

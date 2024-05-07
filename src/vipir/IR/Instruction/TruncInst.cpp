@@ -31,39 +31,15 @@ namespace vipir
         return {mValue};
     }
 
-    
-    void TruncInst::emit(MC::Builder& builder)
+
+    void TruncInst::emit(lir::Builder& builder)
     {
-        instruction::OperandPtr value = mValue->getEmittedValue();
-        instruction::OperandPtr operand = mVReg->operand(mType->getOperandSize());
-
-        if (auto valueReg = dynamic_cast<instruction::Register*>(value.get()))
-        {
-            instruction::RegisterPtr truncatedReg = std::make_unique<instruction::Register>(valueReg->getID(), mType->getOperandSize());
-            if (auto operandReg = dynamic_cast<instruction::Register*>(operand.get()))
-            {
-                if (truncatedReg->getID() != operandReg->getID())
-                {
-                    builder.addValue(std::make_unique<instruction::MovInstruction>(operand->clone(), std::move(truncatedReg)));
-                }
-            }
-        }
-        else
-        {
-            builder.addValue(std::make_unique<instruction::MovInstruction>(operand->clone(), std::move(value)));
-        }
-
-        mEmittedValue = std::move(operand);
-    }
-
-    void TruncInst::emit2(lir::Builder& builder)
-    {
-        lir::OperandPtr value = mValue->getEmittedValue2();
+        lir::OperandPtr value = mValue->getEmittedValue();
         lir::OperandPtr vreg = std::make_unique<lir::VirtualReg>(mVReg, mType->getOperandSize());
 
         builder.addValue(std::make_unique<lir::Move>(vreg->clone(), std::move(value)));
 
-        mEmittedValue2 = std::move(vreg);
+        mEmittedValue = std::move(vreg);
     }
 
 
