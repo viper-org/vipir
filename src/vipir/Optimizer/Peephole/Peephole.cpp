@@ -32,8 +32,9 @@ namespace vipir
                         it = instructions.erase(it, it + 2);
                         instructions.insert(it, std::make_unique<lir::Move>(std::move(left), std::move(right)));
                     }
+                    else ++it;
                 }
-                ++it;
+                else ++it;
             }
         }
 
