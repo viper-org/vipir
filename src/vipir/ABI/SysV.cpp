@@ -28,7 +28,7 @@ namespace vipir
 
         std::vector<int> SysV::getGeneralPurposeRegisters() const
         {
-            return { 0, 1, 2, 3, 6, 7 };
+            return { 1, 2, 3, 6, 7 };
         }
 
         std::vector<int> SysV::getCallerSavedRegisters() const

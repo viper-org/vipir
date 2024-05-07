@@ -32,13 +32,20 @@ namespace vipir
             if (*mLeft == mRight) return;
 
             instruction::OperandPtr left = mLeft->asmOperand();
+            instruction::OperandPtr right = mRight->asmOperand();
             if (auto label = dynamic_cast<instruction::LabelOperand*>(left.get()))
             {
                 (void)left.release();
                 instruction::LabelOperandPtr lbl = instruction::LabelOperandPtr(label);
                 left = std::make_unique<instruction::Relative>(std::move(lbl), std::nullopt);
             }
-            builder.addValue(std::make_unique<instruction::MovInstruction>(std::move(left), mRight->asmOperand(), mLeft->size()));
+            if (dynamic_cast<instruction::Memory*>(left.get()) && dynamic_cast<instruction::Memory*>(right.get()))
+            {
+                instruction::OperandPtr reg = std::make_unique<instruction::Register>(0, mRight->size());
+                builder.addValue(std::make_unique<instruction::MovInstruction>(reg->clone(), std::move(right)));
+                right = std::move(reg);
+            }
+            builder.addValue(std::make_unique<instruction::MovInstruction>(std::move(left), std::move(right), mLeft->size()));
         }
 
 
