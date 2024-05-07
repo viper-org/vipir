@@ -42,7 +42,7 @@ int main()
     auto arrayType = vipir::Type::GetArrayType(i32Type, 3);
     auto structType = vipir::Type::GetStructType({arrayType, i32Type});
 
-    auto func1 = vipir::Function::Create(vipir::FunctionType::Create(i64Type, {i32Type}), mod, "main");
+    auto func1 = vipir::Function::Create(vipir::FunctionType::Create(i32Type, {i32Type}), mod, "main");
     auto bb1 = vipir::BasicBlock::Create("", func1);
 
     builder.setInsertPoint(bb1);
@@ -63,7 +63,7 @@ int main()
     auto gep2 = builder.CreateGEP(gep1, offset);
     auto load = builder.CreateLoad(gep2);
 
-    auto retval = builder.CreateSExt(load, i64Type);
+    auto retval = builder.CreateIMul(load, func1->getArgument(0));
 
     builder.CreateRet(retval);
 

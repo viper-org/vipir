@@ -5,6 +5,7 @@
 
 #include "vasm/instruction/twoOperandInstruction/LogicalInstruction.h"
 #include "vasm/instruction/singleOperandInstruction/Grp4Instruction.h"
+#include "vasm/instruction/variableOperandInstruction/IMulInstruction.h"
 
 #include <format>
 
@@ -32,6 +33,10 @@ namespace vipir
                 case Operator::Sub:
                     operatorName = "SUB";
                     symbol = "-";
+                    break;
+                case Operator::IMul:
+                    operatorName = "IMUL";
+                    symbol = "*";
                     break;
 
                 case Operator::BWAnd:
@@ -63,6 +68,17 @@ namespace vipir
                     break;
                 case Operator::Sub:
                     createInstruction.template operator()<instruction::SubInstruction>();
+                    break;
+
+                case Operator::IMul:
+                    if (dynamic_cast<instruction::Immediate*>(mRight->asmOperand().get()))
+                    {
+                        builder.addValue(std::make_unique<instruction::IMulInstruction>(mLeft->asmOperand(), mLeft->asmOperand(), mRight->asmOperand()));
+                    }
+                    else
+                    {
+                        builder.addValue(std::make_unique<instruction::IMulInstruction>(mLeft->asmOperand(), mRight->asmOperand()));
+                    }
                     break;
 
                 case Operator::BWAnd:

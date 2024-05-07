@@ -177,6 +177,10 @@ namespace vipir
                 createArithmetic(lir::BinaryArithmetic::Operator::Sub);
                 break;
 
+            case Instruction::IMUL:
+                createArithmetic(lir::BinaryArithmetic::Operator::IMul);
+                break;
+
             case Instruction::BWAND:
                 createArithmetic(lir::BinaryArithmetic::Operator::BWAnd);
                 break;
