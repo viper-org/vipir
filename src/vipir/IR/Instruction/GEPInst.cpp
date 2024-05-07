@@ -71,7 +71,6 @@ namespace vipir
             }
 
             offset = nullptr;
-
             scale = 1;
         }
 

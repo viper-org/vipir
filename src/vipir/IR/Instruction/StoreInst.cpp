@@ -1,8 +1,7 @@
 // Copyright 2024 solar-mist
 
 #include "vipir/IR/Instruction/StoreInst.h"
-#include "vipir/IR/Instruction/AllocaInst.h"
-#include "vipir/IR/Instruction/GEPInst.h"
+#include "vipir/IR/Instruction/LoadInst.h"
 
 #include "vipir/IR/BasicBlock.h"
 #include "vipir/IR/GlobalVar.h"
@@ -41,7 +40,15 @@ namespace vipir
         mPtr->lateEmit(builder);
         mValue->lateEmit(builder);
 
-        builder.addValue(std::make_unique<lir::Move>(mPtr->getEmittedValue(), mValue->getEmittedValue()));
+        if (dynamic_cast<LoadInst*>(mPtr))
+        {
+            lir::OperandPtr mem = std::make_unique<lir::Memory>(mValue->getType()->getOperandSize(), mPtr->getEmittedValue(), std::nullopt, nullptr, std::nullopt);
+            builder.addValue(std::make_unique<lir::Move>(std::move(mem), mValue->getEmittedValue()));
+        }
+        else
+        {
+            builder.addValue(std::make_unique<lir::Move>(mPtr->getEmittedValue(), mValue->getEmittedValue()));
+        }
     }
 
     StoreInst::StoreInst(BasicBlock* parent, Value* ptr, Value* value)
