@@ -2,6 +2,7 @@
 
 #include "vipir/IR/Instruction/StoreInst.h"
 #include "vipir/IR/Instruction/LoadInst.h"
+#include "vipir/IR/Instruction/GEPInst.h"
 
 #include "vipir/IR/BasicBlock.h"
 #include "vipir/IR/GlobalVar.h"
@@ -40,15 +41,19 @@ namespace vipir
         mPtr->lateEmit(builder);
         mValue->lateEmit(builder);
 
+        lir::OperandPtr ptr = mPtr->getEmittedValue();
+        lir::OperandPtr value = mValue->getEmittedValue();
+
         if (dynamic_cast<LoadInst*>(mPtr))
         {
-            lir::OperandPtr mem = std::make_unique<lir::Memory>(mValue->getType()->getOperandSize(), mPtr->getEmittedValue(), std::nullopt, nullptr, std::nullopt);
-            builder.addValue(std::make_unique<lir::Move>(std::move(mem), mValue->getEmittedValue()));
+            ptr = std::make_unique<lir::Memory>(mValue->getType()->getOperandSize(), std::move(ptr), std::nullopt, nullptr, std::nullopt);
         }
-        else
+        if (dynamic_cast<GEPInst*>(mValue))
         {
-            builder.addValue(std::make_unique<lir::Move>(mPtr->getEmittedValue(), mValue->getEmittedValue()));
+            value = static_cast<lir::Memory*>(value.get())->base();
         }
+
+        builder.addValue(std::make_unique<lir::Move>(std::move(ptr), std::move(value)));
     }
 
     StoreInst::StoreInst(BasicBlock* parent, Value* ptr, Value* value)

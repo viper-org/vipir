@@ -145,6 +145,8 @@ namespace vipir
             bool isMemory() override;
             codegen::OperandSize size() override;
 
+            OperandPtr base();
+
         private:
             codegen::OperandSize mSize;
             OperandPtr mBase;

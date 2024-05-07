@@ -334,6 +334,11 @@ namespace vipir
             return mSize;
         }
 
+        OperandPtr Memory::base()
+        {
+            return mBase->clone();
+        }
+
 
         Compound::Compound(std::vector<OperandPtr> values)
             : mValues(std::move(values))
