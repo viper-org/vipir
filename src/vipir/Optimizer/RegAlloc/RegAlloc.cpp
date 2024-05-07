@@ -33,6 +33,7 @@ namespace vipir
 
             auto createStackVReg = [&virtualRegs, &virtualRegCount, function, abi](){
                 function->mVirtualRegs.push_back(std::make_unique<VReg>(virtualRegCount++, abi->getStackOffsetRegister(), 0));
+                ++function->mVirtualRegs.back().get()->mUses;
                 return function->mVirtualRegs.back().get();
             };
 
@@ -47,10 +48,12 @@ namespace vipir
                         return vreg.second->mOnStack;
                     });
                     if (it == virtualRegs.end()) return createStackVReg();
+                    ++it->second->mUses;
                     return it->second;
                 }
                 VReg* reg = virtualRegs.begin()->second;
                 virtualRegs.erase(virtualRegs.begin());
+                ++reg->mUses;
                 return reg;
             };
 
@@ -130,42 +133,55 @@ namespace vipir
             int index = 0;
             for (auto& basicBlock : function->mBasicBlockList)
             {
+                basicBlock->mInterval.first = index;
                 for (auto& value : basicBlock->mValueList)
                 {
-                    value->mInterval.first = index;
                     index++;
                 }
+                basicBlock->mInterval.second = index;
             }
 
-
-            for (auto bb = function->mBasicBlockList.rbegin(); bb != function->mBasicBlockList.rend(); ++bb)
+            for (auto it = function->mBasicBlockList.rbegin(); it != function->mBasicBlockList.rend(); ++it)
             {
-                for (auto it = (*bb)->mValueList.rbegin(); it != (*bb)->mValueList.rend(); ++it)
+                auto& bb = *it;
+
+                std::vector<Value*> live;
+                for (auto successor : bb->successors())
                 {
-                    index--;
-                    auto& value = *it;
+                    std::copy(successor->liveIn().begin(), successor->liveIn().end(), std::back_inserter(live));
+                }
+
+                for (auto value : live)
+                {
+                    value->mInterval = bb->mInterval;
+                }
+
+                for (auto valueIt = bb->mValueList.rbegin(); valueIt != bb->mValueList.rend(); ++valueIt)
+                {
+                    auto& value = *valueIt;
+
                     for (auto operand : value->getOperands())
                     {
-                        // If we haven't set the last usage yet, this is it
-                        if (operand->mInterval.second == -1)
+                        if (operand->mInterval.second < value->mInterval.second)
                         {
-                            operand->mInterval.second = index;
+                            operand->mInterval.second = value->mInterval.second;
+                        }
+                        live.push_back(operand);
+                    }
+                }
+
+                if (bb->loopEnd())
+                {
+                    for (auto value : live)
+                    {
+                        if (value->mInterval.second < bb->loopEnd()->mInterval.second)
+                        {
+                            value->mInterval.second = bb->loopEnd()->mInterval.second;
                         }
                     }
                 }
-            }
 
-            // If any values don't have an end interval, set it to the same as the
-            // start - they are never used
-            for (auto& basicBlock : function->mBasicBlockList)
-            {
-                for (auto& value : basicBlock->mValueList)
-                {
-                    if (value->mInterval.second == -1)
-                    {
-                        value->mInterval.second = value->mInterval.first;
-                    }
-                }
+                bb->liveIn() = live;
             }
         }
 

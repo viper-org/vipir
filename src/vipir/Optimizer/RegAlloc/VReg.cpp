@@ -12,6 +12,7 @@ namespace vipir
     {
         VReg::VReg(int id, int phys)
             : mId(id)
+            , mUses(0)
             , mPhysicalRegister(phys)
             , mOnStack(false)
         {
@@ -19,6 +20,7 @@ namespace vipir
 
         VReg::VReg(int id, int phys, int offset)
             : mId(id)
+            , mUses(0)
             , mPhysicalRegister(phys)
             , mStackOffset(offset)
             , mOnStack(true)
@@ -41,6 +43,11 @@ namespace vipir
         int VReg::getId() const
         {
             return mId;
+        }
+
+        int VReg::getUses() const
+        {
+            return mUses;
         }
 
         bool VReg::onStack() const

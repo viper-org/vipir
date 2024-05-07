@@ -16,7 +16,7 @@
 namespace vipir
 {
     class Function;
-    
+
     class BasicBlock : public Value
     {
     using ValuePtr = std::unique_ptr<Value>;
@@ -29,6 +29,10 @@ namespace vipir
 
         void insertValue(Value* value);
         void eraseValue(Value* value);
+
+        std::vector<Value*>& liveIn();
+        std::vector<BasicBlock*>& successors();
+        BasicBlock*& loopEnd();
 
         void print(std::ostream& stream) override;
         std::string ident() const override;
@@ -44,6 +48,9 @@ namespace vipir
         Function* mParent;
 
         std::vector<ValuePtr> mValueList;
+        std::vector<Value*> mLiveIn;
+        std::vector<BasicBlock*> mSuccessors;
+        BasicBlock* mLoopEnd;
     };
 }
 

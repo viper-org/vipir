@@ -94,7 +94,7 @@ namespace vipir
         std::vector<int> abiCalleeSaved = mModule.abi()->getCalleeSavedRegisters();
         for (auto& vreg : mVirtualRegs)
         {
-            if (!vreg->onStack())
+            if (!vreg->onStack() && vreg->getUses() > 0)
             {
                 auto it = std::find(abiCalleeSaved.begin(), abiCalleeSaved.end(), vreg->getPhysicalRegister());
                 if (it != abiCalleeSaved.end()) mCalleeSaved.push_back(vreg->getPhysicalRegister());

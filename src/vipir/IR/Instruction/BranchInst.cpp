@@ -63,6 +63,7 @@ namespace vipir
         , mFalseBranch(nullptr)
     {
         mRequiresVReg = false;
+        parent->successors().push_back(destination);
     }
 
     BranchInst::BranchInst(BasicBlock* parent, Value* condition, BasicBlock* trueBranch, BasicBlock* falseBranch)
@@ -73,5 +74,7 @@ namespace vipir
     {
         assert(mCondition->getType() == Type::GetBooleanType());
         mRequiresVReg = false;
+        parent->successors().push_back(trueBranch);
+        parent->successors().push_back(falseBranch);
     }
 }

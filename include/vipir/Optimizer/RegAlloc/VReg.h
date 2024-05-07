@@ -23,11 +23,13 @@ namespace vipir
             instruction::OperandPtr operand(codegen::OperandSize size);
 
             int getId() const;
+            int getUses() const;
             bool onStack() const;
             int getPhysicalRegister() const;
             int getStackOffset() const;
         private:
             int mId;
+            int mUses;
 
             bool mOnStack;
 

@@ -47,6 +47,21 @@ namespace vipir
         });
     }
 
+    std::vector<Value*>& BasicBlock::liveIn()
+    {
+        return mLiveIn;
+    }
+
+    std::vector<BasicBlock*>& BasicBlock::successors()
+    {
+        return mSuccessors;
+    }
+
+    BasicBlock*& BasicBlock::loopEnd()
+    {
+        return mLoopEnd;
+    }
+
     void BasicBlock::print(std::ostream& stream)
     {
         stream << std::format("{}:\n", mName);
