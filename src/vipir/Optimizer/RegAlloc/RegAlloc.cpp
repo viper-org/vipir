@@ -164,7 +164,6 @@ namespace vipir
 
                     for (auto operand : value->getOperands())
                     {
-                        operand->mInterval.first = std::min(operand->mInterval.first, bb->mInterval.first);
                         operand->mInterval.second = std::max(operand->mInterval.second, value->mInterval.first);
                         live.push_back(operand);
                     }
