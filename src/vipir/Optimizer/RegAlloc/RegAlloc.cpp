@@ -136,6 +136,7 @@ namespace vipir
                 basicBlock->mInterval.first = index;
                 for (auto& value : basicBlock->mValueList)
                 {
+                    value->mInterval.first = index;
                     index++;
                 }
                 basicBlock->mInterval.second = index;
@@ -153,7 +154,8 @@ namespace vipir
 
                 for (auto value : live)
                 {
-                    value->mInterval = bb->mInterval;
+                    value->mInterval.first = std::min(value->mInterval.first, bb->mInterval.first);
+                    value->mInterval.second = std::max(value->mInterval.second, bb->mInterval.second);
                 }
 
                 for (auto valueIt = bb->mValueList.rbegin(); valueIt != bb->mValueList.rend(); ++valueIt)
@@ -162,14 +164,11 @@ namespace vipir
 
                     for (auto operand : value->getOperands())
                     {
-                        if (operand->mInterval.second < bb->mInterval.second)
-                        {
-                            operand->mInterval.second = bb->mInterval.second;
-                        }
+                        operand->mInterval.first = std::min(operand->mInterval.first, bb->mInterval.first);
+                        operand->mInterval.second = std::max(operand->mInterval.second, value->mInterval.first);
                         live.push_back(operand);
                     }
 
-                    value->mInterval.first = bb->mInterval.first;
                     live.erase(std::remove_if(live.begin(), live.end(), [&value](auto liveValue){
                         return liveValue == value.get();
                     }), live.end());
