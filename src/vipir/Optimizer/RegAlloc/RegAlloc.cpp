@@ -162,9 +162,9 @@ namespace vipir
 
                     for (auto operand : value->getOperands())
                     {
-                        if (operand->mInterval.second < value->mInterval.second)
+                        if (operand->mInterval.second < bb->mInterval.second)
                         {
-                            operand->mInterval.second = value->mInterval.second;
+                            operand->mInterval.second = bb->mInterval.second;
                         }
                         live.push_back(operand);
                     }
