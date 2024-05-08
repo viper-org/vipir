@@ -177,10 +177,8 @@ namespace vipir
                 {
                     for (auto value : live)
                     {
-                        if (value->mInterval.second < bb->loopEnd()->mInterval.second)
-                        {
-                            value->mInterval.second = bb->loopEnd()->mInterval.second;
-                        }
+                        value->mInterval.first = std::min(value->mInterval.first, bb->mInterval.first);
+                        value->mInterval.second = std::max(value->mInterval.second, bb->loopEnd()->mInterval.second);
                     }
                 }
 
