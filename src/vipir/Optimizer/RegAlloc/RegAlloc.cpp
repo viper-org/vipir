@@ -168,6 +168,11 @@ namespace vipir
                         }
                         live.push_back(operand);
                     }
+
+                    value->mInterval.first = bb->mInterval.first;
+                    live.erase(std::remove_if(live.begin(), live.end(), [&value](auto liveValue){
+                        return liveValue == value.get();
+                    }), live.end());
                 }
 
                 if (bb->loopEnd())
