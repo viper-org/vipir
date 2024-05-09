@@ -131,6 +131,15 @@ namespace vipir
         {
             constant->emit(builder);
         }
+
+        for (GlobalPtr& global : mGlobals)
+        {
+            if (auto func = dynamic_cast<Function*>(global.get()))
+            {
+                func->setEmittedValue();
+            }
+        }
+
         for (const GlobalPtr& global : mGlobals)
         {
             global->emit(builder);

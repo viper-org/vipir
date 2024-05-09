@@ -77,18 +77,21 @@ namespace vipir
         return "@" + mName;
     }
 
+    void Function::setEmittedValue()
+    {
+        mEmittedValue = std::make_unique<lir::Lbl>(mName);
+    }
+
     void Function::emit(lir::Builder& builder)
     {
         builder.setSection(lir::SectionType::Code);
 
         if (mBasicBlockList.empty())
         {
-            mEmittedValue = std::make_unique<lir::Lbl>(mName);
             builder.addValue(std::make_unique<lir::ExternLabel>(mName));
             return;
         }
 
-        mEmittedValue = std::make_unique<lir::Lbl>(mName);
         builder.addValue(std::make_unique<lir::Label>(mName, true));
         
         std::vector<int> abiCalleeSaved = mModule.abi()->getCalleeSavedRegisters();

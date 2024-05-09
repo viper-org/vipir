@@ -33,6 +33,7 @@ namespace vipir
         std::vector<int> getCalleeSaved();
 
         void insertBasicBlock(BasicBlock* basicBlock);
+        void setEmittedValue();
 
         void print(std::ostream& stream) override;
         std::string ident() const override;
