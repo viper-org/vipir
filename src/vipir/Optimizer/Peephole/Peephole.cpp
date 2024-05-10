@@ -6,6 +6,8 @@
 #include "vipir/LIR/Instruction/Move.h"
 #include "vipir/LIR/Instruction/LoadAddress.h"
 
+#include <algorithm>
+
 namespace vipir
 {
     namespace opt
@@ -158,21 +160,16 @@ namespace vipir
             if (!dynamic_cast<lir::VirtualReg*>(operand.get())) return false;
             for (int i = index+1; i < values.size(); ++i)
             {
-                if (auto move = dynamic_cast<lir::Move*>(values[i].get()))
-                {
-                    if (*move->mLeft == operand) return false;
-                    else if (*move->mRight == operand) return false;
-                }
-                if (auto la = dynamic_cast<lir::LoadAddress*>(values[i].get()))
-                {
-                    auto memory = dynamic_cast<lir::Memory*>(la->mRight.get());
-                    if (!memory) continue;
-                    
-                    if (*la->mRight == operand) return false;
+                auto inputs = values[i]->getInputOperands();
+                auto outputs = values[i]->getOutputOperands();
 
-                    if (*memory->mBase == operand) return false;
-                    if (memory->mIndex && *memory->mIndex == operand) return false;
-                }
+                if (std::find_if(inputs.begin(), inputs.end(), [&operand](const auto input){
+                    return *operand == input;
+                }) != inputs.end()) return false;
+
+                if (std::find_if(outputs.begin(), outputs.end(), [&operand](const auto output){
+                    return *operand == output;
+                }) != outputs.end()) return false;
             }
             return true; // Value is never used again
         }
