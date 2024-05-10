@@ -14,8 +14,14 @@ namespace vipir
         {
             auto& instructions = builder.getValues();
 
+            int index = 0;
             for (auto it = instructions.begin(); it != instructions.end();)
             {
+                if (checkDeadStore(*it, instructions, index))
+                {
+                    it = instructions.erase(it);
+                }
+
                 if ((it + 1) != instructions.end())
                 {
                     if (checkDoubleMove(*it, *(it + 1)))
@@ -30,11 +36,13 @@ namespace vipir
                         lir::OperandPtr right = leaFirst->mRight->clone();
 
                         it = instructions.erase(it, it + 2);
-                        instructions.insert(it, std::make_unique<lir::Move>(std::move(left), std::move(right)));
+                        it = instructions.insert(it, std::make_unique<lir::Move>(std::move(left), std::move(right)));
                     }
                     else ++it;
                 }
                 else ++it;
+
+                ++index;
             }
         }
 
@@ -90,6 +98,32 @@ namespace vipir
                     {
                         return true;
                     }
+                }
+            }
+            return false;
+        }
+
+
+        /*
+         * Check for a store into a physical/virtual register that is not followed by a move
+         * out of that register until after a new value has been stored into it. For example:
+         * MOV R1, [MEM]
+         * MOV R2, [MEM2]
+         * MOV R3, R2
+         * The first MOV can be removed as it is a dead store
+         */
+        bool Peephole::checkDeadStore(lir::ValuePtr& value, std::vector<lir::ValuePtr>& values, int index)
+        {
+            auto move = dynamic_cast<lir::Move*>(value.get());
+            if (!move) return false;
+
+            auto& operand = move->mLeft;
+            for (int i = index; i < values.size(); ++i)
+            {
+                if (auto move = dynamic_cast<lir::Move*>(values[i].get()))
+                {
+                    if (*move->mLeft == operand) return true;
+                    else if (*move->mRight == operand) return false;
                 }
             }
             return false;
