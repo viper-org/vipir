@@ -117,6 +117,12 @@ namespace vipir
             global->emit(builder);
         }
 
+        if (std::find(mPasses.begin(), mPasses.end(), Pass::PeepholeOptimization) != mPasses.end())
+        {
+            opt::Peephole peephole;
+            peephole.doOptimizations(builder);
+        }
+
         for (auto& value : builder.getValues())
         {
             value->print(stream);
