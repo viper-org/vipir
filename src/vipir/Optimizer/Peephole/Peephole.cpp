@@ -17,16 +17,13 @@ namespace vipir
             int index = 0;
             for (auto it = instructions.begin(); it != instructions.end();)
             {
-                if (checkDeadStore(*it, instructions, index))
-                {
-                    it = instructions.erase(it);
-                }
-
+                bool iterate = true;
                 if ((it + 1) != instructions.end())
                 {
                     if (checkDoubleMove(*it, *(it + 1)))
                     {
                         it = instructions.erase(it + 1);
+                        iterate = false;
                     }
                     else if (checkLeaMove(*it, *(it + 1)))
                     {
@@ -37,10 +34,14 @@ namespace vipir
 
                         it = instructions.erase(it, it + 2);
                         it = instructions.insert(it, std::make_unique<lir::Move>(std::move(left), std::move(right)));
+                        iterate = false;
                     }
-                    else ++it;
                 }
-                else ++it;
+                if (checkDeadStore(*it, instructions, index))
+                {
+                    it = instructions.erase(it);
+                }
+                if (iterate) ++it;
 
                 ++index;
             }
