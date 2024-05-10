@@ -16,7 +16,13 @@ namespace vipir
         
         private:
             bool checkDoubleMove(lir::ValuePtr& first, lir::ValuePtr& second);
-            bool checkLeaMove(lir::ValuePtr& first, lir::ValuePtr& second);
+            enum class LeaMoveResult
+            {
+                None,
+                Direct,
+                Indirect
+            };
+            LeaMoveResult checkLeaMove(lir::ValuePtr& first, lir::ValuePtr& second);
             bool checkDeadStore(lir::ValuePtr& value, std::vector<lir::ValuePtr>& values, int index);
         };
     }

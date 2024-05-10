@@ -20,12 +20,13 @@ namespace vipir
                 bool iterate = true;
                 if ((it + 1) != instructions.end())
                 {
+                    auto leaMoveResult = checkLeaMove(*it, *(it + 1));
                     if (checkDoubleMove(*it, *(it + 1)))
                     {
                         it = instructions.erase(it + 1);
                         iterate = false;
                     }
-                    else if (checkLeaMove(*it, *(it + 1)))
+                    else if (leaMoveResult != LeaMoveResult::None)
                     {
                         auto leaFirst = dynamic_cast<lir::LoadAddress*>(it->get());
                         auto moveSecond = dynamic_cast<lir::Move*>((it + 1)->get());
@@ -33,7 +34,10 @@ namespace vipir
                         lir::OperandPtr right = leaFirst->mRight->clone();
 
                         it = instructions.erase(it, it + 2);
-                        it = instructions.insert(it, std::make_unique<lir::Move>(std::move(left), std::move(right)));
+                        if (leaMoveResult == LeaMoveResult::Indirect)
+                            it = instructions.insert(it, std::make_unique<lir::Move>(std::move(left), std::move(right)));
+                        else // direct
+                            it = instructions.insert(it, std::make_unique<lir::LoadAddress>(std::move(left), std::move(right)));
                         iterate = false;
                     }
                 }
@@ -83,13 +87,18 @@ namespace vipir
          * MOV R2, [R1]
          *
          * This can be simplified to MOV R2, [MEM]
+         *
+         * Also checks for a lea into a register, then a direct move from that
+         * register, as this can be simplified to a lea directly into the target
          */
-        bool Peephole::checkLeaMove(lir::ValuePtr& first, lir::ValuePtr& second)
+        Peephole::LeaMoveResult Peephole::checkLeaMove(lir::ValuePtr& first, lir::ValuePtr& second)
         {
             auto leaFirst = dynamic_cast<lir::LoadAddress*>(first.get());
-            if (!leaFirst) return false;
+            if (!leaFirst) return LeaMoveResult::None;
             auto moveSecond = dynamic_cast<lir::Move*>(second.get());
-            if (!moveSecond) return false;
+            if (!moveSecond) return LeaMoveResult::None;
+
+            if (*moveSecond->mRight == leaFirst->mLeft) return LeaMoveResult::Direct;
 
             if (auto mem = dynamic_cast<lir::Memory*>(moveSecond->mRight.get()))
             {
@@ -97,11 +106,11 @@ namespace vipir
                 {
                     if (*leaFirst->mLeft == mem->mBase)
                     {
-                        return true;
+                        return LeaMoveResult::Indirect;
                     }
                 }
             }
-            return false;
+            return LeaMoveResult::None;
         }
 
 
