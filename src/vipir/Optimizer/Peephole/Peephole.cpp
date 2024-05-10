@@ -119,6 +119,7 @@ namespace vipir
             if (!move) return false;
 
             auto& operand = move->mLeft;
+            if (!dynamic_cast<lir::VirtualReg*>(operand.get())) return false;
             for (int i = index; i < values.size(); ++i)
             {
                 if (auto move = dynamic_cast<lir::Move*>(values[i].get()))
