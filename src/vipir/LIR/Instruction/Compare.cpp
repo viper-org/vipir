@@ -58,5 +58,10 @@ namespace vipir
         {
             builder.addValue(std::make_unique<instruction::CmpInstruction>(mLeft->asmOperand(), mRight->asmOperand()));
         }
+
+        std::vector<std::reference_wrapper<OperandPtr> > Compare::getInputOperands()
+        {
+            return {mLeft, mRight};
+        }
     }
 }

@@ -41,5 +41,15 @@ namespace vipir
 
             builder.addValue(std::make_unique<instruction::LeaInstruction>(mLeft->asmOperand(), std::move(right)));
         }
+
+        std::vector<std::reference_wrapper<OperandPtr> > LoadAddress::getOutputOperands()
+        {
+            return {mLeft};
+        }
+
+        std::vector<std::reference_wrapper<OperandPtr> > LoadAddress::getInputOperands()
+        {
+            return {mRight};
+        }
     }
 }

@@ -93,6 +93,15 @@ namespace vipir
             }
         }
 
+        std::vector<std::reference_wrapper<OperandPtr> > BinaryArithmetic::getOutputOperands()
+        {
+            return {mLeft};
+        }
+
+        std::vector<std::reference_wrapper<OperandPtr> > BinaryArithmetic::getInputOperands()
+        {
+            return {mLeft, mRight};
+        }
 
         UnaryArithmetic::UnaryArithmetic(OperandPtr operand, Operator op)
             : mOperand(std::move(operand))
@@ -133,6 +142,17 @@ namespace vipir
                     createInstruction.template operator()<instruction::NegInstruction>();
                     break;
             }
+        }
+
+        std::vector<std::reference_wrapper<OperandPtr> > UnaryArithmetic::getOutputOperands()
+        {
+            return {mOperand};
+        }
+
+
+        std::vector<std::reference_wrapper<OperandPtr> > UnaryArithmetic::getInputOperands()
+        {
+            return {mOperand};
         }
     }
 }

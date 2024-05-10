@@ -18,6 +18,8 @@ namespace vipir
             void print(std::ostream& stream) const override;
             void emit(MC::Builder& builder) override;
 
+            std::vector<std::reference_wrapper<OperandPtr> > getInputOperands() override;
+
         private:
             OperandPtr mDest;
         };
@@ -30,6 +32,8 @@ namespace vipir
 
             void print(std::ostream& stream) const override;
             void emit(MC::Builder& builder) override;
+
+            std::vector<std::reference_wrapper<OperandPtr> > getInputOperands() override;
 
         private:
             OperandPtr mDest;
@@ -45,6 +49,8 @@ namespace vipir
 
             void print(std::ostream& stream) const override;
             void emit(MC::Builder& builder) override;
+
+            std::vector<std::reference_wrapper<OperandPtr> > getInputOperands() override;
 
         private:
             OperandPtr mDest;

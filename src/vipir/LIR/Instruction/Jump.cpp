@@ -30,6 +30,11 @@ namespace vipir
             builder.addValue(std::make_unique<instruction::JmpInstruction>(mDest->asmOperand()));
         }
 
+        std::vector<std::reference_wrapper<OperandPtr> > Jump::getInputOperands()
+        {
+            return {mDest};
+        }
+
 
         CondJump::CondJump(OperandPtr dest, OperandPtr cond)
             : mDest(std::move(dest))
@@ -70,6 +75,11 @@ namespace vipir
             }
         }
 
+        std::vector<std::reference_wrapper<OperandPtr> > CondJump::getInputOperands()
+        {
+            return {mDest};
+        }
+
 
 
         Call::Call(OperandPtr dest)
@@ -85,6 +95,11 @@ namespace vipir
         void Call::emit(MC::Builder& builder)
         {
             builder.addValue(std::make_unique<instruction::CallInstruction>(mDest->asmOperand()));
+        }
+
+        std::vector<std::reference_wrapper<OperandPtr> > Call::getInputOperands()
+        {
+            return {mDest};
         }
     }
 }

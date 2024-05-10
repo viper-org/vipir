@@ -16,6 +16,7 @@ namespace vipir
         
         private:
             bool checkDoubleMove(lir::ValuePtr& first, lir::ValuePtr& second);
+            bool checkMoveEqualArgs(lir::ValuePtr& value);
             enum class LeaMoveResult
             {
                 None,

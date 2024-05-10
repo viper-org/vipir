@@ -18,6 +18,9 @@ namespace vipir
             void print(std::ostream& stream) const override;
             void emit(MC::Builder& builder) override;
 
+            std::vector<std::reference_wrapper<OperandPtr> > getOutputOperands() override;
+            std::vector<std::reference_wrapper<OperandPtr> > getInputOperands() override;
+
         private:
             OperandPtr mLeft;
             OperandPtr mRight;

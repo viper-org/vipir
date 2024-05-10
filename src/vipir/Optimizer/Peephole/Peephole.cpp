@@ -18,6 +18,12 @@ namespace vipir
             for (auto it = instructions.begin(); it != instructions.end();)
             {
                 bool iterate = true;
+                if (checkMoveEqualArgs(*it))
+                {
+                    it = instructions.erase(it);
+                    iterate = false;
+                    hasOptimized = true;
+                }
                 if ((it + 1) != instructions.end())
                 {
                     auto leaMoveResult = checkLeaMove(*it, *(it + 1));
@@ -85,6 +91,23 @@ namespace vipir
 
 
         /*
+         * Check for a mov where the operands are identical, and remove
+         * them. For example:
+         *
+         * MOV R1, R1
+         *
+         * This instruction can be removed in its entirety
+         */
+        bool Peephole::checkMoveEqualArgs(lir::ValuePtr& value)
+        {
+            auto move = dynamic_cast<lir::Move*>(value.get());
+            if (!move) return false;
+
+            return (*move->mLeft == move->mRight);
+        }
+
+
+        /*
          * Check for a lea into a register, then an indirect move from that register
          * immediately after. For example:
          * LEA R1, [MEM]
@@ -137,8 +160,18 @@ namespace vipir
             {
                 if (auto move = dynamic_cast<lir::Move*>(values[i].get()))
                 {
-                    if (*move->mLeft == operand) return true;
+                    if (*move->mLeft == operand) return false;
                     else if (*move->mRight == operand) return false;
+                }
+                if (auto la = dynamic_cast<lir::LoadAddress*>(values[i].get()))
+                {
+                    auto memory = dynamic_cast<lir::Memory*>(la->mRight.get());
+                    if (!memory) continue;
+                    
+                    if (*la->mRight == operand) return false;
+
+                    if (*memory->mBase == operand) return false;
+                    if (memory->mIndex && *memory->mIndex == operand) return false;
                 }
             }
             return true; // Value is never used again

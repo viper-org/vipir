@@ -19,6 +19,9 @@ namespace vipir
             virtual void print(std::ostream& stream) const = 0;
 
             virtual void emit(MC::Builder& builder) = 0;
+
+            virtual std::vector<std::reference_wrapper<OperandPtr> > getOutputOperands() { return {}; }
+            virtual std::vector<std::reference_wrapper<OperandPtr> > getInputOperands() { return {}; }
         };
     }
 }

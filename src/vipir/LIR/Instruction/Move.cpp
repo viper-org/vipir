@@ -48,6 +48,16 @@ namespace vipir
             builder.addValue(std::make_unique<instruction::MovInstruction>(std::move(left), std::move(right), mLeft->size()));
         }
 
+        std::vector<std::reference_wrapper<OperandPtr> > Move::getOutputOperands()
+        {
+            return {mLeft};
+        }
+
+        std::vector<std::reference_wrapper<OperandPtr> > Move::getInputOperands()
+        {
+            return {mLeft, mRight};
+        }
+
 
         MoveSX::MoveSX(OperandPtr left, OperandPtr right)
             : mLeft(std::move(left))
@@ -70,6 +80,16 @@ namespace vipir
                 left = std::make_unique<instruction::Relative>(std::move(lbl), std::nullopt);
             }
             builder.addValue(std::make_unique<instruction::MovSXInstruction>(std::move(left), mRight->asmOperand(), mLeft->size()));
+        }
+
+        std::vector<std::reference_wrapper<OperandPtr> > MoveSX::getOutputOperands()
+        {
+            return {mLeft};
+        }
+
+        std::vector<std::reference_wrapper<OperandPtr> > MoveSX::getInputOperands()
+        {
+            return {mRight};
         }
     }
 }
