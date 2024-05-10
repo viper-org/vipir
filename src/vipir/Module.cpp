@@ -99,6 +99,14 @@ namespace vipir
             }
         }
 
+        for (const GlobalPtr& global : mGlobals)
+        {
+            if (auto func = dynamic_cast<Function*>(global.get()))
+            {
+                func->setEmittedValue();
+            }
+        }
+
         lir::Builder builder;
         for (const ValuePtr& constant : mConstants)
         {
