@@ -42,6 +42,11 @@ namespace vipir
         return std::format("%{}", getName(mValueId));
     }
 
+    std::vector<Value*> CallInst::getOperands()
+    {
+        return mParameters;
+    }
+
 
     void CallInst::emit(lir::Builder& builder)
     {
