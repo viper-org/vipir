@@ -6,6 +6,7 @@
 
 #include "vipir/LIR/Label.h"
 #include "vipir/LIR/Instruction/EnterFunc.h"
+#include "vipir/LIR/Instruction/Ret.h"
 
 #include "vasm/instruction/Label.h"
 #include "vasm/instruction/Directive.h"
@@ -94,20 +95,10 @@ namespace vipir
 
         builder.addValue(std::make_unique<lir::Label>(mName, true));
         
-        std::vector<int> abiCalleeSaved = mModule.abi()->getCalleeSavedRegisters();
-        for (auto& vreg : mVirtualRegs)
-        {
-            if (!vreg->onStack() && vreg->getUses() > 0)
-            {
-                auto it = std::find(abiCalleeSaved.begin(), abiCalleeSaved.end(), vreg->getPhysicalRegister());
-                if (it != abiCalleeSaved.end()) mCalleeSaved.push_back(vreg->getPhysicalRegister());
-            }
-        }
-        if (mCalleeSaved.size() % 2 != 0)
-        { // Keep stack aligned to 16 bytes
-            mTotalStackOffset += 8;
-        }
         builder.addValue(std::make_unique<lir::EnterFunc>(mTotalStackOffset, mCalleeSaved));
+        mEnterFuncNode = builder.getValues().back().get();
+
+        lir::Builder newBuilder;
 
         for (auto& basicBlock : mBasicBlockList)
         {
@@ -116,13 +107,22 @@ namespace vipir
 
         for (auto& argument : mArguments)
         {
-            argument->emit(builder);
+            argument->emit(newBuilder);
         }
 
         for (auto& basicBlock : mBasicBlockList)
         {
-            basicBlock->emit(builder);
+            basicBlock->emit(newBuilder);
         }
+
+        for (auto& value : newBuilder.getValues())
+        {
+            if (auto ret = dynamic_cast<lir::Ret*>(value.get()))
+            {
+                mRetNodes.push_back(ret);
+            }
+        }
+        std::move(newBuilder.getValues().begin(), newBuilder.getValues().end(), std::back_inserter(builder.getValues()));
     }
 
     Function::Function(FunctionType* type, Module& module, std::string_view name)
@@ -137,6 +137,36 @@ namespace vipir
         {
             std::string id = std::to_string(module.getNextValueId());
             mArguments.push_back(std::make_unique<Argument>(module, type, std::move(id), index++));
+        }
+    }
+
+
+    void Function::setCalleeSaved()
+    {
+        if (mBasicBlockList.empty()) return;
+        mCalleeSaved.clear();
+        std::vector<int> abiCalleeSaved = mModule.abi()->getCalleeSavedRegisters();
+        for (auto& vreg : mVirtualRegs)
+        {
+            if (!vreg->onStack() && vreg->getUses() > 0)
+            {
+                auto it = std::find(abiCalleeSaved.begin(), abiCalleeSaved.end(), vreg->getPhysicalRegister());
+                if (it != abiCalleeSaved.end()) mCalleeSaved.push_back(vreg->getPhysicalRegister());
+            }
+        }
+        if (mCalleeSaved.size() % 2 != 0)
+        { // Keep stack aligned to 16 bytes
+            mTotalStackOffset += 8;
+        }
+
+        lir::EnterFunc* node = static_cast<lir::EnterFunc*>(mEnterFuncNode);
+        node->setStackSize(mTotalStackOffset);
+        node->setCalleeSaved(mCalleeSaved);
+        for (auto node : mRetNodes)
+        {
+            lir::Ret* ret = static_cast<lir::Ret*>(node);
+            ret->setLeave(mTotalStackOffset > 0);
+            ret->setCalleeSaved(mCalleeSaved);
         }
     }
 }

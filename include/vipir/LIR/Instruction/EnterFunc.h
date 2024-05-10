@@ -18,6 +18,9 @@ namespace vipir
             void print(std::ostream& stream) const override;
             void emit(MC::Builder& builder) override;
 
+            void setStackSize(int newSize);
+            void setCalleeSaved(std::vector<int> calleeSaved);
+
         private:
             int mStackSize;
             std::vector<int> mCalleeSaved;

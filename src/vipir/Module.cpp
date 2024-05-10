@@ -165,6 +165,14 @@ namespace vipir
             peephole.doOptimizations(builder);
         }
 
+        for (auto& global : mGlobals)
+        {
+            if (auto func = dynamic_cast<Function*>(global.get()))
+            {
+                func->setCalleeSaved();
+            }
+        }
+
         MC::Builder mcBuilder;
         for (auto& value : builder.getValues())
         {

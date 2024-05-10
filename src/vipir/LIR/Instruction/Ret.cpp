@@ -39,5 +39,15 @@ namespace vipir
 
             builder.addValue(std::make_unique<instruction::RetInstruction>());
         }
+
+        void Ret::setLeave(bool leave)
+        {
+            mLeave = leave;
+        }
+
+        void Ret::setCalleeSaved(std::vector<int> calleeSaved)
+        {
+            mCalleeSaved = std::move(calleeSaved);
+        }
     }
 }

@@ -25,6 +25,8 @@ namespace vipir
             };
             LeaMoveResult checkLeaMove(lir::ValuePtr& first, lir::ValuePtr& second);
             bool checkDeadStore(lir::ValuePtr& value, std::vector<lir::ValuePtr>& values, int index);
+
+            std::vector<lir::ValuePtr>::iterator eraseValue(std::vector<lir::ValuePtr>& values, std::vector<lir::ValuePtr>::iterator it);
         };
     }
 }

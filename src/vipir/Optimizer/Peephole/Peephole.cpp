@@ -22,7 +22,7 @@ namespace vipir
                 bool iterate = true;
                 if (checkMoveEqualArgs(*it))
                 {
-                    it = instructions.erase(it);
+                    it = eraseValue(instructions, it);
                     iterate = false;
                     hasOptimized = true;
                 }
@@ -31,7 +31,8 @@ namespace vipir
                     auto leaMoveResult = checkLeaMove(*it, *(it + 1));
                     if (checkDoubleMove(*it, *(it + 1)))
                     {
-                        it = instructions.erase(it, it + 2);
+                        it = eraseValue(instructions, it);
+                        it = eraseValue(instructions, it);
                         iterate = false;
                         hasOptimized = true;
                     }
@@ -42,7 +43,8 @@ namespace vipir
                         lir::OperandPtr left = moveSecond->mLeft->clone();
                         lir::OperandPtr right = leaFirst->mRight->clone();
 
-                        it = instructions.erase(it, it + 2);
+                        it = eraseValue(instructions, it);
+                        it = eraseValue(instructions, it);
                         if (leaMoveResult == LeaMoveResult::Indirect)
                             it = instructions.insert(it, std::make_unique<lir::Move>(std::move(left), std::move(right)));
                         else // direct
@@ -53,7 +55,7 @@ namespace vipir
                 }
                 if (checkDeadStore(*it, instructions, it - instructions.begin()))
                 {
-                    it = instructions.erase(it);
+                    it = eraseValue(instructions, it);
                     iterate = false;
                     hasOptimized = true;
                 }
@@ -61,6 +63,29 @@ namespace vipir
             }
 
             if (hasOptimized) doOptimizations(builder); // Repeat until no more optimizations are available
+        }
+
+        std::vector<lir::ValuePtr>::iterator Peephole::eraseValue(std::vector<lir::ValuePtr>& values, std::vector<lir::ValuePtr>::iterator it)
+        {
+            auto& value = *it;
+
+            for (auto& input : value->getInputOperands())
+            {
+                if (auto vreg = dynamic_cast<lir::VirtualReg*>(input.get().get()))
+                {
+                    vreg->mVreg->mUses--;
+                }
+            }
+
+            for (auto& output : value->getOutputOperands())
+            {
+                if (auto vreg = dynamic_cast<lir::VirtualReg*>(output.get().get()))
+                {
+                    vreg->mVreg->mUses--;
+                }
+            }
+
+            return values.erase(it);
         }
 
 
