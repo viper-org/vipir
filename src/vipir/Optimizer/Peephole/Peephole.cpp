@@ -12,9 +12,9 @@ namespace vipir
     {
         void Peephole::doOptimizations(lir::Builder& builder)
         {
+            bool hasOptimized = false;
             auto& instructions = builder.getValues();
 
-            int index = 0;
             for (auto it = instructions.begin(); it != instructions.end();)
             {
                 bool iterate = true;
@@ -23,8 +23,9 @@ namespace vipir
                     auto leaMoveResult = checkLeaMove(*it, *(it + 1));
                     if (checkDoubleMove(*it, *(it + 1)))
                     {
-                        it = instructions.erase(it + 1);
+                        it = instructions.erase(it, it + 2);
                         iterate = false;
+                        hasOptimized = true;
                     }
                     else if (leaMoveResult != LeaMoveResult::None)
                     {
@@ -39,16 +40,19 @@ namespace vipir
                         else // direct
                             it = instructions.insert(it, std::make_unique<lir::LoadAddress>(std::move(left), std::move(right)));
                         iterate = false;
+                        hasOptimized = true;
                     }
                 }
-                if (checkDeadStore(*it, instructions, index))
+                if (checkDeadStore(*it, instructions, it - instructions.begin()))
                 {
                     it = instructions.erase(it);
+                    iterate = false;
+                    hasOptimized = true;
                 }
                 if (iterate) ++it;
-
-                ++index;
             }
+
+            if (hasOptimized) doOptimizations(builder); // Repeat until no more optimizations are available
         }
 
 
@@ -137,7 +141,7 @@ namespace vipir
                     else if (*move->mRight == operand) return false;
                 }
             }
-            return false;
+            return true; // Value is never used again
         }
     }
 }
