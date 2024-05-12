@@ -21,6 +21,7 @@ namespace vipir
     class AllocaInst;
     class Function : public Global
     {
+    friend class Module;
     friend class IRBuilder;
     friend class opt::RegAlloc;
     using BasicBlockPtr = std::unique_ptr<BasicBlock>;
@@ -52,6 +53,11 @@ namespace vipir
         std::vector<std::unique_ptr<opt::VReg> > mVirtualRegs;
         int mTotalStackOffset;
         std::vector<int> mCalleeSaved;
+
+        lir::Value* mEnterFuncNode;
+        std::vector<lir::Value*> mRetNodes;
+
+        void setCalleeSaved();
     };
 }
 

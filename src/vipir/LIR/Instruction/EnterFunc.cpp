@@ -47,5 +47,15 @@ namespace vipir
                 builder.addValue(std::make_unique<instruction::PushInstruction>(std::move(reg)));
             }
         }
+
+        void EnterFunc::setStackSize(int newSize)
+        {
+            mStackSize = newSize;
+        }
+
+        void EnterFunc::setCalleeSaved(std::vector<int> calleeSaved)
+        {
+            mCalleeSaved = std::move(calleeSaved);
+        }
     }
 }
