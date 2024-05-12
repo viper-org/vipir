@@ -16,7 +16,7 @@ namespace vipir
 
         int SysV::getParameterRegister(int index) const
         {
-            constexpr std::array registers {7, 6, 1, 2};
+            constexpr std::array registers { 7, 6, 2, 1, 8, 9 };
 
             return registers[index];
         }
@@ -28,7 +28,7 @@ namespace vipir
 
         std::vector<int> SysV::getGeneralPurposeRegisters() const
         {
-            return { 1, 2, 3, 6, 7 };
+            return { 1, 2, 3, 6, 7, 8, 9, 10, 11 };
         }
 
         std::vector<int> SysV::getCallerSavedRegisters() const
@@ -38,7 +38,7 @@ namespace vipir
 
         std::vector<int> SysV::getCalleeSavedRegisters() const
         {
-            return { 3 };
+            return { 3, 12, 13, 14, 15 };
         }
     }
 }
