@@ -80,7 +80,7 @@ namespace vipir
 
     void Function::setEmittedValue()
     {
-        bool plt = !mBasicBlockList.empty();
+        bool plt = mBasicBlockList.empty();
 
         mEmittedValue = std::make_unique<lir::Lbl>(mName, plt);
     }
