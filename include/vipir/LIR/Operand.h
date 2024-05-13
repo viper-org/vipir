@@ -95,7 +95,7 @@ namespace vipir
         class Lbl : public Operand
         {
         public:
-            Lbl(std::string name);
+            Lbl(std::string name, bool plt);
 
             std::string ident() const override;
             instruction::OperandPtr asmOperand() override;
@@ -105,6 +105,7 @@ namespace vipir
 
         private:
             std::string mName;
+            bool mPlt;
         };
 
         class CMP : public Operand

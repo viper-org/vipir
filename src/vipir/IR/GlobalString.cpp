@@ -42,7 +42,7 @@ namespace vipir
     void GlobalString::emit(lir::Builder& builder)
     {
         builder.setSection(lir::SectionType::Data);
-        mEmittedValue = std::make_unique<lir::Lbl>(std::to_string(mValueId));
+        mEmittedValue = std::make_unique<lir::Lbl>(std::to_string(mValueId), false);
 
         builder.addValue(std::make_unique<lir::Label>(std::to_string(mValueId), false));
         builder.addValue(std::make_unique<lir::GlobalString>(mValue));

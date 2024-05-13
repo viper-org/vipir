@@ -80,7 +80,7 @@ namespace vipir
 
     void BasicBlock::setEmittedValue()
     {
-        mEmittedValue = std::make_unique<lir::Lbl>(mName);
+        mEmittedValue = std::make_unique<lir::Lbl>(mName, false);
     }
 
     void BasicBlock::emit(lir::Builder& builder)

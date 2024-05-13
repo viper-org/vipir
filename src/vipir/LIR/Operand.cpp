@@ -143,8 +143,9 @@ namespace vipir
         }
 
 
-        Lbl::Lbl(std::string name)
+        Lbl::Lbl(std::string name, bool plt)
             : mName(std::move(name))
+            , mPlt(plt)
         {
         }
 
@@ -155,12 +156,12 @@ namespace vipir
 
         instruction::OperandPtr Lbl::asmOperand()
         {
-            return std::make_unique<instruction::LabelOperand>(mName);
+            return std::make_unique<instruction::LabelOperand>(mName, mPlt ? "plt" : "");
         }
 
         OperandPtr Lbl::clone()
         {
-            return std::make_unique<Lbl>(mName);
+            return std::make_unique<Lbl>(mName, mPlt);
         }
 
         bool Lbl::operator==(OperandPtr& other)
