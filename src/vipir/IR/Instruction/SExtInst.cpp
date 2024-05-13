@@ -37,9 +37,16 @@ namespace vipir
         lir::OperandPtr value = mValue->getEmittedValue();
         lir::OperandPtr vreg = std::make_unique<lir::VirtualReg>(mVReg, mType->getOperandSize());
 
-        builder.addValue(std::make_unique<lir::MoveSX>(vreg->clone(), std::move(value)));
+        if (dynamic_cast<lir::Immediate*>(value.get()))
+        {
+            mEmittedValue = value->clone();
+        }
+        else
+        {
+            builder.addValue(std::make_unique<lir::MoveSX>(vreg->clone(), std::move(value)));
 
-        mEmittedValue = std::move(vreg);
+            mEmittedValue = std::move(vreg);
+        }
     }
 
 
