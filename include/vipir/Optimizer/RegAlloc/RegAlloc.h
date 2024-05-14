@@ -27,7 +27,7 @@ namespace vipir
             {
                 bool operator()(Value* a, Value* b) const
                 {
-                    return a->mInterval.second <= b->mInterval.second;
+                    return a->mInterval.second < b->mInterval.second;
                 }
             };
 
