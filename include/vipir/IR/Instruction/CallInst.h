@@ -20,7 +20,7 @@ namespace vipir
         void print(std::ostream& stream) override;
         std::string ident() const override;
         
-        std::vector<Value*> getOperands() override;
+        std::vector<int> getRegisterSmashes() override;
 
     protected:
         void emit(lir::Builder& builder) override;

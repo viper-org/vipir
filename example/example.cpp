@@ -42,35 +42,26 @@ int main()
     auto arrayType = vipir::Type::GetArrayType(i32Type, 3);
     auto structType = vipir::Type::GetStructType({arrayType, i32Type});
 
+    auto func = vipir::Function::Create(vipir::FunctionType::Create(i32Type, {i32Type}), mod, "test");
+
     auto func1 = vipir::Function::Create(vipir::FunctionType::Create(i32Type, {i32Type}), mod, "main");
     auto bb1 = vipir::BasicBlock::Create("", func1);
 
     builder.setInsertPoint(bb1);
 
-    auto global = mod.createGlobalVar(structType);
+    auto alloca = builder.CreateAlloca(i32Type);
+    auto x = vipir::ConstantInt::Get(mod, 32, i32Type);
+    builder.CreateStore(alloca, x);
 
-    auto init11 = vipir::ConstantInt::Get(mod, 44, i32Type);
-    auto init12 = vipir::ConstantInt::Get(mod, 44, i32Type);
-    auto init13 = vipir::ConstantInt::Get(mod, 44, i32Type);
-    auto init1 = vipir::ConstantArray::Get(mod, arrayType, {init11, init12, init13});
+    auto param = builder.CreateLoad(alloca);
 
-    auto init2 = vipir::ConstantInt::Get(mod, 23, i32Type);
-    auto init = vipir::ConstantStruct::Get(mod, structType, {init1, init2});
-    global->setInitialValue(init);
+    auto call = builder.CreateCall(func, {param});
 
-
-    auto gep1 = builder.CreateStructGEP(global, 0);
-    auto offset = vipir::ConstantInt::Get(mod, 1, i32Type);
-    auto gep2 = builder.CreateGEP(gep1, offset);
-    auto load = builder.CreateLoad(gep2);
-
-    auto retval = builder.CreateIMul(load, func1->getArgument(0));
-
-    builder.CreateRet(retval);
+    builder.CreateRet(call);
 
     mod.addPass(vipir::Pass::PeepholeOptimization);
 
-    //mod.print2(std::cout);
+    //mod.print(std::cout);
 
     mod.emit(std::cout, vipir::OutputFormat::ELF);
 }

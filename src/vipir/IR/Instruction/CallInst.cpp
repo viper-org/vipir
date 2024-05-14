@@ -42,9 +42,9 @@ namespace vipir
         return std::format("%{}", getName(mValueId));
     }
 
-    std::vector<Value*> CallInst::getOperands()
+    std::vector<int> CallInst::getRegisterSmashes()
     {
-        return mParameters;
+        return mModule.abi()->getCalleeSavedRegisters();
     }
 
 
@@ -54,15 +54,6 @@ namespace vipir
 
         lir::OperandPtr function = mFunction->getEmittedValue();
         codegen::OperandSize size = mType->getOperandSize();
-
-        int index = 0;
-        for (auto parameter : mParameters)
-        {
-            parameter->lateEmit(builder);
-            lir::OperandPtr value = parameter->getEmittedValue();
-            lir::OperandPtr reg = std::make_unique<lir::PhysicalReg>(mModule.abi()->getParameterRegister(index++), parameter->getType()->getOperandSize());
-            builder.addValue(std::make_unique<lir::Move>(std::move(reg), std::move(value)));
-        }
 
         builder.addValue(std::make_unique<lir::Call>(std::move(function)));
 

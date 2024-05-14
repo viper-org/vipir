@@ -14,6 +14,7 @@
 #include "vipir/IR/Instruction/UnaryInst.h"
 #include "vipir/IR/Instruction/BranchInst.h"
 #include "vipir/IR/Instruction/CallInst.h"
+#include "vipir/IR/Instruction/StoreParamInst.h"
 #include "vipir/IR/Instruction/PtrCastInst.h"
 #include "vipir/IR/Instruction/SExtInst.h"
 #include "vipir/IR/Instruction/TruncInst.h"
@@ -259,6 +260,13 @@ namespace vipir
 
     CallInst* IRBuilder::CreateCall(Function* function, std::vector<Value*> parameters)
     {
+        int index = 0;
+        for (auto parameter : parameters)
+        {
+            StoreParamInst* store = new StoreParamInst(mInsertPoint, index++, parameter);
+            mInsertPoint->insertValue(store);
+        }
+
         CallInst* call = new CallInst(mInsertPoint, function, std::move(parameters));
 
         mInsertPoint->insertValue(call);

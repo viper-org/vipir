@@ -4,7 +4,6 @@
 #include "vipir/Optimizer/RegAlloc/RegAlloc.h"
 
 #include "vipir/IR/Instruction/AllocaInst.h"
-#include "vipir/IR/Instruction/CallInst.h"
 
 #include <algorithm>
 #include <map>
@@ -76,17 +75,16 @@ namespace vipir
                 for (auto& value : basicBlock->mValueList)
                 {
                     ExpireOldIntervals(value->mInterval.first);
-                    if (dynamic_cast<CallInst*>(value.get()))
+                    auto smashes = value->getRegisterSmashes();
+                    if (!smashes.empty())
                     {
-                        // any active values using a caller-saved value need to be moved
-                        std::vector<int> callerSaved = abi->getCallerSavedRegisters();
                         std::vector<VReg*> destroyedRegisters;
 
                         // erase caller-saved values from current free register pool
                         for (auto it = virtualRegs.begin(); it != virtualRegs.end();)
                         {
-                            auto callerSavedIt = std::find(callerSaved.begin(), callerSaved.end(), it->second->mPhysicalRegister);
-                            if (callerSavedIt != callerSaved.end())
+                            auto smashIt = std::find(smashes.begin(), smashes.end(), it->second->mPhysicalRegister);
+                            if (smashIt != smashes.end())
                             {
                                 destroyedRegisters.push_back(it->second);
                                 it = virtualRegs.erase(it);
@@ -94,18 +92,18 @@ namespace vipir
                             else ++it;
                         }
 
-                        // swap the register of any active values
+                        // swap the register of any active values using a smashed register
                         for (auto value : activeValues)
                         {
-                            auto callerSavedIt = std::find(callerSaved.begin(), callerSaved.end(), value->mVReg->mPhysicalRegister);
-                            if (callerSavedIt != callerSaved.end())
+                            auto smashIt = std::find(smashes.begin(), smashes.end(), value->mVReg->mPhysicalRegister);
+                            if (smashIt != smashes.end())
                             {
                                 destroyedRegisters.push_back(value->mVReg);
                                 value->mVReg = getNextFreeVReg(false);
                             }
                         }
 
-                        // allow all of the caller-saved registers to be reused again
+                        // allow all of the smashed registers to be reused again
                         for (auto vreg : destroyedRegisters)
                         {
                             virtualRegs[vreg->getId()] = vreg;

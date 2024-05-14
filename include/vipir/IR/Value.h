@@ -49,6 +49,7 @@ namespace vipir
 
         virtual lir::OperandPtr getEmittedValue() { return mEmittedValue->clone(); }
         virtual void lateEmit(lir::Builder& builder) { }
+        virtual std::vector<int> getRegisterSmashes() { return std::vector<int>(); }
     
     protected:
         Module& mModule;

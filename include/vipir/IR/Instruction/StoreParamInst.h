@@ -1,0 +1,36 @@
+// Copyright 2024 solar-mist
+
+/*
+ * An instruction that stores a value into a parameter
+ * register by its index
+*/
+
+#ifndef VIPIR_IR_INSTRUCTION_STORE_PARAM_INST_H
+#define VIPIR_IR_INSTRUCTION_STORE_PARAM_INST_H 1
+
+#include "vipir/IR/Instruction/Instruction.h"
+
+namespace vipir
+{
+    class StoreParamInst : public Instruction
+    {
+    friend class IRBuilder;
+    public:
+        void print(std::ostream& stream) override;
+    
+        std::vector<Value*> getOperands() override;
+        std::vector<int> getRegisterSmashes() override;
+
+    protected:
+        void emit(lir::Builder& builder) override;
+        std::string ident() const override;
+
+    private:
+        StoreParamInst(BasicBlock* parent, int paramIndex, Value* value);
+
+        int mParamIndex;
+        Value* mValue;
+    };
+}
+
+#endif // VIPIR_IR_INSTRUCTION_STORE_PARAM_INST_H
