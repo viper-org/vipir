@@ -67,7 +67,7 @@ namespace vipir
 
         void MoveSX::print(std::ostream& stream) const
         {
-            stream << std::format("MOVE {} -> {}\n", mRight->ident(), mLeft->ident());
+            stream << std::format("MOVESX {} -> {}\n", mRight->ident(), mLeft->ident());
         }
 
         void MoveSX::emit(MC::Builder& builder)
