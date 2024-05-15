@@ -91,5 +91,47 @@ namespace vipir
         {
             return {mRight};
         }
+
+
+        MoveZX::MoveZX(OperandPtr left, OperandPtr right)
+            : mLeft(std::move(left))
+            , mRight(std::move(right))
+        {
+        }
+
+        void MoveZX::print(std::ostream& stream) const
+        {
+            stream << std::format("MOVEZX {} -> {}\n", mRight->ident(), mLeft->ident());
+        }
+
+        void MoveZX::emit(MC::Builder& builder)
+        {
+            instruction::OperandPtr left = mLeft->asmOperand();
+            if (auto label = dynamic_cast<instruction::LabelOperand*>(left.get()))
+            {
+                (void)left.release();
+                instruction::LabelOperandPtr lbl = instruction::LabelOperandPtr(label);
+                left = std::make_unique<instruction::Relative>(std::move(lbl), std::nullopt);
+            }
+
+            if (mLeft->size() == codegen::OperandSize::Quad && mRight->size() == codegen::OperandSize::Long)
+            {
+                if (*mLeft == mRight) return;
+
+                builder.addValue(std::make_unique<instruction::MovInstruction>(std::move(left), mRight->asmOperand(), mRight->size()));
+            }
+
+            builder.addValue(std::make_unique<instruction::MovZXInstruction>(std::move(left), mRight->asmOperand(), mLeft->size()));
+        }
+
+        std::vector<std::reference_wrapper<OperandPtr> > MoveZX::getOutputOperands()
+        {
+            return {mLeft};
+        }
+
+        std::vector<std::reference_wrapper<OperandPtr> > MoveZX::getInputOperands()
+        {
+            return {mRight};
+        }
     }
 }

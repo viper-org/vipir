@@ -17,6 +17,7 @@
 #include "vipir/IR/Instruction/StoreParamInst.h"
 #include "vipir/IR/Instruction/PtrCastInst.h"
 #include "vipir/IR/Instruction/SExtInst.h"
+#include "vipir/IR/Instruction/ZExtInst.h"
 #include "vipir/IR/Instruction/TruncInst.h"
 #include "vipir/IR/Instruction/IntToPtrInst.h"
 #include "vipir/IR/Instruction/PtrToIntInst.h"
@@ -290,6 +291,15 @@ namespace vipir
         mInsertPoint->insertValue(sext);
 
         return sext;
+    }
+
+    ZExtInst* IRBuilder::CreateZExt(Value* value, Type* destType)
+    {
+        ZExtInst* zext = new ZExtInst(mInsertPoint, value, destType);
+
+        mInsertPoint->insertValue(zext);
+
+        return zext;
     }
 
     TruncInst* IRBuilder::CreateTrunc(Value* value, Type* destType)

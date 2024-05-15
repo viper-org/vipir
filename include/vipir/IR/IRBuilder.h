@@ -29,6 +29,7 @@ namespace vipir
     class CallInst;
     class PtrCastInst;
     class SExtInst;
+    class ZExtInst;
     class TruncInst;
     class IntToPtrInst;
     class PtrToIntInst;
@@ -87,6 +88,7 @@ namespace vipir
 
         PtrCastInst* CreatePtrCast(Value* ptr, Type* destType);
         SExtInst* CreateSExt(Value* value, Type* destType);
+        ZExtInst* CreateZExt(Value* value, Type* destType);
         TruncInst* CreateTrunc(Value* value, Type* destType);
         IntToPtrInst* CreateIntToPtr(Value* value, Type* destType);
         PtrToIntInst* CreatePtrToInt(Value* value, Type* destType);

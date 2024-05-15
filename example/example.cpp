@@ -16,6 +16,7 @@
 #include "vipir/IR/Instruction/GEPInst.h"
 #include "vipir/IR/Instruction/TruncInst.h"
 #include "vipir/IR/Instruction/SExtInst.h"
+#include "vipir/IR/Instruction/ZExtInst.h"
 
 #include "vipir/Optimizer/RegAlloc/RegAlloc.h"
 #include "vipir/Type/FunctionType.h"
@@ -44,7 +45,7 @@ int main()
 
     auto func = vipir::Function::Create(vipir::FunctionType::Create(i32Type, {i32Type}), mod, "test");
 
-    auto func1 = vipir::Function::Create(vipir::FunctionType::Create(i32Type, {i32Type}), mod, "main");
+    auto func1 = vipir::Function::Create(vipir::FunctionType::Create(i64Type, {i32Type}), mod, "main");
     auto bb1 = vipir::BasicBlock::Create("", func1);
 
     builder.setInsertPoint(bb1);
@@ -57,7 +58,9 @@ int main()
 
     auto call = builder.CreateCall(func, {param});
 
-    builder.CreateRet(call);
+    auto retval = builder.CreateZExt(call, i64Type);
+
+    builder.CreateRet(retval);
 
     mod.addPass(vipir::Pass::PeepholeOptimization);
 
