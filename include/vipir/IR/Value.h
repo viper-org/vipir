@@ -61,6 +61,7 @@ namespace vipir
         bool mRequiresVReg{true};
 
         std::pair<int, int> mInterval{-1,-1};
+        std::vector<opt::VReg*> mDisallowedVRegs;
 
         virtual void emit(lir::Builder& builder) = 0;
     };

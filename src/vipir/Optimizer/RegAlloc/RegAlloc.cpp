@@ -30,13 +30,23 @@ namespace vipir
                 virtualRegs[id] = function->mVirtualRegs.back().get();
             }
 
+            doRegalloc(function, virtualRegs, virtualRegCount, abi);
+
+            setStackOffsets(function, abi);
+        }
+
+        void RegAlloc::doRegalloc(Function* function, std::map<int, VReg*>& virtualRegs, int virtualRegCount, abi::ABI* abi)
+        {
+            std::map<int, VReg*> allVRegs = virtualRegs;
+            int totalVRegs = virtualRegCount;
+
             auto createStackVReg = [&virtualRegs, &virtualRegCount, function, abi](){
                 function->mVirtualRegs.push_back(std::make_unique<VReg>(virtualRegCount++, abi->getStackOffsetRegister(), 0));
                 ++function->mVirtualRegs.back().get()->mUses;
                 return function->mVirtualRegs.back().get();
             };
 
-            auto getNextFreeVReg = [&virtualRegs, &virtualRegCount, abi, createStackVReg](bool requireMemory){
+            auto getNextFreeVReg = [&virtualRegs, &virtualRegCount, abi, createStackVReg](bool requireMemory, std::vector<VReg*> disallowed){
                 if (virtualRegs.empty())
                 {
                     return createStackVReg();
@@ -50,8 +60,12 @@ namespace vipir
                     ++it->second->mUses;
                     return it->second;
                 }
-                VReg* reg = virtualRegs.begin()->second;
-                virtualRegs.erase(virtualRegs.begin());
+                auto it = std::find_if(virtualRegs.begin(), virtualRegs.end(), [&disallowed](const auto& vreg){
+                    return std::find(disallowed.begin(), disallowed.end(), vreg.second) == disallowed.end();
+                });
+                if (it == virtualRegs.end()) return createStackVReg();
+                VReg* reg = it->second;
+                virtualRegs.erase(it);
                 ++reg->mUses;
                 return reg;
             };
@@ -99,7 +113,8 @@ namespace vipir
                             if (smashIt != smashes.end())
                             {
                                 destroyedRegisters.push_back(value->mVReg);
-                                value->mVReg = getNextFreeVReg(false);
+                                std::copy(destroyedRegisters.begin(), destroyedRegisters.end(), std::back_inserter(value->mDisallowedVRegs));
+                                doRegalloc(function, allVRegs, totalVRegs, abi);
                             }
                         }
 
@@ -117,12 +132,10 @@ namespace vipir
                             if (alloca->mForceMemory) requireMemory = true;
                         }
                         activeValues.insert(value.get());
-                        value->mVReg = getNextFreeVReg(requireMemory);
+                        value->mVReg = getNextFreeVReg(requireMemory, value->mDisallowedVRegs);
                     }
                 }
             }
-
-            setStackOffsets(function, abi);
         }
 
 

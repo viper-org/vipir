@@ -20,6 +20,8 @@ namespace vipir
             void assignVirtualRegisters(Function* function, abi::ABI* abi);
 
         private:
+            void doRegalloc(Function* function, std::map<int, VReg*>& virtualRegs, int virtualRegCount, abi::ABI* abi);
+
             void setLiveIntervals(Function* function);
             void setStackOffsets(Function* function, abi::ABI* abi);
 
