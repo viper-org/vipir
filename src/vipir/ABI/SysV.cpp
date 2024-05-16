@@ -18,12 +18,24 @@ namespace vipir
         {
             constexpr std::array registers { 7, 6, 2, 1, 8, 9 };
 
+            if (index >= registers.size()) return -1;
+
             return registers[index];
+        }
+
+        int SysV::getParameterRegisterCount() const
+        {
+            return 6;
         }
 
         int SysV::getStackOffsetRegister() const
         {
             return 5; // rbp
+        }
+
+        int SysV::getStackArgumentRegister() const
+        {
+            return 4; // rsp
         }
 
         std::vector<int> SysV::getGeneralPurposeRegisters() const

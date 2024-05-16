@@ -30,7 +30,6 @@ namespace vipir
 
     void Argument::emit(lir::Builder&)
     {
-        int registerId = mModule.abi()->getParameterRegister(mIdx);
-        mEmittedValue = std::make_unique<lir::PhysicalReg>(registerId, mType->getOperandSize());
+        mEmittedValue = std::make_unique<lir::VirtualReg>(mVReg, mType->getOperandSize());
     }
 }

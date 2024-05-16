@@ -214,7 +214,7 @@ namespace vipir
             std::vector<VReg*> spills;
             for (auto& vreg : function->mVirtualRegs)
             {
-                if (vreg->mOnStack)
+                if (vreg->mOnStack && !vreg->mArgument)
                 {
                     spills.push_back(vreg.get());
                 }
@@ -239,15 +239,34 @@ namespace vipir
         void RegAlloc::setArguments(Function* function, abi::ABI* abi, std::set<Value*, ActiveValueComparator>& activeValues, std::map<int, VReg*>& virtualRegs)
         {
             int argumentIndex = 0;
+
+            int stackOffset = -0x10;
             for (auto& argument : function->mArguments)
             {
-                auto it = std::find_if(virtualRegs.begin(), virtualRegs.end(), [argumentIndex, abi](const auto& vreg){
-                    return vreg.second->mPhysicalRegister == abi->getParameterRegister(argumentIndex);
-                });
-                ++argumentIndex;
-                argument->mVReg = it->second;
-                virtualRegs.erase(it);
-                activeValues.insert(argument.get());
+                if (argumentIndex >= abi->getParameterRegisterCount())
+                {
+                    int id = function->mVirtualRegs.size();
+                    function->mVirtualRegs.push_back(std::make_unique<VReg>(id, abi->getStackOffsetRegister()));
+                    VReg* vreg = function->mVirtualRegs.back().get();
+                    
+                    vreg->mOnStack  = true;
+                    vreg->mArgument = true;
+                    vreg->mStackOffset = stackOffset;
+                    stackOffset -= 8;
+
+                    argument->mVReg = vreg;
+                    activeValues.insert(argument.get());
+                }
+                else
+                {
+                    auto it = std::find_if(virtualRegs.begin(), virtualRegs.end(), [argumentIndex, abi](const auto& vreg){
+                        return vreg.second->mPhysicalRegister == abi->getParameterRegister(argumentIndex);
+                    });
+                    ++argumentIndex;
+                    argument->mVReg = it->second;
+                    virtualRegs.erase(it);
+                    activeValues.insert(argument.get());
+                }
             }
         }
     }

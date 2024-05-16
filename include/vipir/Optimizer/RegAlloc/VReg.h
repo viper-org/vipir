@@ -33,6 +33,7 @@ namespace vipir
             int mUses;
 
             bool mOnStack;
+            bool mArgument;
 
             int mPhysicalRegister;
             int mStackOffset;

@@ -37,7 +37,20 @@ namespace vipir
     {
         mValue->lateEmit(builder);
 
-        lir::OperandPtr ptr = std::make_unique<lir::PhysicalReg>(mModule.abi()->getParameterRegister(mParamIndex), mValue->getType()->getOperandSize());
+        int regID = mModule.abi()->getParameterRegister(mParamIndex);
+        lir::OperandPtr ptr;
+
+        if (regID != -1)
+        {
+            ptr = std::make_unique<lir::PhysicalReg>(regID, mValue->getType()->getOperandSize());
+        }
+        else
+        {
+            int offset = 1 * 8;
+            lir::OperandPtr reg = std::make_unique<lir::PhysicalReg>(mModule.abi()->getStackArgumentRegister(), codegen::OperandSize::Quad);
+            ptr = std::make_unique<lir::Memory>(mValue->getType()->getOperandSize(), std::move(reg), offset, nullptr, std::nullopt);
+        }
+
         lir::OperandPtr value = mValue->getEmittedValue();
 
         builder.addValue(std::make_unique<lir::Move>(std::move(ptr), std::move(value)));
