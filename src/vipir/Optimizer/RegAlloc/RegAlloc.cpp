@@ -37,9 +37,6 @@ namespace vipir
 
         void RegAlloc::doRegalloc(Function* function, std::map<int, VReg*>& virtualRegs, int virtualRegCount, abi::ABI* abi)
         {
-            std::map<int, VReg*> allVRegs = virtualRegs;
-            int totalVRegs = virtualRegCount;
-
             auto createStackVReg = [&virtualRegs, &virtualRegCount, function, abi](){
                 function->mVirtualRegs.push_back(std::make_unique<VReg>(virtualRegCount++, abi->getStackOffsetRegister(), 0));
                 ++function->mVirtualRegs.back().get()->mUses;
@@ -114,7 +111,14 @@ namespace vipir
                             {
                                 destroyedRegisters.push_back(value->mVReg);
                                 std::copy(destroyedRegisters.begin(), destroyedRegisters.end(), std::back_inserter(value->mDisallowedVRegs));
-                                doRegalloc(function, allVRegs, totalVRegs, abi);
+
+                                std::map<int, VReg*> virtualRegs;
+                                for (auto& vreg : function->mVirtualRegs)
+                                {
+                                    virtualRegs[vreg->getId()] = vreg.get();
+                                }
+                                doRegalloc(function, virtualRegs, virtualRegs.size(), abi);
+                                return;
                             }
                         }
 
