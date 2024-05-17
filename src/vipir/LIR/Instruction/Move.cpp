@@ -74,13 +74,26 @@ namespace vipir
         void MoveSX::emit(MC::Builder& builder)
         {
             instruction::OperandPtr left = mLeft->asmOperand();
+            instruction::OperandPtr right = mRight->asmOperand();
             if (auto label = dynamic_cast<instruction::LabelOperand*>(left.get()))
             {
                 (void)left.release();
                 instruction::LabelOperandPtr lbl = instruction::LabelOperandPtr(label);
                 left = std::make_unique<instruction::Relative>(std::move(lbl), std::nullopt);
             }
-            builder.addValue(std::make_unique<instruction::MovSXInstruction>(std::move(left), mRight->asmOperand(), mLeft->size()));
+
+            if (dynamic_cast<instruction::Memory*>(left.get()))
+            {
+                instruction::OperandPtr reg = std::make_unique<instruction::Register>(0, mLeft->size());
+                left = std::move(reg);
+            }
+
+            builder.addValue(std::make_unique<instruction::MovSXInstruction>(left->clone(), std::move(right), mLeft->size()));
+
+            if (dynamic_cast<instruction::Memory*>(mLeft->asmOperand().get()))
+            {
+                builder.addValue(std::make_unique<instruction::MovInstruction>(std::move(left), mLeft->asmOperand(), mLeft->size()));
+            }
         }
 
         std::vector<std::reference_wrapper<OperandPtr> > MoveSX::getOutputOperands()
