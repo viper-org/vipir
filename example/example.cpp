@@ -43,7 +43,12 @@ int main()
     auto arrayType = vipir::Type::GetArrayType(i32Type, 3);
     auto structType = vipir::Type::GetStructType({arrayType, i32Type});
 
-    auto func1 = vipir::Function::Create(vipir::FunctionType::Create(i32Type, {i32Type}), mod, "main");
+    auto func = vipir::Function::Create(vipir::FunctionType::Create(i32Type, {i32Type,i32Type,i32Type,i32Type,i32Type,i32Type,i32Type}), mod, "test");
+    auto bb = vipir::BasicBlock::Create("", func);
+    builder.setInsertPoint(bb);
+    builder.CreateRet(func->getArgument(6));
+
+    auto func1 = vipir::Function::Create(vipir::FunctionType::Create(i64Type, {i32Type}), mod, "main");
     auto bb1 = vipir::BasicBlock::Create("", func1);
 
     builder.setInsertPoint(bb1);
@@ -52,9 +57,9 @@ int main()
     auto x = vipir::ConstantInt::Get(mod, 32, i32Type);
     builder.CreateStore(alloca, x);
 
-    auto lhs = builder.CreateLoad(alloca);
-    auto rhs = vipir::ConstantInt::Get(mod, 2, i32Type);
-    auto retval = builder.CreateSDiv(lhs, rhs);
+    auto param = vipir::ConstantInt::Get(mod, 1, i32Type);
+    auto call = builder.CreateCall(func, {param,param,param,param,param,param, param});
+    auto retval = builder.CreateZExt(call, i64Type);
 
     builder.CreateRet(retval);
 

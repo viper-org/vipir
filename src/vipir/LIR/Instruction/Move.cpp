@@ -4,6 +4,7 @@
 #include "vipir/LIR/Instruction/Move.h"
 
 #include "vasm/instruction/twoOperandInstruction/MovInstruction.h"
+#include "vasm/instruction/singleOperandInstruction/PushInstruction.h"
 
 #include "vasm/instruction/operand/Memory.h"
 #include "vasm/instruction/operand/Register.h"
@@ -132,6 +133,28 @@ namespace vipir
         std::vector<std::reference_wrapper<OperandPtr> > MoveZX::getInputOperands()
         {
             return {mRight};
+        }
+
+
+
+        Push::Push(OperandPtr operand)
+            : mOperand(std::move(operand))
+        {
+        }
+
+        void Push::print(std::ostream& stream) const
+        {
+            stream << std::format("PUSH {}\n", mOperand->ident());
+        }
+
+        void Push::emit(MC::Builder& builder)
+        {
+            builder.addValue(std::make_unique<instruction::PushInstruction>(mOperand->asmOperand(), mOperand->size()));
+        }
+
+        std::vector<std::reference_wrapper<OperandPtr> > Push::getInputOperands()
+        {
+            return {mOperand};
         }
     }
 }

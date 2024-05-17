@@ -10,6 +10,7 @@
 
 #include "vipir/LIR/Instruction/Move.h"
 #include "vipir/LIR/Instruction/Jump.h"
+#include "vipir/LIR/Instruction/Arithmetic.h"
 
 #include "vasm/instruction/operand/Register.h"
 
@@ -57,16 +58,26 @@ namespace vipir
 
         builder.addValue(std::make_unique<lir::Call>(std::move(function)));
 
+        if (mStackRestore > 0)
+        {
+            assert(mStackRestore % 16 == 0);
+
+            lir::OperandPtr stack = std::make_unique<lir::PhysicalReg>(mModule.abi()->getStackArgumentRegister(), codegen::OperandSize::Quad);
+            lir::OperandPtr restore = std::make_unique<lir::Immediate>(mStackRestore);
+            builder.addValue(std::make_unique<lir::BinaryArithmetic>(std::move(stack), lir::BinaryArithmetic::Operator::Add, std::move(restore)));
+        }
+
         lir::OperandPtr vreg = std::make_unique<lir::VirtualReg>(mVReg, mType->getOperandSize());
         lir::OperandPtr returnRegister = std::make_unique<lir::PhysicalReg>(mModule.abi()->getReturnRegister(), mType->getOperandSize());
         builder.addValue(std::make_unique<lir::Move>(vreg->clone(), std::move(returnRegister)));
         mEmittedValue = std::move(vreg);
     }
 
-    CallInst::CallInst(BasicBlock* parent, Function* function, std::vector<Value*> parameters)
+    CallInst::CallInst(BasicBlock* parent, Function* function, std::vector<Value*> parameters, int stackRestore)
         : Instruction(parent->getModule(), parent)
         , mFunction(function)
         , mParameters(std::move(parameters))
+        , mStackRestore(stackRestore)
         , mValueId(mModule.getNextValueId())
     {
         mType = mFunction->getFunctionType()->getReturnType();

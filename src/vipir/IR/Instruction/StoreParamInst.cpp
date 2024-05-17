@@ -7,6 +7,7 @@
 #include "vipir/Module.h"
 
 #include "vipir/LIR/Instruction/Move.h"
+#include "vipir/LIR/Instruction/Arithmetic.h"
 
 #include <format>
 
@@ -39,27 +40,33 @@ namespace vipir
 
         int regID = mModule.abi()->getParameterRegister(mParamIndex);
         lir::OperandPtr ptr;
+        lir::OperandPtr value = mValue->getEmittedValue();
+
+        // align the stack if it is made unaligned by the passing of parameters
+        lir::OperandPtr stack = std::make_unique<lir::PhysicalReg>(mModule.abi()->getStackArgumentRegister(), codegen::OperandSize::Quad);
+        if (mAlignStack)
+        {
+            lir::OperandPtr alignment = std::make_unique<lir::Immediate>(8);
+            builder.addValue(std::make_unique<lir::BinaryArithmetic>(stack->clone(), lir::BinaryArithmetic::Operator::Sub, std::move(alignment)));
+        }
 
         if (regID != -1)
         {
             ptr = std::make_unique<lir::PhysicalReg>(regID, mValue->getType()->getOperandSize());
+            builder.addValue(std::make_unique<lir::Move>(std::move(ptr), std::move(value)));
         }
         else
         {
             int offset = 1 * 8;
-            lir::OperandPtr reg = std::make_unique<lir::PhysicalReg>(mModule.abi()->getStackArgumentRegister(), codegen::OperandSize::Quad);
-            ptr = std::make_unique<lir::Memory>(mValue->getType()->getOperandSize(), std::move(reg), offset, nullptr, std::nullopt);
+            builder.addValue(std::make_unique<lir::Push>(std::move(value)));
         }
-
-        lir::OperandPtr value = mValue->getEmittedValue();
-
-        builder.addValue(std::make_unique<lir::Move>(std::move(ptr), std::move(value)));
     }
 
-    StoreParamInst::StoreParamInst(BasicBlock* parent, int paramIndex, Value* value)
+    StoreParamInst::StoreParamInst(BasicBlock* parent, int paramIndex, Value* value, bool alignStack)
         : Instruction(parent->getModule(), parent)
         , mParamIndex(paramIndex)
         , mValue(value)
+        , mAlignStack(alignStack)
     {
         mRequiresVReg = false;
     }

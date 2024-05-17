@@ -59,6 +59,22 @@ namespace vipir
             OperandPtr mLeft;
             OperandPtr mRight;
         };
+
+
+        class Push : public Value
+        {
+        friend class opt::Peephole;
+        public:
+            Push(OperandPtr operand);
+
+            void print(std::ostream& stream) const override;
+            void emit(MC::Builder& builder) override;
+
+            std::vector<std::reference_wrapper<OperandPtr> > getInputOperands() override;
+
+        private:
+            OperandPtr mOperand;
+        };
     }
 }
 

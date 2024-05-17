@@ -25,6 +25,8 @@
 #include "vipir/IR/Constant/ConstantInt.h"
 #include "vipir/IR/Constant/ConstantBool.h"
 
+#include "vipir/Module.h"
+
 namespace vipir
 {
     IRBuilder::IRBuilder()
@@ -289,13 +291,25 @@ namespace vipir
     CallInst* IRBuilder::CreateCall(Function* function, std::vector<Value*> parameters)
     {
         int index = 0;
+        bool alignedStack = true;
+        int stackRestore = 0;
+        if (parameters.size() >= mInsertPoint->getModule().abi()->getParameterRegisterCount())
+        {
+            stackRestore = 8 * (parameters.size() - mInsertPoint->getModule().abi()->getParameterRegisterCount());
+            stackRestore = (stackRestore + 15) & ~15; // align to 16 bytes
+            if ((parameters.size() - mInsertPoint->getModule().abi()->getParameterRegisterCount()) % 2 != 0) // misaligned stack
+                alignedStack = false;
+        }
+
         for (auto parameter : parameters)
         {
-            StoreParamInst* store = new StoreParamInst(mInsertPoint, index++, parameter);
+            StoreParamInst* store = new StoreParamInst(mInsertPoint, index++, parameter, !alignedStack);
+            if (!alignedStack)
+                alignedStack = true;
             mInsertPoint->insertValue(store);
         }
 
-        CallInst* call = new CallInst(mInsertPoint, function, std::move(parameters));
+        CallInst* call = new CallInst(mInsertPoint, function, std::move(parameters), stackRestore);
 
         mInsertPoint->insertValue(call);
 

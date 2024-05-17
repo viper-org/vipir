@@ -26,10 +26,11 @@ namespace vipir
         std::string ident() const override;
 
     private:
-        StoreParamInst(BasicBlock* parent, int paramIndex, Value* value);
+        StoreParamInst(BasicBlock* parent, int paramIndex, Value* value, bool alignStack);
 
         int mParamIndex;
         Value* mValue;
+        bool mAlignStack;
     };
 }
 
