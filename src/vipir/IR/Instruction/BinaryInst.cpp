@@ -37,8 +37,18 @@ namespace vipir
                 operatorName = "sub";
                 break;
 
-            case Instruction::IMUL:
-                operatorName = "imul";
+            case Instruction::SMUL:
+                operatorName = "smul";
+                break;
+            case Instruction::UMUL:
+                operatorName = "umul";
+                break;
+
+            case Instruction::SDIV:
+                operatorName = "sdiv";
+                break;
+            case Instruction::UDIV:
+                operatorName = "udiv";
                 break;
 
             case Instruction::BWOR:
@@ -85,15 +95,48 @@ namespace vipir
         return {mLeft, mRight};
     }
 
+    std::vector<int> BinaryInst::getRegisterSmashes()
+    {
+        if (mOperator == Instruction::UMUL || mOperator == Instruction::SDIV || mOperator == Instruction::UDIV)
+        {
+            return {0, 2}; // rax, rdx
+        }
+        return {};
+    }
+
     void BinaryInst::emit(lir::Builder& builder)
     {
-
         auto createArithmetic = [&builder, this](lir::BinaryArithmetic::Operator op){
             mLeft->lateEmit(builder);
             mRight->lateEmit(builder);
             lir::OperandPtr vreg = std::make_unique<lir::VirtualReg>(mVReg, mType->getOperandSize());
             builder.addValue(std::make_unique<lir::Move>(vreg->clone(), mLeft->getEmittedValue()));
             builder.addValue(std::make_unique<lir::BinaryArithmetic>(vreg->clone(), op, mRight->getEmittedValue()));
+            mEmittedValue = std::move(vreg);
+        };
+
+        auto createSingleOpArithmetic = [&builder, this](lir::BinaryArithmetic::Operator op){
+            mLeft->lateEmit(builder);
+            mRight->lateEmit(builder);
+            lir::OperandPtr sourceReg = std::make_unique<lir::PhysicalReg>(0, mType->getOperandSize());
+            builder.addValue(std::make_unique<lir::Move>(sourceReg->clone(), mLeft->getEmittedValue()));
+
+            if (op == lir::BinaryArithmetic::Operator::IDiv || op == lir::BinaryArithmetic::Operator::Div)
+            {
+                lir::OperandPtr rdx = std::make_unique<lir::PhysicalReg>(2, mType->getOperandSize());
+                lir::OperandPtr zero = std::make_unique<lir::Immediate>(0);
+                builder.addValue(std::make_unique<lir::Move>(std::move(rdx), std::move(zero)));
+            }
+
+            lir::OperandPtr vreg = std::make_unique<lir::VirtualReg>(mVReg, mType->getOperandSize());
+            lir::OperandPtr right = mRight->getEmittedValue();
+            if (dynamic_cast<lir::Immediate*>(right.get()))
+            {
+                builder.addValue(std::make_unique<lir::Move>(vreg->clone(), std::move(right)));
+                right = vreg->clone();
+            }
+            builder.addValue(std::make_unique<lir::BinaryArithmetic>(sourceReg->clone(), op, std::move(right)));
+            builder.addValue(std::make_unique<lir::Move>(vreg->clone(), std::move(sourceReg)));
             mEmittedValue = std::move(vreg);
         };
         
@@ -106,8 +149,18 @@ namespace vipir
                 createArithmetic(lir::BinaryArithmetic::Operator::Sub);
                 break;
 
-            case Instruction::IMUL:
+            case Instruction::SMUL:
                 createArithmetic(lir::BinaryArithmetic::Operator::IMul);
+                break;
+            case Instruction::UMUL:
+                createSingleOpArithmetic(lir::BinaryArithmetic::Operator::Mul);
+                break;
+
+            case Instruction::SDIV:
+                createSingleOpArithmetic(lir::BinaryArithmetic::Operator::IDiv);
+                break;
+            case Instruction::UDIV:
+                createSingleOpArithmetic(lir::BinaryArithmetic::Operator::Div);
                 break;
 
             case Instruction::BWAND:
@@ -168,20 +221,20 @@ namespace vipir
         , mValueId(mModule.getNextValueId())
     {
         assert(left->getType() == right->getType());
-
-        mRequiresVReg = false;
         
         switch (mOperator)
         {
             case Instruction::ADD:
             case Instruction::SUB:
-            case Instruction::IMUL:
+            case Instruction::SMUL:
+            case Instruction::UMUL:
+            case Instruction::SDIV:
+            case Instruction::UDIV:
             case Instruction::BWOR:
             case Instruction::BWAND:
             case Instruction::BWXOR:
             {
                 mType = left->getType();
-                mRequiresVReg = true;
                 break;
             }
 
@@ -193,6 +246,7 @@ namespace vipir
             case Instruction::GE:
             {
                 mType = Type::GetBooleanType();
+                mRequiresVReg = false;
                 break;
             }
         }

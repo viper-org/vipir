@@ -25,7 +25,8 @@ namespace vipir
         enum BinaryOperators
         {
             ADD, SUB,
-            IMUL,
+            SMUL, UMUL,
+            SDIV, UDIV,
 
             BWAND, BWOR, BWXOR,
 

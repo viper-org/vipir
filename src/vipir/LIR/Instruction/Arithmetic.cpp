@@ -34,9 +34,23 @@ namespace vipir
                     operatorName = "SUB";
                     symbol = "-";
                     break;
+
                 case Operator::IMul:
                     operatorName = "IMUL";
                     symbol = "*";
+                    break;
+                case Operator::Mul:
+                    operatorName = "MUL";
+                    symbol = "*";
+                    break;
+                    
+                case Operator::IDiv:
+                    operatorName = "IDIV";
+                    symbol = "/";
+                    break;
+                case Operator::Div:
+                    operatorName = "DIV";
+                    symbol = "/";
                     break;
 
                 case Operator::BWAnd:
@@ -60,6 +74,10 @@ namespace vipir
             auto createInstruction = [&builder, this]<class InstT>(){
                 builder.addValue(std::make_unique<InstT>(mLeft->asmOperand(), mRight->asmOperand()));
             };
+
+            auto createSingleOpInstruction = [&builder, this]<class InstT>(){
+                builder.addValue(std::make_unique<InstT>(mRight->asmOperand()));
+            };
             
             switch(mOperator)
             {
@@ -79,6 +97,17 @@ namespace vipir
                     {
                         builder.addValue(std::make_unique<instruction::IMulInstruction>(mLeft->asmOperand(), mRight->asmOperand()));
                     }
+                    break;
+
+                case Operator::Mul:
+                    createSingleOpInstruction.template operator()<instruction::MulInstruction>();
+                    break;
+
+                case Operator::IDiv:
+                    createSingleOpInstruction.template operator()<instruction::IDivInstruction>();
+                    break;
+                case Operator::Div:
+                    createSingleOpInstruction.template operator()<instruction::DivInstruction>();
                     break;
 
                 case Operator::BWAnd:

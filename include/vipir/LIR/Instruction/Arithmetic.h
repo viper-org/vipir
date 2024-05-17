@@ -16,7 +16,8 @@ namespace vipir
             enum class Operator
             {
                 Add, Sub,
-                IMul,
+                IMul, Mul,
+                IDiv, Div,
 
                 BWAnd, BWOr, BWXor
             };

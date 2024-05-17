@@ -129,13 +129,40 @@ namespace vipir
         return sub;
     }
 
-    BinaryInst* IRBuilder::CreateIMul(Value* left, Value* right)
+    BinaryInst* IRBuilder::CreateSMul(Value* left, Value* right)
     {
-        BinaryInst* imul = new BinaryInst(mInsertPoint, left, Instruction::IMUL, right);
+        BinaryInst* smul = new BinaryInst(mInsertPoint, left, Instruction::SMUL, right);
 
-        mInsertPoint->insertValue(imul);
+        mInsertPoint->insertValue(smul);
 
-        return imul;
+        return smul;
+    }
+
+    BinaryInst* IRBuilder::CreateUMul(Value* left, Value* right)
+    {
+        BinaryInst* umul = new BinaryInst(mInsertPoint, left, Instruction::UMUL, right);
+
+        mInsertPoint->insertValue(umul);
+
+        return umul;
+    }
+
+    BinaryInst* IRBuilder::CreateSDiv(Value* left, Value* right)
+    {
+        BinaryInst* sdiv = new BinaryInst(mInsertPoint, left, Instruction::SDIV, right);
+
+        mInsertPoint->insertValue(sdiv);
+
+        return sdiv;
+    }
+
+    BinaryInst* IRBuilder::CreateUDiv(Value* left, Value* right)
+    {
+        BinaryInst* udiv = new BinaryInst(mInsertPoint, left, Instruction::UDIV, right);
+
+        mInsertPoint->insertValue(udiv);
+
+        return udiv;
     }
 
     BinaryInst* IRBuilder::CreateBWOr(Value* left, Value* right)
