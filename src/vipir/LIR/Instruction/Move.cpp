@@ -92,7 +92,7 @@ namespace vipir
 
             if (dynamic_cast<instruction::Memory*>(mLeft->asmOperand().get()))
             {
-                builder.addValue(std::make_unique<instruction::MovInstruction>(std::move(left), mLeft->asmOperand(), mLeft->size()));
+                builder.addValue(std::make_unique<instruction::MovInstruction>(mLeft->asmOperand(), std::move(left), mLeft->size()));
             }
         }
 
