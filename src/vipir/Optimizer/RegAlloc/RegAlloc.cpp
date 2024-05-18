@@ -211,7 +211,7 @@ namespace vipir
                     if (value->requiresVReg())
                     {
                         auto it = std::find_if(function->mVirtualRegs.begin(), function->mVirtualRegs.end(), [&value](const auto& vreg){
-                            return value->mVReg->getId() == vreg->getId();
+                            return value->mVReg == vreg.get();
                         });
                         if (it != function->mVirtualRegs.end())
                         {
