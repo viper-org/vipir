@@ -92,7 +92,7 @@ namespace vipir
 
         lir::OperandPtr mem = std::make_unique<lir::Memory>(mType->getOperandSize(), std::move(ptr), displacement, std::move(offset), scale);
         builder.addValue(std::make_unique<lir::LoadAddress>(vreg->clone(), std::move(mem)));
-        mEmittedValue = std::make_unique<lir::Memory>(size, std::move(vreg), std::nullopt, nullptr, std::nullopt);
+        mEmittedValue = std::move(vreg);
     }
 
     GEPInst::GEPInst(BasicBlock* parent, Value* ptr, Value* offset)
