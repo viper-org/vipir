@@ -45,7 +45,7 @@ namespace vipir
 
     std::vector<int> CallInst::getRegisterSmashes()
     {
-        return mModule.abi()->getCalleeSavedRegisters();
+        return mModule.abi()->getCallerSavedRegisters();
     }
 
 
