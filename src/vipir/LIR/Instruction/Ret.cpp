@@ -32,7 +32,7 @@ namespace vipir
                 builder.addValue(std::make_unique<instruction::PopInstruction>(std::move(reg)));
             }
 
-            if (mLeave)
+            if (mLeave || !mCalleeSaved.empty())
             {
                 builder.addValue(std::make_unique<instruction::LeaveInstruction>());
             }
