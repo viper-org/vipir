@@ -32,7 +32,7 @@ namespace vipir
     friend class Function;
     friend class opt::RegAlloc;
     public:
-        Value(Module& module) : mModule(module), mType(Type::GetVoidType()) { }
+        Value(Module& module) : mModule(module), mType(Type::GetVoidType()), mRegisterSmashesDone(false) { }
         virtual ~Value() { }
 
         Module& getModule() { return mModule; }
@@ -59,9 +59,9 @@ namespace vipir
 
         opt::VReg* mVReg{0};
         bool mRequiresVReg{true};
-
         std::pair<int, int> mInterval{-1,-1};
         std::vector<opt::VReg*> mDisallowedVRegs;
+        bool mRegisterSmashesDone;
 
         virtual void emit(lir::Builder& builder) = 0;
     };

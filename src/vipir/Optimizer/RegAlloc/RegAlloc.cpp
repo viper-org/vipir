@@ -87,46 +87,29 @@ namespace vipir
                 {
                     ExpireOldIntervals(value->mInterval.first);
                     auto smashes = value->getRegisterSmashes();
-                    if (!smashes.empty())
+                    if (!value->mRegisterSmashesDone && !smashes.empty())
                     {
+                        value->mRegisterSmashesDone = true;
                         std::vector<VReg*> destroyedRegisters;
-
-                        // erase caller-saved values from current free register pool
-                        for (auto it = virtualRegs.begin(); it != virtualRegs.end();)
+                        for (auto smash : smashes)
                         {
-                            auto smashIt = std::find(smashes.begin(), smashes.end(), it->second->mPhysicalRegister);
-                            if (smashIt != smashes.end())
-                            {
-                                destroyedRegisters.push_back(it->second);
-                                it = virtualRegs.erase(it);
-                            }
-                            else ++it;
+                            destroyedRegisters.push_back(function->mVirtualRegs[smash].get());
                         }
 
-                        // swap the register of any active values using a smashed register
+                        // Set the disallowed registers for each active value
                         for (auto value : activeValues)
                         {
-                            auto smashIt = std::find(smashes.begin(), smashes.end(), value->mVReg->mPhysicalRegister);
-                            if (smashIt != smashes.end())
-                            {
-                                destroyedRegisters.push_back(value->mVReg);
-                                std::copy(destroyedRegisters.begin(), destroyedRegisters.end(), std::back_inserter(value->mDisallowedVRegs));
-
-                                std::map<int, VReg*> virtualRegs;
-                                for (auto& vreg : function->mVirtualRegs)
-                                {
-                                    virtualRegs[vreg->getId()] = vreg.get();
-                                }
-                                doRegalloc(function, virtualRegs, virtualRegs.size(), abi);
-                                return;
-                            }
+                            std::copy(destroyedRegisters.begin(), destroyedRegisters.end(), std::back_inserter(value->mDisallowedVRegs));
                         }
 
-                        // allow all of the smashed registers to be reused again
-                        for (auto vreg : destroyedRegisters)
+                        // Allow every virtual reg to be used again
+                        std::map<int, VReg*> virtualRegs;
+                        for (auto& vreg : function->mVirtualRegs)
                         {
-                            virtualRegs[vreg->getId()] = vreg;
+                            virtualRegs[vreg->getId()] = vreg.get();
                         }
+                        doRegalloc(function, virtualRegs, virtualRegs.size(), abi);
+                        return;
                     }
                     if (value->requiresVReg())
                     {
