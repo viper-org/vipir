@@ -93,7 +93,12 @@ namespace vipir
                         std::vector<VReg*> destroyedRegisters;
                         for (auto smash : smashes)
                         {
-                            destroyedRegisters.push_back(function->mVirtualRegs[smash].get());
+                            auto it = std::find_if(function->mVirtualRegs.begin(), function->mVirtualRegs.end(), [smash](const auto& vreg){
+                                return vreg->mPhysicalRegister == smash;
+                            });
+
+                            if (it != function->mVirtualRegs.end())
+                                destroyedRegisters.push_back(it->get());
                         }
 
                         // Set the disallowed registers for each active value
