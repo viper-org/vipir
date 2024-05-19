@@ -16,6 +16,8 @@ namespace vipir
         class Value
         {
         public:
+            virtual ~Value() { }
+
             virtual void print(std::ostream& stream) const = 0;
 
             virtual void emit(MC::Builder& builder) = 0;
