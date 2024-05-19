@@ -45,7 +45,7 @@ namespace vipir
 
         std::vector<int> SysV::getCallerSavedRegisters() const
         {
-            return { 0, 1, 2, 6, 7 };
+            return { 0, 1, 2, 6, 7, 8, 9, 10, 11 };
         }
 
         std::vector<int> SysV::getCalleeSavedRegisters() const
