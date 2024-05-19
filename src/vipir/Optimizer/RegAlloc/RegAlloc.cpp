@@ -99,6 +99,7 @@ namespace vipir
                         // Set the disallowed registers for each active value
                         for (auto value : activeValues)
                         {
+                            value->mRegisterSmashesDone = false; // Since register configuration changes, we need to recompute smashes
                             std::copy(destroyedRegisters.begin(), destroyedRegisters.end(), std::back_inserter(value->mDisallowedVRegs));
                         }
 
