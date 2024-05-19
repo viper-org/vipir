@@ -26,8 +26,9 @@ namespace vipir
 
         void Ret::emit(MC::Builder& builder)
         {
-            for (auto calleeSaved : mCalleeSaved)
+            for (auto it = mCalleeSaved.rbegin(); it != mCalleeSaved.rend(); ++it)
             {
+                auto& calleeSaved = *it;
                 instruction::OperandPtr reg = std::make_unique<instruction::Register>(calleeSaved, codegen::OperandSize::Quad);
                 builder.addValue(std::make_unique<instruction::PopInstruction>(std::move(reg)));
             }
