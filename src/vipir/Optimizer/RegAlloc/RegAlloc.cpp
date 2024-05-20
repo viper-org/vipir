@@ -54,7 +54,9 @@ namespace vipir
                     });
                     if (it == virtualRegs.end()) return createStackVReg();
                     ++it->second->mUses;
-                    return it->second;
+                    VReg* vreg = it->second;
+                    virtualRegs.erase(it);
+                    return vreg;
                 }
                 auto it = std::find_if(virtualRegs.begin(), virtualRegs.end(), [&disallowed](const auto& vreg){
                     return std::find(disallowed.begin(), disallowed.end(), vreg.second) == disallowed.end();
@@ -118,6 +120,7 @@ namespace vipir
                         std::map<int, VReg*> virtualRegs;
                         for (auto& vreg : function->mVirtualRegs)
                         {
+                            vreg->mUses = 0;
                             virtualRegs[vreg->getId()] = vreg.get();
                         }
                         doRegalloc(function, virtualRegs, virtualRegs.size(), abi);
