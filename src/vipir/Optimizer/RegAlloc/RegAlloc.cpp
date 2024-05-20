@@ -4,10 +4,10 @@
 #include "vipir/Optimizer/RegAlloc/RegAlloc.h"
 
 #include "vipir/IR/Instruction/AllocaInst.h"
+#include "vipir/IR/Instruction/CallInst.h"
 
 #include <algorithm>
 #include <map>
-#include <set>
 
 namespace vipir
 {
@@ -67,9 +67,13 @@ namespace vipir
                 return reg;
             };
 
-            std::set<Value*, ActiveValueComparator> activeValues;
+            std::vector<Value*> activeValues;
             auto ExpireOldIntervals = [&activeValues, &virtualRegs](int i){
                 std::erase_if(activeValues, [i, &virtualRegs](Value* value){
+                    if (value->mId == 11)
+                    {
+                        auto a = 1;
+                    }
                     if (value->mInterval.second <= i)
                     {
                         virtualRegs[value->mVReg->getId()] = value->mVReg;
@@ -80,12 +84,15 @@ namespace vipir
             };
 
             setArguments(function, abi, activeValues, virtualRegs);
+            std::sort(activeValues.begin(), activeValues.end(), [](Value* a, Value* b){
+                    return a->mInterval.second < b->mInterval.second;
+            });
 
             for (auto& basicBlock : function->mBasicBlockList)
             {
                 for (auto& value : basicBlock->mValueList)
                 {
-                    ExpireOldIntervals(value->mInterval.first);
+                    ExpireOldIntervals(value->mId);
                     auto smashes = value->getRegisterSmashes();
                     if (!value->mRegisterSmashesDone && !smashes.empty())
                     {
@@ -99,6 +106,10 @@ namespace vipir
 
                             if (it != function->mVirtualRegs.end())
                                 destroyedRegisters.push_back(it->get());
+                        }
+                        if (dynamic_cast<CallInst*>(value.get()))
+                        {
+                            auto x = 1;
                         }
 
                         // Set the disallowed registers for each active value
@@ -124,7 +135,14 @@ namespace vipir
                         {
                             if (alloca->mForceMemory) requireMemory = true;
                         }
-                        activeValues.insert(value.get());
+                        if (value->mId == 11)
+                        {
+                            *value;
+                        }
+                        activeValues.push_back(value.get());
+                        std::sort(activeValues.begin(), activeValues.end(), [](Value* a, Value* b){
+                                return a->mInterval.second < b->mInterval.second;
+                        });
                         value->mVReg = getNextFreeVReg(requireMemory, value->mDisallowedVRegs);
                     }
                 }
@@ -141,6 +159,7 @@ namespace vipir
                 for (auto& value : basicBlock->mValueList)
                 {
                     value->mInterval.first = index;
+                    value->mId = index;
                     index++;
                 }
                 basicBlock->mInterval.second = index;
@@ -242,7 +261,7 @@ namespace vipir
         }
 
 
-        void RegAlloc::setArguments(Function* function, abi::ABI* abi, std::set<Value*, ActiveValueComparator>& activeValues, std::map<int, VReg*>& virtualRegs)
+        void RegAlloc::setArguments(Function* function, abi::ABI* abi, std::vector<Value*>& activeValues, std::map<int, VReg*>& virtualRegs)
         {
             int argumentIndex = 0;
 
@@ -261,7 +280,7 @@ namespace vipir
                     stackOffset -= 8;
 
                     argument->mVReg = vreg;
-                    activeValues.insert(argument.get());
+                    activeValues.push_back(argument.get());
                 }
                 else
                 {
@@ -271,7 +290,7 @@ namespace vipir
                     ++argumentIndex;
                     argument->mVReg = it->second;
                     virtualRegs.erase(it);
-                    activeValues.insert(argument.get());
+                    activeValues.push_back(argument.get());
                 }
             }
         }

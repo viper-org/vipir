@@ -8,7 +8,6 @@
 #include "vipir/ABI/ABI.h"
 
 #include <map>
-#include <set>
 
 namespace vipir
 {
@@ -33,7 +32,7 @@ namespace vipir
                 }
             };
 
-            void setArguments(Function* function, abi::ABI* abi, std::set<Value*, ActiveValueComparator>& activeValues, std::map<int, VReg*>& virtualRegs);
+            void setArguments(Function* function, abi::ABI* abi, std::vector<Value*>& activeValues, std::map<int, VReg*>& virtualRegs);
         };
     }
 }
