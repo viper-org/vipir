@@ -48,6 +48,10 @@ namespace vipir
         {
             ptr = std::make_unique<lir::Memory>(mValue->getType()->getOperandSize(), std::move(ptr), std::nullopt, nullptr, std::nullopt);
         }
+        else if (dynamic_cast<GEPInst*>(mPtr))
+        {
+            ptr = std::make_unique<lir::Memory>(mValue->getType()->getOperandSize(), std::move(ptr), std::nullopt, nullptr, std::nullopt);
+        }
 
         builder.addValue(std::make_unique<lir::Move>(std::move(ptr), std::move(value)));
     }
