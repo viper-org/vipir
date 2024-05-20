@@ -4,7 +4,6 @@
 #include "vipir/Optimizer/RegAlloc/RegAlloc.h"
 
 #include "vipir/IR/Instruction/AllocaInst.h"
-#include "vipir/IR/Instruction/CallInst.h"
 
 #include <algorithm>
 #include <map>
@@ -107,10 +106,6 @@ namespace vipir
                             if (it != function->mVirtualRegs.end())
                                 destroyedRegisters.push_back(it->get());
                         }
-                        if (dynamic_cast<CallInst*>(value.get()))
-                        {
-                            auto x = 1;
-                        }
 
                         // Set the disallowed registers for each active value
                         for (auto value : activeValues)
@@ -134,10 +129,6 @@ namespace vipir
                         if (auto alloca = dynamic_cast<AllocaInst*>(value.get()))
                         {
                             if (alloca->mForceMemory) requireMemory = true;
-                        }
-                        if (value->mId == 11)
-                        {
-                            *value;
                         }
                         activeValues.push_back(value.get());
                         std::sort(activeValues.begin(), activeValues.end(), [](Value* a, Value* b){
