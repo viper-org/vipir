@@ -99,5 +99,15 @@ namespace vipir
         , mParent(parent)
         , mLoopEnd(nullptr)
     {
+        bool alldigits = true;
+        for (char c : mName)
+        {
+            if (!std::isdigit(c)) 
+            {
+                alldigits = false;
+                break;
+            }
+        }
+        if (alldigits) mName = ".L" + mName;
     }
 }

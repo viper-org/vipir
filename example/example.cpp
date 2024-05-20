@@ -46,7 +46,7 @@ int main()
     auto func = vipir::Function::Create(vipir::FunctionType::Create(i32Type, {i32Type,i32Type,i32Type,i32Type,i32Type,i32Type,i32Type}), mod, "test");
     auto bb = vipir::BasicBlock::Create("", func);
     builder.setInsertPoint(bb);
-    builder.CreateRet(func->getArgument(6));
+    builder.CreateRet(func->getArgument(1));
 
     auto func1 = vipir::Function::Create(vipir::FunctionType::Create(i64Type, {i32Type}), mod, "main");
     auto bb1 = vipir::BasicBlock::Create("", func1);
