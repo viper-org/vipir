@@ -26,6 +26,8 @@ namespace vipir
         {
         friend class opt::Peephole;
         public:
+            virtual ~Operand() { }
+            
             virtual std::string ident() const = 0;
 
             virtual instruction::OperandPtr asmOperand() = 0;
