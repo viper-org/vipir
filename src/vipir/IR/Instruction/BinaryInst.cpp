@@ -110,8 +110,15 @@ namespace vipir
             mLeft->lateEmit(builder);
             mRight->lateEmit(builder);
             lir::OperandPtr vreg = std::make_unique<lir::VirtualReg>(mVReg, mType->getOperandSize());
-            builder.addValue(std::make_unique<lir::Move>(vreg->clone(), mLeft->getEmittedValue()));
-            builder.addValue(std::make_unique<lir::BinaryArithmetic>(vreg->clone(), op, mRight->getEmittedValue()));
+            if (*mRight->getEmittedValue() == vreg)
+            {
+                builder.addValue(std::make_unique<lir::BinaryArithmetic>(mRight->getEmittedValue(), op, mLeft->getEmittedValue()));
+            }
+            else
+            {
+                builder.addValue(std::make_unique<lir::Move>(vreg->clone(), mLeft->getEmittedValue()));
+                builder.addValue(std::make_unique<lir::BinaryArithmetic>(vreg->clone(), op, mRight->getEmittedValue()));
+            }
             mEmittedValue = std::move(vreg);
         };
 
