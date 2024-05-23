@@ -23,7 +23,7 @@ namespace vipir
     {
         GlobalString* string = new GlobalString(module, std::move(value));
         
-        module.insertGlobalAt(string, -1);
+        module.insertGlobalAtFront(string);
 
         return string;
     }
