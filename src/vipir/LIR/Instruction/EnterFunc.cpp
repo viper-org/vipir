@@ -31,11 +31,8 @@ namespace vipir
 
         void EnterFunc::emit(MC::Builder& builder)
         {
-            if (mStackSize || !mCalleeSaved.empty())
-            {
-                builder.addValue(std::make_unique<instruction::PushInstruction>(instruction::Register::Get("rbp")));
-                builder.addValue(std::make_unique<instruction::MovInstruction>(instruction::Register::Get("rbp"), instruction::Register::Get("rsp")));
-            }
+            builder.addValue(std::make_unique<instruction::PushInstruction>(instruction::Register::Get("rbp")));
+            builder.addValue(std::make_unique<instruction::MovInstruction>(instruction::Register::Get("rbp"), instruction::Register::Get("rsp")));
             if (mStackSize)
             {
                 instruction::OperandPtr reg = instruction::Register::Get("rsp");

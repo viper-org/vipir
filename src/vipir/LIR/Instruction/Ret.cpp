@@ -4,6 +4,8 @@
 #include "vipir/LIR/Instruction/Ret.h"
 
 #include "vasm/instruction/NoOperandInstruction.h"
+#include "vasm/instruction/twoOperandInstruction/MovInstruction.h"
+#include "vasm/instruction/singleOperandInstruction/PushInstruction.h"
 #include "vasm/instruction/singleOperandInstruction/PopInstruction.h"
 
 #include "vasm/instruction/operand/Register.h"
@@ -36,6 +38,11 @@ namespace vipir
             if (mLeave || !mCalleeSaved.empty())
             {
                 builder.addValue(std::make_unique<instruction::LeaveInstruction>());
+            }
+            else
+            {
+                builder.addValue(std::make_unique<instruction::MovInstruction>(instruction::Register::Get("rsp"), instruction::Register::Get("rbp")));
+                builder.addValue(std::make_unique<instruction::PopInstruction>(instruction::Register::Get("rbp")));
             }
 
             builder.addValue(std::make_unique<instruction::RetInstruction>());
