@@ -41,17 +41,10 @@ namespace vipir
             }
             else
             {
-                if (mFuncStackSize)
-                    builder.addValue(std::make_unique<instruction::MovInstruction>(instruction::Register::Get("rsp"), instruction::Register::Get("rbp")));
                 builder.addValue(std::make_unique<instruction::PopInstruction>(instruction::Register::Get("rbp")));
             }
 
             builder.addValue(std::make_unique<instruction::RetInstruction>());
-        }
-
-        void Ret::setFuncStackSize(int newSize)
-        {
-            mFuncStackSize = newSize;
         }
 
         void Ret::setLeave(bool leave)
