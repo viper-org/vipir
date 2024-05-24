@@ -18,10 +18,12 @@ namespace vipir
             void print(std::ostream& stream) const override;
             void emit(MC::Builder& builder) override;
 
+            void setFuncStackSize(int newSize);
             void setLeave(bool leave);
             void setCalleeSaved(std::vector<int> calleeSaved);
 
         private:
+            int mFuncStackSize;
             bool mLeave;
             std::vector<int> mCalleeSaved;
         };
