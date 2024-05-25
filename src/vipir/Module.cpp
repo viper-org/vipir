@@ -60,6 +60,7 @@ namespace vipir
     {
         mGlobals.push_back(GlobalPtr(global));
     }
+
     void Module::insertGlobalAt(Global* global, int offset)
     {
         if (mGlobals.empty())
@@ -70,6 +71,11 @@ namespace vipir
         {
             mGlobals.insert(mGlobals.end() + offset, GlobalPtr(global));
         }
+    }
+
+    void Module::insertGlobalAtFront(Global* global)
+    {
+        mGlobals.insert(mGlobals.begin(), GlobalPtr(global));
     }
 
     void Module::insertConstant(Value* constant)

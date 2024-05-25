@@ -54,6 +54,7 @@ namespace vipir
         GlobalVar* createGlobalVar(Type* type);
         void insertGlobal(Global* global);
         void insertGlobalAt(Global* global, int offset);
+        void insertGlobalAtFront(Global* global);
         void insertConstant(Value* constant);
 
         void print(std::ostream& stream) const;

@@ -23,7 +23,7 @@ namespace vipir
     {
         GlobalString* string = new GlobalString(module, std::move(value));
         
-        module.insertGlobalAt(string, -1);
+        module.insertGlobalAtFront(string);
 
         return string;
     }
@@ -45,7 +45,7 @@ namespace vipir
         mEmittedValue = std::make_unique<lir::Lbl>(std::to_string(mValueId), false);
 
         builder.addValue(std::make_unique<lir::Label>(std::to_string(mValueId), false));
-        builder.addValue(std::make_unique<lir::GlobalString>(mValue));
+        builder.addValue(std::make_unique<lir::GlobalString>(mValue + '\0'));
     }
 
     GlobalString::GlobalString(Module& module, std::string value)
