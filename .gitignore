@@ -12,4 +12,5 @@ Makefile
 
 CMakeCache.txt
 compile_commands.json
+compile_flags.txt
 vipir-example
