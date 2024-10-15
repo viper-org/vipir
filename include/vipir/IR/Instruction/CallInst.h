@@ -26,9 +26,9 @@ namespace vipir
         void emit(lir::Builder& builder) override;
 
     private:
-        CallInst(BasicBlock* parent, Function* function, std::vector<Value*> parameters, int stackRestore);
+        CallInst(BasicBlock* parent, Value* callee, std::vector<Value*> parameters, int stackRestore);
 
-        Function* mFunction;
+        Value* mCallee;
         std::vector<Value*> mParameters;
         int mStackRestore;
         int mValueId;

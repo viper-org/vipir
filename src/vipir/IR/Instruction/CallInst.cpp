@@ -5,9 +5,11 @@
 #include "vipir/IR/BasicBlock.h"
 #include "vipir/IR/Function.h"
 
-#include "vipir/LIR/Operand.h"
 #include "vipir/Module.h"
 
+#include "vipir/Type/PointerType.h"
+
+#include "vipir/LIR/Operand.h"
 #include "vipir/LIR/Instruction/Move.h"
 #include "vipir/LIR/Instruction/Jump.h"
 #include "vipir/LIR/Instruction/Arithmetic.h"
@@ -24,7 +26,7 @@ namespace vipir
 {
     void CallInst::print(std::ostream& stream)
     {
-        stream << std::format("call {}(", mFunction->ident());
+        stream << std::format("call {}(", mCallee->ident());
 
         if (!mParameters.empty())
         {
@@ -51,12 +53,12 @@ namespace vipir
 
     void CallInst::emit(lir::Builder& builder)
     {
-        mFunction->lateEmit(builder);
+        mCallee->lateEmit(builder);
 
-        lir::OperandPtr function = mFunction->getEmittedValue();
+        lir::OperandPtr callee = mCallee->getEmittedValue();
         codegen::OperandSize size = mType->getOperandSize();
 
-        builder.addValue(std::make_unique<lir::Call>(std::move(function)));
+        builder.addValue(std::make_unique<lir::Call>(std::move(callee)));
 
         if (mStackRestore > 0)
         {
@@ -73,19 +75,26 @@ namespace vipir
         mEmittedValue = std::move(vreg);
     }
 
-    CallInst::CallInst(BasicBlock* parent, Function* function, std::vector<Value*> parameters, int stackRestore)
+    CallInst::CallInst(BasicBlock* parent, Value* callee, std::vector<Value*> parameters, int stackRestore)
         : Instruction(parent->getModule(), parent)
-        , mFunction(function)
+        , mCallee(callee)
         , mParameters(std::move(parameters))
         , mStackRestore(stackRestore)
         , mValueId(mModule.getNextValueId())
     {
-        mType = mFunction->getFunctionType()->getReturnType();
+        FunctionType* functionType;
+        if (callee->getType()->isPointerType())
+        {
+            functionType = static_cast<FunctionType*>(static_cast<PointerType*>(mCallee->getType())->getBaseType());
+        }
+        else
+            functionType = static_cast<FunctionType*>(mCallee->getType());
+        mType = functionType->getReturnType();
 
         int index = 0;
         for (auto parameter : mParameters)
         {
-            assert(parameter->getType() == mFunction->getArgument(index++)->getType());
+            assert(parameter->getType() == functionType->getArgumentTypes()[index++]);
         }
     }
 }
