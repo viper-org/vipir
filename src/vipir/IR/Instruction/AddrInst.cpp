@@ -4,6 +4,7 @@
 #include "vipir/IR/Instruction/AllocaInst.h"
 
 #include "vipir/IR/BasicBlock.h"
+#include "vipir/IR/Function.h"
 
 #include "vipir/Module.h"
 
@@ -56,6 +57,10 @@ namespace vipir
         if (auto alloca = dynamic_cast<AllocaInst*>(mPtr))
         {
             alloca->forceMemory();
+        }
+        if (auto func = dynamic_cast<Function*>(mPtr))
+        {
+            mType = Type::GetPointerType(mType);
         }
     }
 }
