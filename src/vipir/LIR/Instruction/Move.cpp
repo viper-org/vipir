@@ -3,6 +3,9 @@
 
 #include "vipir/LIR/Instruction/Move.h"
 
+#include "vasm/instruction/singleOperandInstruction/SetccInstruction.h"
+#include "vipir/MC/CmpOperand.h"
+
 #include "vasm/instruction/twoOperandInstruction/MovInstruction.h"
 #include "vasm/instruction/singleOperandInstruction/PushInstruction.h"
 
@@ -39,6 +42,34 @@ namespace vipir
                 (void)left.release();
                 instruction::LabelOperandPtr lbl = instruction::LabelOperandPtr(label);
                 left = std::make_unique<instruction::Relative>(std::move(lbl), std::nullopt);
+            }
+            if (auto cmp = dynamic_cast<CmpOperand*>(right.get()))
+            {
+                auto createSetcc = [&builder, &left]<typename InstT>(){
+                    builder.addValue(std::make_unique<InstT>(std::move(left)));
+                };
+                switch(cmp->getOperator())
+                {
+                    case CmpOperator::EQ:
+                        createSetcc.template operator()<instruction::SeteInstruction>();
+                        break;
+                    case CmpOperator::NE:
+                        createSetcc.template operator()<instruction::SetneInstruction>();
+                        break;
+                    case CmpOperator::LT:
+                        createSetcc.template operator()<instruction::SetlInstruction>();
+                        break;
+                    case CmpOperator::GT:
+                        createSetcc.template operator()<instruction::SetgInstruction>();
+                        break;
+                    case CmpOperator::LE:
+                        createSetcc.template operator()<instruction::SetleInstruction>();
+                        break;
+                    case CmpOperator::GE:
+                        createSetcc.template operator()<instruction::SetgeInstruction>();
+                        break;
+                }
+                return;
             }
             if (dynamic_cast<instruction::Memory*>(left.get()) && dynamic_cast<instruction::Memory*>(right.get()))
             {
