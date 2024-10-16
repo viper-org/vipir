@@ -45,6 +45,11 @@ namespace vipir
         return std::format("%{}", getName(mValueId));
     }
 
+    std::vector<Value*> CallInst::getOperands()
+    {
+        return { mCallee };
+    }
+
     std::vector<int> CallInst::getRegisterSmashes()
     {
         return mModule.abi()->getCallerSavedRegisters();

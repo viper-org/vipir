@@ -19,6 +19,8 @@ namespace vipir
     public:
         void print(std::ostream& stream) override;
         std::string ident() const override;
+    
+        std::vector<Value*> getOperands() override;
         
         std::vector<int> getRegisterSmashes() override;
 
