@@ -30,6 +30,14 @@ namespace vipir
                         value->mMarked = true;
                         workList.push_back(value.get());
                     }
+                    for (auto operand : value->getOperands())
+                    {
+                        if (operand->isCritical() && !operand->mMarked)
+                        {
+                            operand->mMarked = true;
+                            workList.push_back(value.get());
+                        }
+                    }
                 }
             }
 
