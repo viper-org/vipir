@@ -24,6 +24,8 @@ namespace vipir
         
         std::vector<int> getRegisterSmashes() override;
 
+        bool isCritical() override;
+
     protected:
         void emit(lir::Builder& builder) override;
 

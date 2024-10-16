@@ -28,7 +28,8 @@ namespace vipir
 
     enum class Pass
     {
-        PeepholeOptimization
+        PeepholeOptimization,
+        DeadCodeElimination
     };
 
     class Module

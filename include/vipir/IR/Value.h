@@ -13,6 +13,7 @@
 #include "vipir/MC/Builder.h"
 
 #include "vipir/Optimizer/RegAlloc/VReg.h"
+#include "vipir/Optimizer/DCE/DeadCodeElimination.h"
 
 #include "vipir/LIR/Builder.h"
 
@@ -31,6 +32,7 @@ namespace vipir
     friend class BasicBlock;
     friend class Function;
     friend class opt::RegAlloc;
+    friend class opt::DeadCodeEliminator;
     public:
         Value(Module& module) : mModule(module), mType(Type::GetVoidType()), mRegisterSmashesDone(false), mId(0x69696969) { }
         virtual ~Value() { }
@@ -50,6 +52,8 @@ namespace vipir
         virtual lir::OperandPtr getEmittedValue() { return mEmittedValue->clone(); }
         virtual void lateEmit(lir::Builder& builder) { }
         virtual std::vector<int> getRegisterSmashes() { return std::vector<int>(); }
+
+        virtual bool isCritical() { return false; }
     
     protected:
         Module& mModule;
@@ -64,6 +68,8 @@ namespace vipir
         bool mRequiresVReg{true};
         std::vector<opt::VReg*> mDisallowedVRegs;
         bool mRegisterSmashesDone;
+
+        bool mMarked;
 
         virtual void emit(lir::Builder& builder) = 0;
     };

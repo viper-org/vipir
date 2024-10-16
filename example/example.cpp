@@ -41,8 +41,6 @@ int main()
     auto i8Type = vipir::Type::GetIntegerType(8);
     auto voidType = vipir::Type::GetVoidType();
     auto boolType = vipir::Type::GetBooleanType();
-    auto arrayType = vipir::Type::GetArrayType(i32Type, 3);
-    auto structType = vipir::Type::GetStructType({arrayType, i32Type});
 
     auto func1 = vipir::Function::Create(vipir::FunctionType::Create(boolType, {i32Type}), mod, "main");
     auto bb1 = vipir::BasicBlock::Create("", func1);
@@ -56,10 +54,14 @@ int main()
     auto lhs = builder.CreateLoad(alloca);
     auto rhs = vipir::ConstantInt::Get(mod, 32, i32Type);
     auto cmp = builder.CreateCmpNE(lhs, rhs);
+    
+    auto deadAlloca = builder.CreateAlloca(i32Type);
+    auto y = vipir::ConstantInt::Get(mod, 12, i32Type);
+    builder.CreateStore(deadAlloca, y);
 
     builder.CreateRet(cmp);
 
-    mod.addPass(vipir::Pass::PeepholeOptimization);
+    mod.addPass(vipir::Pass::DeadCodeElimination);
 
     //mod.print(std::cout);
 

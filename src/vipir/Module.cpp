@@ -137,6 +137,18 @@ namespace vipir
 
     void Module::emit(std::ostream& stream, OutputFormat format)
     {
+        if (std::find(mPasses.begin(), mPasses.end(), Pass::DeadCodeElimination) != mPasses.end())
+        {
+            opt::DeadCodeEliminator dce;
+            for (auto& global : mGlobals)
+            {
+                if (auto func = dynamic_cast<Function*>(global.get()))
+                {
+                    dce.eliminateDeadCode(func);
+                }
+            }
+        }
+
         opt::RegAlloc regalloc;
         for (const GlobalPtr& global : mGlobals)
         {

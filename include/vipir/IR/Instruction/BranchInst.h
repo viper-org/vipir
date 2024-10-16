@@ -21,6 +21,8 @@ namespace vipir
         
         std::vector<Value*> getOperands() override;
 
+        bool isCritical() override;
+
     protected:
         void emit(lir::Builder& builder) override;
 

@@ -40,6 +40,11 @@ namespace vipir
         return {};
     }
 
+    bool BranchInst::isCritical()
+    {
+        return true;
+    }
+
 
     void BranchInst::emit(lir::Builder& builder)
     {

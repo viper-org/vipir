@@ -55,6 +55,11 @@ namespace vipir
         return mModule.abi()->getCallerSavedRegisters();
     }
 
+    bool CallInst::isCritical()
+    {
+        return true;
+    }
+
 
     void CallInst::emit(lir::Builder& builder)
     {

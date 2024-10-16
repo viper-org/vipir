@@ -38,6 +38,11 @@ namespace vipir
         else return std::vector<Value*>();
     }
 
+    bool RetInst::isCritical()
+    {
+        return true;
+    }
+
     std::string RetInst::ident() const
     {
         return "%undef";
