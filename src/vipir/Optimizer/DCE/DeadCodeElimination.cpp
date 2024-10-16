@@ -30,14 +30,6 @@ namespace vipir
                         value->mMarked = true;
                         workList.push_back(value.get());
                     }
-                    for (auto operand : value->getOperands())
-                    {
-                        if (operand->isCritical() && !operand->mMarked)
-                        {
-                            operand->mMarked = true;
-                            workList.push_back(value.get());
-                        }
-                    }
                 }
             }
 
@@ -67,10 +59,20 @@ namespace vipir
 
                     if (!value->mMarked)
                     {
-                        if (auto instruction = dynamic_cast<Instruction*>(value.get()))
+                        for (auto operand : value->getOperands())
                         {
-                            instruction->eraseFromParent();
-                            --i; // Don't increment at the end of the loop as we have just erased
+                            if (operand->mMarked)
+                            {
+                                value->mMarked = true;
+                            }
+                        }
+                        if (!value->mMarked)
+                        {
+                            if (auto instruction = dynamic_cast<Instruction*>(value.get()))
+                            {
+                                instruction->eraseFromParent();
+                                --i; // Don't increment at the end of the loop as we have just erased
+                            }
                         }
                     }
                 }
