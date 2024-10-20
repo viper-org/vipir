@@ -40,7 +40,8 @@ namespace vipir
 
         std::vector<int> SysV::getGeneralPurposeRegisters() const
         {
-            return { 1, 2, 3, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 };
+            // No '11' because this is used in case of mov mem, mem
+            return { 0, 1, 2, 6, 7, 8, 9, 10, 3, 12, 13, 14, 15 };
         }
 
         std::vector<int> SysV::getCallerSavedRegisters() const

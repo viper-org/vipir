@@ -73,7 +73,7 @@ namespace vipir
             }
             if (dynamic_cast<instruction::Memory*>(left.get()) && dynamic_cast<instruction::Memory*>(right.get()))
             {
-                instruction::OperandPtr reg = std::make_unique<instruction::Register>(0, mRight->size());
+                instruction::OperandPtr reg = std::make_unique<instruction::Register>(11, mRight->size());
                 builder.addValue(std::make_unique<instruction::MovInstruction>(reg->clone(), std::move(right)));
                 right = std::move(reg);
             }
