@@ -51,6 +51,8 @@ namespace vipir
 
     void RetInst::emit(lir::Builder& builder)
     {
+        mParent->endPosition() = builder.getPosition();
+        
         if (mReturnValue)
         {
             mReturnValue->lateEmit(builder);

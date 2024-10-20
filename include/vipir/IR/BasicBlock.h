@@ -21,6 +21,7 @@ namespace vipir
     {
     using ValuePtr = std::unique_ptr<Value>;
     friend class Function;
+    friend class PhiInst;
     friend class opt::RegAlloc;
     friend class opt::DeadCodeEliminator;
     public:
@@ -34,6 +35,7 @@ namespace vipir
         std::vector<Value*>& liveIn();
         std::vector<BasicBlock*>& successors();
         BasicBlock*& loopEnd();
+        int& endPosition();
 
         void print(std::ostream& stream) override;
         std::string ident() const override;
@@ -52,6 +54,8 @@ namespace vipir
         std::vector<Value*> mLiveIn;
         std::vector<BasicBlock*> mSuccessors;
         BasicBlock* mLoopEnd;
+
+        int mEndPosition { -1 }; // for phi nodes
     };
 }
 

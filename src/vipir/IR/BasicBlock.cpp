@@ -62,6 +62,11 @@ namespace vipir
         return mLoopEnd;
     }
 
+    int& BasicBlock::endPosition()
+    {
+        return mEndPosition;
+    }
+
     void BasicBlock::print(std::ostream& stream)
     {
         stream << std::format("{}:\n", mName);

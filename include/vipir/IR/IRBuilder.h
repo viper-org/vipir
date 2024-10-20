@@ -33,6 +33,7 @@ namespace vipir
     class TruncInst;
     class IntToPtrInst;
     class PtrToIntInst;
+    class PhiInst;
 
     class ConstantBool;
 
@@ -95,6 +96,8 @@ namespace vipir
         TruncInst* CreateTrunc(Value* value, Type* destType);
         IntToPtrInst* CreateIntToPtr(Value* value, Type* destType);
         PtrToIntInst* CreatePtrToInt(Value* value, Type* destType);
+
+        PhiInst* CreatePhi(Type* type);
 
 
         ConstantBool* CreateConstantBool(bool value);

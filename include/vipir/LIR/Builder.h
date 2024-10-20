@@ -17,12 +17,18 @@ namespace vipir
         {
         public:
             void addValue(ValuePtr value);
+            void insertValue(ValuePtr value, int position);
             void setSection(SectionType sect);
+
+            int getPosition();
+            int getInsertCount();
 
             std::vector<ValuePtr>& getValues();
 
         private:
             std::vector<ValuePtr> mValues;
+
+            int mInsertCount{ 0 };
         };
     }
 }

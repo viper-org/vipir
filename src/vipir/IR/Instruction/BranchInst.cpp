@@ -48,6 +48,8 @@ namespace vipir
 
     void BranchInst::emit(lir::Builder& builder)
     {
+        mParent->endPosition() = builder.getPosition();
+
         if (!mFalseBranch) // Unconditional branch won't have a false branch
         {
             builder.addValue(std::make_unique<lir::Jump>(mTrueBranch->getEmittedValue()));

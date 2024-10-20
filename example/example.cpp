@@ -17,6 +17,7 @@
 #include "vipir/IR/Instruction/TruncInst.h"
 #include "vipir/IR/Instruction/SExtInst.h"
 #include "vipir/IR/Instruction/ZExtInst.h"
+#include "vipir/IR/Instruction/PhiInst.h"
 
 #include "vipir/Optimizer/RegAlloc/RegAlloc.h"
 #include "vipir/Type/FunctionType.h"
@@ -42,24 +43,30 @@ int main()
     auto voidType = vipir::Type::GetVoidType();
     auto boolType = vipir::Type::GetBooleanType();
 
-    auto func1 = vipir::Function::Create(vipir::FunctionType::Create(boolType, {i32Type}), mod, "main");
+    auto func1 = vipir::Function::Create(vipir::FunctionType::Create(i32Type, {i32Type}), mod, "main");
+    auto entrybb = vipir::BasicBlock::Create("", func1);
     auto bb1 = vipir::BasicBlock::Create("", func1);
+    auto bb2 = vipir::BasicBlock::Create("", func1);
+    auto mergebb = vipir::BasicBlock::Create("", func1);
+
+    builder.setInsertPoint(entrybb);
+    builder.CreateBr(bb1);
+
 
     builder.setInsertPoint(bb1);
+    auto x1 = vipir::ConstantInt::Get(mod, 12, i32Type);
+    builder.CreateBr(mergebb);
 
-    auto alloca = builder.CreateAlloca(i32Type);
-    auto x = vipir::ConstantInt::Get(mod, 32, i32Type);
-    builder.CreateStore(alloca, x);
+    builder.setInsertPoint(bb2);
+    auto x2 = vipir::ConstantInt::Get(mod, 33, i32Type);
+    builder.CreateBr(mergebb);
 
-    auto lhs = builder.CreateLoad(alloca);
-    auto rhs = vipir::ConstantInt::Get(mod, 32, i32Type);
-    auto cmp = builder.CreateCmpNE(lhs, rhs);
     
-    auto deadAlloca = builder.CreateAlloca(i32Type);
-    auto y = vipir::ConstantInt::Get(mod, 12, i32Type);
-    builder.CreateStore(deadAlloca, y);
-
-    builder.CreateRet(cmp);
+    builder.setInsertPoint(mergebb);
+    auto phi = builder.CreatePhi(i32Type);
+    phi->addIncoming(x1, bb1);
+    phi->addIncoming(x2, bb2);
+    builder.CreateRet(phi);
 
     mod.addPass(vipir::Pass::DeadCodeElimination);
 

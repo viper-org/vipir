@@ -21,6 +21,7 @@
 #include "vipir/IR/Instruction/TruncInst.h"
 #include "vipir/IR/Instruction/IntToPtrInst.h"
 #include "vipir/IR/Instruction/PtrToIntInst.h"
+#include "vipir/IR/Instruction/PhiInst.h"
 
 #include "vipir/IR/Constant/ConstantInt.h"
 #include "vipir/IR/Constant/ConstantBool.h"
@@ -368,6 +369,16 @@ namespace vipir
         mInsertPoint->insertValue(ptrtoint);
 
         return ptrtoint;
+    }
+
+
+    PhiInst* IRBuilder::CreatePhi(Type* type)
+    {
+        PhiInst* phi = new PhiInst(mInsertPoint, type);
+
+        mInsertPoint->insertValue(phi);
+
+        return phi;
     }
 
 
