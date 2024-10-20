@@ -37,7 +37,8 @@ namespace vipir
 
     std::vector<Value*> BranchInst::getOperands()
     {
-        return { mCondition };
+        if (mCondition) return { mCondition };
+        return {};
     }
 
     bool BranchInst::isCritical()
