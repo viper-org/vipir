@@ -61,7 +61,7 @@ namespace vipir
             auto condition = mCondition->getEmittedValue();
             if (auto imm = dynamic_cast<lir::Immediate*>(condition.get()))
             {
-                if (imm)
+                if (imm->value())
                 {
                     builder.addValue(std::make_unique<lir::Jump>(mTrueBranch->getEmittedValue()));
                 }
