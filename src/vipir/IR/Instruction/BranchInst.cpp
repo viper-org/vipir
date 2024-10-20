@@ -58,6 +58,19 @@ namespace vipir
         else
         {
             mCondition->lateEmit(builder);
+            auto condition = mCondition->getEmittedValue();
+            if (auto imm = dynamic_cast<lir::Immediate*>(condition.get()))
+            {
+                if (imm)
+                {
+                    builder.addValue(std::make_unique<lir::Jump>(mTrueBranch->getEmittedValue()));
+                }
+                else
+                {
+                    builder.addValue(std::make_unique<lir::Jump>(mFalseBranch->getEmittedValue()));
+                }
+                return;
+            }
             builder.addValue(std::make_unique<lir::CondJump>(mTrueBranch->getEmittedValue(), mCondition->getEmittedValue()));
             builder.addValue(std::make_unique<lir::Jump>(mFalseBranch->getEmittedValue()));
         }

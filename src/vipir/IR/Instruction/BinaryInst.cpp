@@ -190,7 +190,39 @@ namespace vipir
         auto createCompare = [&builder, this](lir::CMP::Operator op){
             mLeft->lateEmit(builder);
             mRight->lateEmit(builder);
-            builder.addValue(std::make_unique<lir::Compare>(mLeft->getEmittedValue(), op, mRight->getEmittedValue()));
+            auto left = mLeft->getEmittedValue();
+            auto right = mRight->getEmittedValue();
+            if (auto leftImm = dynamic_cast<lir::Immediate*>(left.get()))
+            {
+                if (auto rightImm = dynamic_cast<lir::Immediate*>(right.get()))
+                {
+                    int value;
+                    switch (op)
+                    {
+                        case lir::CMP::Operator::EQ:
+                            value = leftImm->value() == rightImm->value();
+                            break;
+                        case lir::CMP::Operator::NE:
+                            value = leftImm->value() != rightImm->value();
+                            break;
+                        case lir::CMP::Operator::LT:
+                            value = leftImm->value() < rightImm->value();
+                            break;
+                        case lir::CMP::Operator::GT:
+                            value = leftImm->value() > rightImm->value();
+                            break;
+                        case lir::CMP::Operator::LE:
+                            value = leftImm->value() <= rightImm->value();
+                            break;
+                        case lir::CMP::Operator::GE:
+                            value = leftImm->value() >= rightImm->value();
+                            break;
+                    }
+                    mEmittedValue = std::make_unique<lir::Immediate>(value);
+                    return;
+                }
+            }
+            builder.addValue(std::make_unique<lir::Compare>(std::move(left), op, std::move(right)));
             mEmittedValue = std::make_unique<lir::CMP>(op);
         };
 
