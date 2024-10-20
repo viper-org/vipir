@@ -14,7 +14,7 @@ namespace vipir
         stream << std::format("%{} = phi [ ", getName(mValueId));
         for (size_t i = 0; i < mIncoming.size() - 1; ++i)
         {
-            stream << std::format("{} : {} ]", mIncoming[i].first->ident(), mIncoming[i].second->ident());
+            stream << std::format("{} : {}, ", mIncoming[i].first->ident(), mIncoming[i].second->ident());
         }
         stream << std::format("{} : {} ]", mIncoming.back().first->ident(), mIncoming.back().second->ident());
     }
