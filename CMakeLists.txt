@@ -61,6 +61,7 @@ set(SOURCES
     "src/vipir/Optimizer/RegAlloc/RegAlloc.cpp"
     "src/vipir/Optimizer/RegAlloc/VReg.cpp"
     "src/vipir/Optimizer/Peephole/Peephole.cpp"
+    "src/vipir/Optimizer/Peephole/PeepholeV2.cpp"
     "src/vipir/Optimizer/DCE/DeadCodeElimination.cpp"
 
     "src/vipir/LIR/Builder.cpp"
@@ -133,6 +134,7 @@ set(HEADERS
     "include/vipir/Optimizer/RegAlloc/RegAlloc.h"
     "include/vipir/Optimizer/RegAlloc/VReg.h"
     "include/vipir/Optimizer/Peephole/Peephole.h"
+    "include/vipir/Optimizer/Peephole/PeepholeV2.h"
     "include/vipir/Optimizer/DCE/DeadCodeElimination.h"
 
     "include/vipir/LIR/Builder.h"

@@ -10,7 +10,7 @@
 #include "vipir/MC/Builder.h"
 
 #include "vipir/Optimizer/RegAlloc/RegAlloc.h"
-#include "vipir/Optimizer/Peephole/Peephole.h"
+#include "vipir/Optimizer/Peephole/PeepholeV2.h"
 
 #include "vasm/codegen/Elf.h"
 #include "vasm/codegen/Pe.h"
@@ -125,8 +125,8 @@ namespace vipir
 
         if (std::find(mPasses.begin(), mPasses.end(), Pass::PeepholeOptimization) != mPasses.end())
         {
-            opt::Peephole peephole;
-            peephole.doOptimizations(builder);
+            opt::PeepholeV2 peephole;
+            peephole.doPeephole(builder);
         }
 
         for (auto& value : builder.getValues())
@@ -179,8 +179,8 @@ namespace vipir
 
         if (std::find(mPasses.begin(), mPasses.end(), Pass::PeepholeOptimization) != mPasses.end())
         {
-            opt::Peephole peephole;
-            peephole.doOptimizations(builder);
+            opt::PeepholeV2 peephole;
+            peephole.doPeephole(builder);
         }
 
         for (auto& global : mGlobals)

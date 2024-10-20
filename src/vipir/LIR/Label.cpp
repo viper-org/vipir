@@ -15,6 +15,7 @@ namespace vipir
         Label::Label(std::string name, bool global)
             : mName(name)
             , mGlobal(global)
+            , mHadReferenceOptimized(false)
         {
         }
 

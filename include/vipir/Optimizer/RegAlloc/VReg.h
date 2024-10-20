@@ -15,6 +15,7 @@ namespace vipir
         class VReg
         {
         friend class Peephole;
+        friend class PeepholeV2;
         friend class RegAlloc;
         public:
             VReg() = default;

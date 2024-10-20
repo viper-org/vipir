@@ -69,6 +69,7 @@ int main()
     builder.CreateRet(phi);
 
     mod.addPass(vipir::Pass::DeadCodeElimination);
+    mod.addPass(vipir::Pass::PeepholeOptimization);
 
     //mod.print(std::cout);
 

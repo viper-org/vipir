@@ -16,7 +16,11 @@
 
 namespace vipir
 {
-    namespace opt { class Peephole; }
+    namespace opt
+    {
+        class Peephole;
+        class PeepholeV2;
+    }
 
     namespace lir
     {
@@ -25,6 +29,7 @@ namespace vipir
         class Operand
         {
         friend class opt::Peephole;
+        friend class opt::PeepholeV2;
         public:
             virtual ~Operand() { }
             
@@ -42,6 +47,7 @@ namespace vipir
         class Immediate : public Operand
         {
         friend class opt::Peephole;
+        friend class opt::PeepholeV2;
         public:
             Immediate(std::intmax_t value);
 
@@ -60,6 +66,7 @@ namespace vipir
         class PhysicalReg : public Operand
         {
         friend class opt::Peephole;
+        friend class opt::PeepholeV2;
         friend class VirtualReg;
         public:
             PhysicalReg(int id, codegen::OperandSize size);
@@ -78,6 +85,7 @@ namespace vipir
         class VirtualReg : public Operand
         {
         friend class opt::Peephole;
+        friend class opt::PeepholeV2;
         friend class PhysicalReg;
         public:
             VirtualReg(opt::VReg* reg, codegen::OperandSize size);
@@ -96,6 +104,7 @@ namespace vipir
 
         class Lbl : public Operand
         {
+        friend class opt::PeepholeV2;
         public:
             Lbl(std::string name, bool plt);
 
@@ -113,6 +122,7 @@ namespace vipir
         class CMP : public Operand
         {
         friend class opt::Peephole;
+        friend class opt::PeepholeV2;
         public:
             enum class Operator
             {
@@ -138,6 +148,7 @@ namespace vipir
         class Memory : public Operand
         {
         friend class opt::Peephole;
+        friend class opt::PeepholeV2;
         public:
             Memory(codegen::OperandSize size, OperandPtr base, std::optional<int> displacement, OperandPtr index, std::optional<int> scale);
 
@@ -161,6 +172,7 @@ namespace vipir
         class Compound : public Operand
         {
         friend class opt::Peephole;
+        friend class opt::PeepholeV2;
         public:
             Compound(std::vector<OperandPtr> values);
 

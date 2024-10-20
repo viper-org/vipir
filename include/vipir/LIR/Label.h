@@ -11,6 +11,7 @@ namespace vipir
     {
         class Label : public Value
         {
+        friend class opt::PeepholeV2;
         public:
             Label(std::string name, bool global);
 
@@ -20,6 +21,8 @@ namespace vipir
         private:
             std::string mName;
             bool mGlobal;
+
+            bool mHadReferenceOptimized;
         };
 
         class ExternLabel : public Value
