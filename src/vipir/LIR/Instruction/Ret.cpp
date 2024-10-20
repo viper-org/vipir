@@ -41,7 +41,8 @@ namespace vipir
             }
             else
             {
-                builder.addValue(std::make_unique<instruction::PopInstruction>(instruction::Register::Get("rbp")));
+                if (mSaveFramePointer)
+                    builder.addValue(std::make_unique<instruction::PopInstruction>(instruction::Register::Get("rbp")));
             }
 
             builder.addValue(std::make_unique<instruction::RetInstruction>());
@@ -55,6 +56,11 @@ namespace vipir
         void Ret::setCalleeSaved(std::vector<int> calleeSaved)
         {
             mCalleeSaved = std::move(calleeSaved);
+        }
+
+        void Ret::setSaveFramePointer(bool saveFramePointer)
+        {
+            mSaveFramePointer = saveFramePointer;
         }
     }
 }

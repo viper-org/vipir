@@ -31,8 +31,12 @@ namespace vipir
 
         void EnterFunc::emit(MC::Builder& builder)
         {
-            builder.addValue(std::make_unique<instruction::PushInstruction>(instruction::Register::Get("rbp")));
-            builder.addValue(std::make_unique<instruction::MovInstruction>(instruction::Register::Get("rbp"), instruction::Register::Get("rsp")));
+            if (mSaveFramePointer)
+            {
+                builder.addValue(std::make_unique<instruction::PushInstruction>(instruction::Register::Get("rbp")));
+                builder.addValue(std::make_unique<instruction::MovInstruction>(instruction::Register::Get("rbp"), instruction::Register::Get("rsp")));
+            }
+
             if (mStackSize)
             {
                 instruction::OperandPtr reg = instruction::Register::Get("rsp");
@@ -55,6 +59,11 @@ namespace vipir
         void EnterFunc::setCalleeSaved(std::vector<int> calleeSaved)
         {
             mCalleeSaved = std::move(calleeSaved);
+        }
+
+        void EnterFunc::setSaveFramePointer(bool saveFramePointer)
+        {
+            mSaveFramePointer = saveFramePointer;
         }
     }
 }

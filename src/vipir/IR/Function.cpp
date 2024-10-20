@@ -6,6 +6,7 @@
 
 #include "vipir/LIR/Label.h"
 #include "vipir/LIR/Instruction/EnterFunc.h"
+#include "vipir/LIR/Instruction/Jump.h"
 #include "vipir/LIR/Instruction/Ret.h"
 
 #include "vasm/instruction/Label.h"
@@ -123,6 +124,10 @@ namespace vipir
             {
                 mRetNodes.push_back(ret);
             }
+            if (auto call = dynamic_cast<lir::Call*>(value.get()))
+            {
+                mHasCallNodes = true;
+            }
         }
         std::move(newBuilder.getValues().begin(), newBuilder.getValues().end(), std::back_inserter(builder.getValues()));
     }
@@ -131,6 +136,7 @@ namespace vipir
         : Global(module)
         , mName(name)
         , mTotalStackOffset(0)
+        , mHasCallNodes(false)
     {
         mType = type;
 
@@ -164,11 +170,13 @@ namespace vipir
         lir::EnterFunc* node = static_cast<lir::EnterFunc*>(mEnterFuncNode);
         node->setStackSize(mTotalStackOffset);
         node->setCalleeSaved(mCalleeSaved);
+        node->setSaveFramePointer(mHasCallNodes);
         for (auto node : mRetNodes)
         {
             lir::Ret* ret = static_cast<lir::Ret*>(node);
             ret->setLeave(mTotalStackOffset > 0);
             ret->setCalleeSaved(mCalleeSaved);
+            ret->setSaveFramePointer(mHasCallNodes);
         }
     }
 }

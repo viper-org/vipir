@@ -57,6 +57,7 @@ namespace vipir
 
         lir::Value* mEnterFuncNode;
         std::vector<lir::Value*> mRetNodes;
+        bool mHasCallNodes;
 
         void setCalleeSaved();
     };
