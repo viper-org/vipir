@@ -109,15 +109,47 @@ namespace vipir
         auto createArithmetic = [&builder, this](lir::BinaryArithmetic::Operator op){
             mLeft->lateEmit(builder);
             mRight->lateEmit(builder);
+            auto left = mLeft->getEmittedValue();
+            auto right = mRight->getEmittedValue();
+            if (auto leftImm = dynamic_cast<lir::Immediate*>(left.get()))
+            {
+                if (auto rightImm = dynamic_cast<lir::Immediate*>(right.get()))
+                {
+                    int value;
+                    switch (op)
+                    {
+                        case lir::BinaryArithmetic::Operator::Add:
+                            value = leftImm->value() + rightImm->value();
+                            break;
+                        case lir::BinaryArithmetic::Operator::Sub:
+                            value = leftImm->value() - rightImm->value();
+                            break;
+                        case lir::BinaryArithmetic::Operator::BWAnd:
+                            value = leftImm->value() & rightImm->value();
+                            break;
+                        case lir::BinaryArithmetic::Operator::BWOr:
+                            value = leftImm->value() | rightImm->value();
+                            break;
+                        case lir::BinaryArithmetic::Operator::BWXor:
+                            value = leftImm->value() ^ rightImm->value();
+                            break;
+
+                        default:
+                            break; // Unreachable
+                    }
+                    mEmittedValue = std::make_unique<lir::Immediate>(value);
+                    return;
+                }
+            }
             lir::OperandPtr vreg = std::make_unique<lir::VirtualReg>(mVReg, mType->getOperandSize());
             if (*mRight->getEmittedValue() == vreg)
             {
-                builder.addValue(std::make_unique<lir::BinaryArithmetic>(mRight->getEmittedValue(), op, mLeft->getEmittedValue()));
+                builder.addValue(std::make_unique<lir::BinaryArithmetic>(std::move(right), op, std::move(left)));
             }
             else
             {
-                builder.addValue(std::make_unique<lir::Move>(vreg->clone(), mLeft->getEmittedValue()));
-                builder.addValue(std::make_unique<lir::BinaryArithmetic>(vreg->clone(), op, mRight->getEmittedValue()));
+                builder.addValue(std::make_unique<lir::Move>(vreg->clone(), std::move(left)));
+                builder.addValue(std::make_unique<lir::BinaryArithmetic>(vreg->clone(), op, std::move(right)));
             }
             mEmittedValue = std::move(vreg);
         };
@@ -125,8 +157,32 @@ namespace vipir
         auto createSingleOpArithmetic = [&builder, this](lir::BinaryArithmetic::Operator op){
             mLeft->lateEmit(builder);
             mRight->lateEmit(builder);
+            auto left = mLeft->getEmittedValue();
+            auto right = mRight->getEmittedValue();
+            if (auto leftImm = dynamic_cast<lir::Immediate*>(left.get()))
+            {
+                if (auto rightImm = dynamic_cast<lir::Immediate*>(right.get()))
+                {
+                    int value;
+                    switch (op)
+                    {
+                        case lir::BinaryArithmetic::Operator::Mul:
+                            value = leftImm->value() * rightImm->value();
+                            break;
+                        case lir::BinaryArithmetic::Operator::Div:
+                        case lir::BinaryArithmetic::Operator::IDiv:
+                            value = leftImm->value() / rightImm->value();
+                            break;
+                            
+                        default:
+                            break; // Unreachable
+                    }
+                    mEmittedValue = std::make_unique<lir::Immediate>(value);
+                    return;
+                }
+            }
             lir::OperandPtr sourceReg = std::make_unique<lir::PhysicalReg>(0, mType->getOperandSize());
-            builder.addValue(std::make_unique<lir::Move>(sourceReg->clone(), mLeft->getEmittedValue()));
+            builder.addValue(std::make_unique<lir::Move>(sourceReg->clone(), std::move(left)));
 
             if (op == lir::BinaryArithmetic::Operator::IDiv || op == lir::BinaryArithmetic::Operator::Div)
             {
@@ -136,7 +192,6 @@ namespace vipir
             }
 
             lir::OperandPtr vreg = std::make_unique<lir::VirtualReg>(mVReg, mType->getOperandSize());
-            lir::OperandPtr right = mRight->getEmittedValue();
             if (dynamic_cast<lir::Immediate*>(right.get()))
             {
                 builder.addValue(std::make_unique<lir::Move>(vreg->clone(), std::move(right)));
