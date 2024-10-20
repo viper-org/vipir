@@ -94,8 +94,21 @@ namespace vipir
     }
 
 
-    void Module::printLIR(std::ostream& stream) const
+    void Module::printLIR(std::ostream& stream)
     {
+        if (auto it = std::find(mPasses.begin(), mPasses.end(), Pass::DeadCodeElimination); it!= mPasses.end())
+        {
+            opt::DeadCodeEliminator dce;
+            for (auto& global : mGlobals)
+            {
+                if (auto func = dynamic_cast<Function*>(global.get()))
+                {
+                    dce.eliminateDeadCode(func);
+                }
+            }
+            mPasses.erase(it);
+        }
+
         opt::RegAlloc regalloc;
         for (const GlobalPtr& global : mGlobals)
         {
@@ -123,10 +136,11 @@ namespace vipir
             global->emit(builder);
         }
 
-        if (std::find(mPasses.begin(), mPasses.end(), Pass::PeepholeOptimization) != mPasses.end())
+        if (auto it = std::find(mPasses.begin(), mPasses.end(), Pass::PeepholeOptimization); it != mPasses.end())
         {
             opt::PeepholeV2 peephole;
             peephole.doPeephole(builder);
+            mPasses.erase(it);
         }
 
         for (auto& value : builder.getValues())

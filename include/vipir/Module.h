@@ -59,7 +59,7 @@ namespace vipir
         void insertConstant(Value* constant);
 
         void print(std::ostream& stream) const;
-        void printLIR(std::ostream& stream) const;
+        void printLIR(std::ostream& stream);
 
         void emit(std::ostream& stream, OutputFormat outputFormat);
 
