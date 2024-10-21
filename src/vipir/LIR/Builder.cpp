@@ -14,7 +14,7 @@ namespace vipir
         void Builder::insertValue(ValuePtr value, int position)
         {
             mValues.insert(mValues.begin() + position, std::move(value));
-            ++mInsertCount;
+            mInserts.push_back(position);
         }
 
         void Builder::setSection(SectionType sect)
@@ -27,9 +27,14 @@ namespace vipir
             return mValues.size();
         }
 
-        int Builder::getInsertCount()
+        int Builder::getInsertsBefore(int position)
         {
-            return mInsertCount;
+            int inserts = 0;
+            for (auto insert : mInserts)
+            {
+                if (insert <= position) ++inserts;
+            }
+            return inserts;
         }
 
         std::vector<ValuePtr>& Builder::getValues()

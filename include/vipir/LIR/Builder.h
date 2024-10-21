@@ -21,14 +21,14 @@ namespace vipir
             void setSection(SectionType sect);
 
             int getPosition();
-            int getInsertCount();
+            int getInsertsBefore(int position);
 
             std::vector<ValuePtr>& getValues();
 
         private:
             std::vector<ValuePtr> mValues;
 
-            int mInsertCount{ 0 };
+            std::vector<int> mInserts;
         };
     }
 }

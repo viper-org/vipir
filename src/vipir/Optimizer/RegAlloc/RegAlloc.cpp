@@ -171,7 +171,11 @@ namespace vipir
                         auto incomingIt = std::find_if(phi->mIncoming.begin(), phi->mIncoming.end(), [&bb](const auto& incoming) {
                             return incoming.second == bb.get();
                         });
-                        live.push_back(incomingIt->first);
+                        
+                        if (incomingIt != phi->mIncoming.end())
+                        {
+                            live.push_back(incomingIt->first);
+                        }
                     }
                 }
 
@@ -184,6 +188,7 @@ namespace vipir
                 for (auto valueIt = bb->mValueList.rbegin(); valueIt != bb->mValueList.rend(); ++valueIt)
                 {
                     auto& value = *valueIt;
+                    if (dynamic_cast<PhiInst*>(value.get())) continue;
 
                     for (auto operand : value->getOperands())
                     {
@@ -199,7 +204,7 @@ namespace vipir
 
                 for (auto phi : bb->mPhis)
                 {
-                    live.erase(std::remove(live.begin(), live.end(), phi));
+                    live.erase(std::remove(live.begin(), live.end(), phi), live.end());
                 }
 
                 if (bb->loopEnd())
