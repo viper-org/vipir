@@ -16,6 +16,7 @@
 namespace vipir
 {
     class Function;
+    class PhiInst;
 
     class BasicBlock : public Value
     {
@@ -44,6 +45,8 @@ namespace vipir
         void setEmittedValue();
         void emit(lir::Builder& builder) override;
 
+        std::vector<PhiInst*>& getPhis();
+
     private:
         BasicBlock(std::string_view name, Function* parent);
 
@@ -53,6 +56,7 @@ namespace vipir
         std::vector<ValuePtr> mValueList;
         std::vector<Value*> mLiveIn;
         std::vector<BasicBlock*> mSuccessors;
+        std::vector<PhiInst*> mPhis;
         BasicBlock* mLoopEnd;
 
         int mEndPosition { -1 }; // for phi nodes

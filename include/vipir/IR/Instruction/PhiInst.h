@@ -15,6 +15,7 @@ namespace vipir
     class PhiInst : public Instruction
     {
     friend class IRBuilder;
+    friend class opt::RegAlloc;
     public:
         void print(std::ostream& stream) override;
 

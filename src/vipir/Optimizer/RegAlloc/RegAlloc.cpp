@@ -4,6 +4,7 @@
 #include "vipir/Optimizer/RegAlloc/RegAlloc.h"
 
 #include "vipir/IR/Instruction/AllocaInst.h"
+#include "vipir/IR/Instruction/PhiInst.h"
 
 #include <algorithm>
 #include <map>
@@ -71,10 +72,6 @@ namespace vipir
             std::vector<Value*> activeValues;
             auto ExpireOldIntervals = [&activeValues, &virtualRegs](int i){
                 std::erase_if(activeValues, [i, &virtualRegs](Value* value){
-                    if (value->mId == 11)
-                    {
-                        auto a = 1;
-                    }
                     if (value->mInterval.second <= i)
                     {
                         virtualRegs[value->mVReg->getId()] = value->mVReg;
@@ -147,6 +144,7 @@ namespace vipir
         void RegAlloc::setLiveIntervals(Function* function)
         {
             int index = 0;
+            
             for (auto& basicBlock : function->mBasicBlockList)
             {
                 basicBlock->mInterval.first = index;
@@ -162,11 +160,19 @@ namespace vipir
             for (auto it = function->mBasicBlockList.rbegin(); it != function->mBasicBlockList.rend(); ++it)
             {
                 auto& bb = *it;
-
                 std::vector<Value*> live;
+
                 for (auto successor : bb->successors())
                 {
                     std::copy(successor->liveIn().begin(), successor->liveIn().end(), std::back_inserter(live));
+
+                    for (auto phi : successor->mPhis)
+                    {
+                        auto incomingIt = std::find_if(phi->mIncoming.begin(), phi->mIncoming.end(), [&bb](const auto& incoming) {
+                            return incoming.second == bb.get();
+                        });
+                        live.push_back(incomingIt->first);
+                    }
                 }
 
                 for (auto value : live)
@@ -184,10 +190,16 @@ namespace vipir
                         operand->mInterval.second = std::max(operand->mInterval.second, value->mInterval.first);
                         live.push_back(operand);
                     }
+                    value->mInterval.first = value->mId;
 
                     live.erase(std::remove_if(live.begin(), live.end(), [&value](auto liveValue){
                         return liveValue == value.get();
                     }), live.end());
+                }
+
+                for (auto phi : bb->mPhis)
+                {
+                    live.erase(std::remove(live.begin(), live.end(), phi));
                 }
 
                 if (bb->loopEnd())

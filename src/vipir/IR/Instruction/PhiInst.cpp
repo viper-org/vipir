@@ -56,6 +56,7 @@ namespace vipir
         : Instruction(parent->getModule(), parent)
         , mValueId(mModule.getNextValueId())
     {
+        mParent->getPhis().push_back(this);
         mType = type;
     }
 }

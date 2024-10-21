@@ -97,6 +97,11 @@ namespace vipir
         }
     }
 
+    std::vector<PhiInst*>& BasicBlock::getPhis()
+    {
+        return mPhis;
+    }
+
 
     BasicBlock::BasicBlock(std::string_view name, Function* parent)
         : Value(parent->getModule())
