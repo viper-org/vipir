@@ -56,7 +56,14 @@ namespace vipir
 
         void Compare::emit(MC::Builder& builder)
         {
-            builder.addValue(std::make_unique<instruction::CmpInstruction>(mLeft->asmOperand(), mRight->asmOperand()));
+            if (dynamic_cast<VirtualReg*>(mRight.get()) || dynamic_cast<PhysicalReg*>(mRight.get()))
+            {
+                builder.addValue(std::make_unique<instruction::CmpInstruction>(mRight->asmOperand(), mLeft->asmOperand()));
+            }
+            else
+            {
+                builder.addValue(std::make_unique<instruction::CmpInstruction>(mLeft->asmOperand(), mRight->asmOperand()));
+            }
         }
 
         std::vector<std::reference_wrapper<OperandPtr> > Compare::getInputOperands()
