@@ -57,6 +57,11 @@ namespace vipir
         return mSuccessors;
     }
 
+    std::vector<BasicBlock*>& BasicBlock::predecessors()
+    {
+        return mPredecessors;
+    }
+
     BasicBlock*& BasicBlock::loopEnd()
     {
         return mLoopEnd;

@@ -35,6 +35,7 @@ namespace vipir
 
         std::vector<Value*>& liveIn();
         std::vector<BasicBlock*>& successors();
+        std::vector<BasicBlock*>& predecessors();
         BasicBlock*& loopEnd();
         int& endPosition();
 
@@ -56,6 +57,7 @@ namespace vipir
         std::vector<ValuePtr> mValueList;
         std::vector<Value*> mLiveIn;
         std::vector<BasicBlock*> mSuccessors;
+        std::vector<BasicBlock*> mPredecessors;
         std::vector<PhiInst*> mPhis;
         BasicBlock* mLoopEnd;
 

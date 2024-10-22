@@ -85,6 +85,7 @@ namespace vipir
     {
         mRequiresVReg = false;
         parent->successors().push_back(destination);
+        destination->predecessors().push_back(parent);
     }
 
     BranchInst::BranchInst(BasicBlock* parent, Value* condition, BasicBlock* trueBranch, BasicBlock* falseBranch)
@@ -97,5 +98,7 @@ namespace vipir
         mRequiresVReg = false;
         parent->successors().push_back(trueBranch);
         parent->successors().push_back(falseBranch);
+        trueBranch->predecessors().push_back(parent);
+        falseBranch->predecessors().push_back(parent);
     }
 }
