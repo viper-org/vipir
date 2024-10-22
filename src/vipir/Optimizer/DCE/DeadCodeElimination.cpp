@@ -85,19 +85,19 @@ namespace vipir
         bool DeadCodeEliminator::eliminateUnreachableBlocks(Function* function)
         {
             bool eliminatedSome = false;
-            for (auto it = function->mBasicBlockList.begin() + 1; it != function->mBasicBlockList.end();)
+            for (auto it = function->mBasicBlockList.begin() + 1; it != function->mBasicBlockList.end(); ++it)
             {
                 auto& basicBlock = *it;
-                if (basicBlock->predecessors().empty())
+
+                if (basicBlock->exists() && basicBlock->predecessors().empty())
                 {
                     for (auto successor : basicBlock->successors())
                     {
                         std::erase(successor->predecessors(), basicBlock.get());
                     }
-                    it = function->mBasicBlockList.erase(it);
+                    basicBlock->mExists = false;
                     eliminatedSome = true;
                 }
-                else ++it;
             }
             return eliminatedSome;
         }

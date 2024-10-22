@@ -37,6 +37,7 @@ namespace vipir
         std::vector<BasicBlock*>& successors();
         std::vector<BasicBlock*>& predecessors();
         BasicBlock*& loopEnd();
+        bool exists();
         int& endPosition();
 
         void print(std::ostream& stream) override;
@@ -62,6 +63,8 @@ namespace vipir
         std::vector<BasicBlock*> mPredecessors;
         std::vector<PhiInst*> mPhis;
         BasicBlock* mLoopEnd;
+
+        bool mExists;
 
         int mEndPosition { -1 }; // for phi nodes
     };

@@ -67,6 +67,11 @@ namespace vipir
         return mLoopEnd;
     }
 
+    bool BasicBlock::exists()
+    {
+        return mExists;
+    }
+
     int& BasicBlock::endPosition()
     {
         return mEndPosition;
@@ -103,10 +108,13 @@ namespace vipir
 
     void BasicBlock::emit(lir::Builder& builder)
     {
-        builder.addValue(std::make_unique<lir::Label>(mName, false));
-        for (auto& value : mValueList)
+        if (mExists)
         {
-            value->emit(builder);
+            builder.addValue(std::make_unique<lir::Label>(mName, false));
+            for (auto& value : mValueList)
+            {
+                value->emit(builder);
+            }
         }
     }
 
@@ -121,6 +129,7 @@ namespace vipir
         , mName(name)
         , mParent(parent)
         , mLoopEnd(nullptr)
+        , mExists(true)
     {
         bool alldigits = true;
         for (char c : mName)

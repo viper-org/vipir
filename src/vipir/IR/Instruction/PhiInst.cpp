@@ -40,9 +40,12 @@ namespace vipir
 
         for (auto& incoming : mIncoming)
         {
-            auto position = incoming.second->endPosition();
-            position += builder.getInsertsBefore(position);
-            builder.insertValue(std::make_unique<lir::Move>(vreg->clone(), incoming.first->getEmittedValue()), position);
+            if (incoming.second->exists())
+            {
+                auto position = incoming.second->endPosition();
+                position += builder.getInsertsBefore(position);
+                builder.insertValue(std::make_unique<lir::Move>(vreg->clone(), incoming.first->getEmittedValue()), position);
+            }
         }
         mEmittedValue = std::move(vreg);
     }
