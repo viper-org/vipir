@@ -18,6 +18,8 @@ namespace vipir
         private:
             void markCriticalInstructions(Function* function);
             void sweepInstructions(Function* function);
+
+            bool eliminateUnreachableBlocks(Function* function);
         };
     }
 }
