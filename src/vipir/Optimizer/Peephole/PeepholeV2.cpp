@@ -7,6 +7,8 @@
 #include "vipir/LIR/Instruction/EnterFunc.h"
 #include "vipir/LIR/Instruction/Jump.h"
 
+#include "vipir/Module.h"
+
 namespace vipir
 {
     namespace opt
@@ -124,6 +126,18 @@ namespace vipir
             }
             
             return false;
+        }
+
+
+        PeepholePass::PeepholePass()
+            :Pass(PassType::PeepholeOptimization)
+        {
+        }
+
+        void PeepholePass::execute(Module& module)
+        {
+            PeepholeV2 peephole;
+            peephole.doPeephole(module.getLIRBuilder());
         }
     }
 }

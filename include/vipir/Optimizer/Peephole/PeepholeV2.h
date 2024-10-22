@@ -3,6 +3,8 @@
 #ifndef VIPIR_OPTIMIZER_PEEPHOLE_PEEPHOLE_H
 #define VIPIR_OPTIMIZER_PEEPHOLE_PEEPHOLE_H 1
 
+#include "vipir/Pass/Pass.h"
+
 #include "vipir/LIR/Builder.h"
 
 namespace vipir
@@ -26,6 +28,14 @@ namespace vipir
             bool checkJmpLabel(lir::ValuePtr& first, lir::ValuePtr& second);
 
             std::vector<lir::ValuePtr>::iterator eraseValue(std::vector<lir::ValuePtr>& values, std::vector<lir::ValuePtr>::iterator it);
+        };
+
+        class PeepholePass : public Pass
+        {
+        public:
+            PeepholePass();
+
+            virtual void execute(Module& module) override;
         };
     }
 }

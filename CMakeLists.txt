@@ -12,6 +12,9 @@ FetchContent_MakeAvailable(vasm)
 set(SOURCES
     "src/vipir/Module.cpp"
 
+    "src/vipir/Pass/Pass.cpp"
+    "src/vipir/Pass/DefaultPass.cpp"
+
     "src/vipir/IR/Function.cpp"
     "src/vipir/IR/Argument.cpp"
     "src/vipir/IR/GlobalString.cpp"
@@ -82,6 +85,9 @@ set(SOURCES
 
 set(HEADERS
     "include/vipir/Module.h"
+
+    "include/vipir/Pass/Pass.h"
+    "include/vipir/Pass/DefaultPass.h"
 
     "include/vipir/IR/Value.h"
     "include/vipir/IR/Global.h"

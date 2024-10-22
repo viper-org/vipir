@@ -3,6 +3,8 @@
 
 #include "vipir/Module.h"
 
+#include "vipir/Pass/DefaultPass.h"
+
 #include "vipir/IR/Instruction/LoadInst.h"
 
 #include "vipir/IR/Function.h"
@@ -24,13 +26,22 @@
 namespace vipir
 {
     Module::Module(std::string name)
-        :mName(std::move(name))
+        : mName(std::move(name))
+        , mRunPasses(false)
     {
+        mPassManager.addPass(std::make_unique<LIREmissionPass>());
+        mPassManager.addPass(std::make_unique<LIRCodegenPass>());
     }
 
-    void Module::addPass(Pass pass)
+    PassManager& Module::getPassManager()
     {
-        mPasses.push_back(pass);
+        return mPassManager;
+    }
+
+    void Module::runPasses()
+    {
+        mPassManager.runPasses(*this);
+        mRunPasses = true;
     }
 
     abi::ABI* Module::abi() const
@@ -47,6 +58,11 @@ namespace vipir
     {
         static int valueId = 0;
         return ++valueId;
+    }
+
+    const std::vector<Module::GlobalPtr>& Module::getGlobals() const
+    {
+        return mGlobals;
     }
 
     GlobalVar* Module::createGlobalVar(Type* type)
@@ -78,9 +94,19 @@ namespace vipir
         mGlobals.insert(mGlobals.begin(), GlobalPtr(global));
     }
 
+    const std::vector<Module::ValuePtr>& Module::getConstants() const
+    {
+        return mConstants;
+    }
+
     void Module::insertConstant(Value* constant)
     {
         mConstants.push_back(ValuePtr(constant));
+    }
+
+    lir::Builder& Module::getLIRBuilder()
+    {
+        return mBuilder;
     }
 
     void Module::print(std::ostream& stream) const
@@ -96,97 +122,27 @@ namespace vipir
 
     void Module::printLIR(std::ostream& stream)
     {
-        if (std::find(mPasses.begin(), mPasses.end(), Pass::ConstantFolding) != mPasses.end())
-        {
-            for (auto& constant : mConstants)
-            {
-                constant->doConstantFold();
-            }
-            for (auto& global : mGlobals)
-            {
-                global->doConstantFold();
-            }
-        }
-
-        if (auto it = std::find(mPasses.begin(), mPasses.end(), Pass::DeadCodeElimination); it!= mPasses.end())
-        {
-            opt::DeadCodeEliminator dce;
-            for (auto& global : mGlobals)
-            {
-                if (auto func = dynamic_cast<Function*>(global.get()))
-                {
-                    dce.eliminateDeadCode(func);
-                }
-            }
-            mPasses.erase(it);
-        }
-
-        opt::RegAlloc regalloc;
-        for (const GlobalPtr& global : mGlobals)
-        {
-            if (auto func = dynamic_cast<Function*>(global.get()))
-            {
-                regalloc.assignVirtualRegisters(func, mAbi.get());
-            }
-        }
-
-        for (const GlobalPtr& global : mGlobals)
-        {
-            if (auto func = dynamic_cast<Function*>(global.get()))
-            {
-                func->setEmittedValue();
-            }
-        }
-
-        lir::Builder builder;
-        for (const ValuePtr& constant : mConstants)
-        {
-            constant->emit(builder);
-        }
-        for (const GlobalPtr& global : mGlobals)
-        {
-            global->emit(builder);
-        }
-
-        if (auto it = std::find(mPasses.begin(), mPasses.end(), Pass::PeepholeOptimization); it != mPasses.end())
-        {
-            opt::PeepholeV2 peephole;
-            peephole.doPeephole(builder);
-            mPasses.erase(it);
-        }
-
-        for (auto& value : builder.getValues())
+        for (auto& value : mBuilder.getValues())
         {
             value->print(stream);
         }
     }
 
-    void Module::emit(std::ostream& stream, OutputFormat format)
+    void Module::setOutputFormat(OutputFormat format)
     {
-        if (std::find(mPasses.begin(), mPasses.end(), Pass::ConstantFolding) != mPasses.end())
+        switch(format)
         {
-            for (auto& constant : mConstants)
-            {
-                constant->doConstantFold();
-            }
-            for (auto& global : mGlobals)
-            {
-                global->doConstantFold();
-            }
+            case OutputFormat::ELF:
+                mOutputFormat = std::make_unique<codegen::ELFFormat>(mName);
+                break;
+            case OutputFormat::PE:
+                mOutputFormat = std::make_unique<codegen::PEFormat>(mName);
+                break;
         }
+    }
 
-        if (std::find(mPasses.begin(), mPasses.end(), Pass::DeadCodeElimination) != mPasses.end())
-        {
-            opt::DeadCodeEliminator dce;
-            for (auto& global : mGlobals)
-            {
-                if (auto func = dynamic_cast<Function*>(global.get()))
-                {
-                    dce.eliminateDeadCode(func);
-                }
-            }
-        }
-
+    void Module::lirEmission()
+    {
         opt::RegAlloc regalloc;
         for (const GlobalPtr& global : mGlobals)
         {
@@ -196,10 +152,9 @@ namespace vipir
             }
         }
 
-        lir::Builder builder;
         for (const ValuePtr& constant : mConstants)
         {
-            constant->emit(builder);
+            constant->emit(mBuilder);
         }
 
         for (GlobalPtr& global : mGlobals)
@@ -212,13 +167,7 @@ namespace vipir
 
         for (const GlobalPtr& global : mGlobals)
         {
-            global->emit(builder);
-        }
-
-        if (std::find(mPasses.begin(), mPasses.end(), Pass::PeepholeOptimization) != mPasses.end())
-        {
-            opt::PeepholeV2 peephole;
-            peephole.doPeephole(builder);
+            global->emit(mBuilder);
         }
 
         for (auto& global : mGlobals)
@@ -228,25 +177,17 @@ namespace vipir
                 func->setCalleeSaved();
             }
         }
+    }
 
+    void Module::lirCodegen()
+    {
         MC::Builder mcBuilder;
-        for (auto& value : builder.getValues())
+        for (auto& value : mBuilder.getValues())
         {
             value->emit(mcBuilder);
         }
 
-        std::unique_ptr<codegen::IOutputFormat> outputFormat;
-        switch(format)
-        {
-            case OutputFormat::ELF:
-                outputFormat = std::make_unique<codegen::ELFFormat>(mName);
-                break;
-            case OutputFormat::PE:
-                outputFormat = std::make_unique<codegen::PEFormat>(mName);
-                break;
-        }
-
-        codegen::OpcodeBuilder opcodeBuilder = codegen::OpcodeBuilder(outputFormat.get(), mName);
+        codegen::OpcodeBuilder opcodeBuilder = codegen::OpcodeBuilder(mOutputFormat.get(), mName);
 
         for (const auto& value : mcBuilder.getValues())
         {
@@ -254,8 +195,12 @@ namespace vipir
         }
 
         opcodeBuilder.patchForwardLabels();
+    }
 
-        outputFormat->print(stream);
+    void Module::emit(std::ostream& stream)
+    {
+        if (!mRunPasses) runPasses();
+        mOutputFormat->print(stream);
     }
 
 

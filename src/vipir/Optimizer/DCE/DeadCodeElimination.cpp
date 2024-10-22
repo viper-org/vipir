@@ -5,6 +5,8 @@
 #include "vipir/IR/Function.h"
 #include "vipir/IR/Instruction/Instruction.h"
 
+#include "vipir/Module.h"
+
 namespace vipir
 {
     namespace opt
@@ -100,6 +102,24 @@ namespace vipir
                 }
             }
             return eliminatedSome;
+        }
+
+
+        DCEPass::DCEPass()
+            : Pass(PassType::DeadCodeElimination)
+        {
+        }
+
+        void DCEPass::execute(Module& module)
+        {
+            DeadCodeEliminator dce;
+            for (const auto& global : module.getGlobals())
+            {
+                if (auto function = dynamic_cast<Function*>(global.get()))
+                {
+                    dce.eliminateDeadCode(function);
+                }
+            }
         }
     }
 }

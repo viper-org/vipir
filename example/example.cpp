@@ -1,8 +1,10 @@
-#include "vipir/IR/GlobalString.h"
 #include "vipir/Module.h"
+
+#include "vipir/Pass/DefaultPass.h"
 
 #include "vipir/IR/Function.h"
 #include "vipir/IR/GlobalVar.h"
+#include "vipir/IR/GlobalString.h"
 #include "vipir/IR/BasicBlock.h"
 #include "vipir/IR/IRBuilder.h"
 #include "vipir/IR/Constant/ConstantInt.h"
@@ -19,7 +21,9 @@
 #include "vipir/IR/Instruction/ZExtInst.h"
 #include "vipir/IR/Instruction/PhiInst.h"
 
+#include "vipir/Optimizer/Peephole/PeepholeV2.h"
 #include "vipir/Optimizer/RegAlloc/RegAlloc.h"
+
 #include "vipir/Type/FunctionType.h"
 #include "vipir/Type/StructType.h"
 #include "vipir/Type/ArrayType.h"
@@ -70,11 +74,12 @@ int main()
     phi->addIncoming(x2, bb2);
     builder.CreateRet(phi);
 
-    mod.addPass(vipir::Pass::DeadCodeElimination);
-    mod.addPass(vipir::Pass::PeepholeOptimization);
-    mod.addPass(vipir::Pass::ConstantFolding);
+    mod.setOutputFormat(vipir::OutputFormat::ELF);
+    mod.getPassManager().insertBefore(vipir::PassType::LIREmission, std::make_unique<vipir::opt::DCEPass>());
+    mod.getPassManager().insertBefore(vipir::PassType::DeadCodeElimination, std::make_unique<vipir::ConstantFoldingPass>());
+    mod.getPassManager().insertAfter(vipir::PassType::LIREmission, std::make_unique<vipir::opt::PeepholePass>());
 
     //mod.print(std::cout);
 
-    mod.emit(std::cout, vipir::OutputFormat::ELF);
+    mod.emit(std::cout);
 }

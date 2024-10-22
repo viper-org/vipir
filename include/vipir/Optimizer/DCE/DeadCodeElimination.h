@@ -3,6 +3,8 @@
 #ifndef VIPIR_OPTIMIZER_DCE_DEAD_CODE_ELIMINATION_H
 #define VIPIR_OPTIMIZER_DCE_DEAD_CODE_ELIMINATION_H 1
 
+#include "vipir/Pass/Pass.h"
+
 namespace vipir
 {
     class Function;
@@ -20,6 +22,14 @@ namespace vipir
             void sweepInstructions(Function* function);
 
             bool eliminateUnreachableBlocks(Function* function);
+        };
+
+        class DCEPass : public Pass
+        {
+        public:
+            DCEPass();
+
+            virtual void execute(Module& module) override;
         };
     }
 }
