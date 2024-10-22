@@ -19,6 +19,8 @@ namespace vipir
     public:
         void print(std::ostream& stream) override;
 
+        void doConstantFold() override;
+
         std::vector<Value*> getOperands() override;
 
         void addIncoming(Value* value, BasicBlock* basicBlock);

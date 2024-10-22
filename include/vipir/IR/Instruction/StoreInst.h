@@ -17,6 +17,8 @@ namespace vipir
     friend class IRBuilder;
     public:
         void print(std::ostream& stream) override;
+
+        void doConstantFold() override;
     
         std::vector<Value*> getOperands() override;
 

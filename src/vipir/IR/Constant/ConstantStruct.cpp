@@ -33,6 +33,10 @@ namespace vipir
         return ret + "}";
     }
 
+    void ConstantStruct::doConstantFold()
+    {
+    }
+
     bool ConstantStruct::isConstant() const
     {
         return true;

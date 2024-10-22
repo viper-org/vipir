@@ -28,6 +28,10 @@ namespace vipir
         return {mPtr};
     }
 
+    void PtrCastInst::doConstantFold()
+    {
+    }
+
 
     void PtrCastInst::emit(lir::Builder& builder)
     {

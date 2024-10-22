@@ -38,6 +38,10 @@ namespace vipir
         return std::format("%{}", getName(mValueId));
     }
 
+    void GEPInst::doConstantFold()
+    {
+    }
+
     std::vector<Value*> GEPInst::getOperands()
     {
         return std::vector<Value*>{mPtr, mOffset};

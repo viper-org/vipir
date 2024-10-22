@@ -41,6 +41,10 @@ namespace vipir
         return std::format("%{}", getName(mValueId));
     }
 
+    void LoadInst::doConstantFold()
+    {
+    }
+
 
     void LoadInst::emit(lir::Builder& builder)
     {

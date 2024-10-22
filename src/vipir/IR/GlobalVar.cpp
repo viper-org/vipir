@@ -36,6 +36,10 @@ namespace vipir
         return std::format("{} @{}", mType->getName(), mValueId);
     }
 
+    void GlobalVar::doConstantFold()
+    {
+    }
+
 
     void GlobalVar::emit(lir::Builder& builder)
     {

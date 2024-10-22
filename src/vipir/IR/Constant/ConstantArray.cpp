@@ -35,6 +35,10 @@ namespace vipir
         return ret + "]";
     }
 
+    void ConstantArray::doConstantFold()
+    {
+    }
+
     bool ConstantArray::isConstant() const
     {
         return true;

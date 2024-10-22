@@ -42,6 +42,8 @@ namespace vipir
         void print(std::ostream& stream) override;
         std::string ident() const override;
 
+        void doConstantFold() override;
+
     protected:
         void setEmittedValue();
         void emit(lir::Builder& builder) override;

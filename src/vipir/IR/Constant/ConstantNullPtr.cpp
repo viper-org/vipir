@@ -29,6 +29,10 @@ namespace vipir
         return std::format("{} null", mType->getName());
     }
 
+    void ConstantNullPtr::doConstantFold()
+    {
+    }
+
     bool ConstantNullPtr::isConstant() const
     {
         return true;

@@ -88,6 +88,14 @@ namespace vipir
         return std::format("label %{}", mName);
     }
 
+    void BasicBlock::doConstantFold()
+    {
+        for (auto& value : mValueList)
+        {
+            value->doConstantFold();
+        }
+    }
+
     void BasicBlock::setEmittedValue()
     {
         mEmittedValue = std::make_unique<lir::Lbl>(mName, false);

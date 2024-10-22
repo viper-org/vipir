@@ -79,6 +79,14 @@ namespace vipir
         return "@" + mName;
     }
 
+    void Function::doConstantFold()
+    {
+        for (auto& basicBlock : mBasicBlockList)
+        {
+            basicBlock->doConstantFold();
+        }
+    }
+
     void Function::setEmittedValue()
     {
         bool plt = mBasicBlockList.empty();

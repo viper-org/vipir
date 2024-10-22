@@ -23,6 +23,10 @@ namespace vipir
         return std::format("{} %{}", mType->getName(), getName(mValueId));
     }
 
+    void ZExtInst::doConstantFold()
+    {
+    }
+
     std::vector<Value*> ZExtInst::getOperands()
     {
         return {mValue};

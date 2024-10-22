@@ -18,6 +18,8 @@ namespace vipir
     public:
         void print(std::ostream& stream) override;
 
+        void doConstantFold() override;
+
         Value* getPointer();
 
         std::vector<Value*> getOperands() override;

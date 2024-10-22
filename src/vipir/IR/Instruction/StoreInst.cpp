@@ -35,6 +35,10 @@ namespace vipir
         return "%undef";
     }
 
+    void StoreInst::doConstantFold()
+    {
+    }
+
 
     void StoreInst::emit(lir::Builder& builder)
     {

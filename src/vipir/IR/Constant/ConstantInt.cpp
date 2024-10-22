@@ -29,6 +29,12 @@ namespace vipir
         return std::format("{} {}", mType->getName(), mValue);
     }
 
+    void ConstantInt::doConstantFold()
+    {
+        mConstantFoldedValue = mValue;
+        mIsConstantFolded = true;
+    }
+
     bool ConstantInt::isConstant() const
     {
         return true;

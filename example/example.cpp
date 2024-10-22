@@ -50,7 +50,7 @@ int main()
     auto mergebb = vipir::BasicBlock::Create("", func1);
 
     builder.setInsertPoint(entrybb);
-    builder.CreateBr(bb1);
+    builder.CreateBr(bb2);
 
 
     builder.setInsertPoint(bb1);
@@ -58,7 +58,9 @@ int main()
     builder.CreateBr(mergebb);
 
     builder.setInsertPoint(bb2);
-    auto x2 = vipir::ConstantInt::Get(mod, 33, i32Type);
+    auto a1 = vipir::ConstantInt::Get(mod, 33, i32Type);
+    auto a2 = vipir::ConstantInt::Get(mod, 66, i32Type);
+    auto x2 = builder.CreateAdd(a1, a2);
     builder.CreateBr(mergebb);
 
     
@@ -70,6 +72,7 @@ int main()
 
     mod.addPass(vipir::Pass::DeadCodeElimination);
     mod.addPass(vipir::Pass::PeepholeOptimization);
+    mod.addPass(vipir::Pass::ConstantFolding);
 
     //mod.print(std::cout);
 

@@ -36,6 +36,10 @@ namespace vipir
         return std::format("%{}", getName(mValueId));
     }
 
+    void AddrInst::doConstantFold()
+    {
+    }
+
     void AddrInst::emit(lir::Builder& builder)
     {
         mPtr->lateEmit(builder);

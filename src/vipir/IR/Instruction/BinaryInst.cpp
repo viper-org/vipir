@@ -90,6 +90,67 @@ namespace vipir
         return std::format("%{}", getName(mValueId));
     }
 
+    void BinaryInst::doConstantFold()
+    {
+        if (mLeft->isConstantFolded() && mRight->isConstantFolded())
+        {
+            auto left = mLeft->getConstantFoldedValue();
+            auto right = mRight->getConstantFoldedValue();
+            std::uintmax_t value;
+            switch (mOperator)
+            {
+                case Instruction::ADD:
+                    value = left + right;
+                    break;
+                case Instruction::SUB:
+                    value = left - right;
+                    break;
+                case Instruction::SMUL:
+                    value = left * right;
+                    break;
+                case Instruction::UMUL:
+                    value = left * right;
+                    break;
+                case Instruction::SDIV:
+                    value = left / right;
+                    break;
+                case Instruction::UDIV:
+                    value = left / right;
+                    break;
+                case Instruction::BWAND:
+                    value = left & right;
+                    break;
+                case Instruction::BWOR:
+                    value = left | right;
+                    break;
+                case Instruction::BWXOR:
+                    value = left ^ right;
+                    break;
+                case Instruction::EQ:
+                    value = left == right;
+                    break;
+                case Instruction::NE:
+                    value = left != right;
+                    break;
+                case Instruction::LT:
+                    value = left < right;
+                    break;
+                case Instruction::GT:
+                    value = left > right;
+                    break;
+                case Instruction::LE:
+                    value = left <= right;
+                    break;
+                case Instruction::GE:
+                    value = left >= right;
+                    break;
+            }
+            mConstantFoldedValue = value;
+            mIsConstantFolded = true;
+            mRequiresVReg = false; // No need for a virtual reg since emitted value will be an IMM
+        }
+    }
+
     std::vector<Value*> BinaryInst::getOperands()
     {
         return {mLeft, mRight};
@@ -110,36 +171,11 @@ namespace vipir
             mLeft->lateEmit(builder);
             mRight->lateEmit(builder);
             auto left = mLeft->getEmittedValue();
-            auto right = mRight->getEmittedValue();
-            if (auto leftImm = dynamic_cast<lir::Immediate*>(left.get()))
+            auto right = mRight->getEmittedValue();            
+            if (mIsConstantFolded)
             {
-                if (auto rightImm = dynamic_cast<lir::Immediate*>(right.get()))
-                {
-                    int value;
-                    switch (op)
-                    {
-                        case lir::BinaryArithmetic::Operator::Add:
-                            value = leftImm->value() + rightImm->value();
-                            break;
-                        case lir::BinaryArithmetic::Operator::Sub:
-                            value = leftImm->value() - rightImm->value();
-                            break;
-                        case lir::BinaryArithmetic::Operator::BWAnd:
-                            value = leftImm->value() & rightImm->value();
-                            break;
-                        case lir::BinaryArithmetic::Operator::BWOr:
-                            value = leftImm->value() | rightImm->value();
-                            break;
-                        case lir::BinaryArithmetic::Operator::BWXor:
-                            value = leftImm->value() ^ rightImm->value();
-                            break;
-
-                        default:
-                            break; // Unreachable
-                    }
-                    mEmittedValue = std::make_unique<lir::Immediate>(value);
-                    return;
-                }
+                mEmittedValue = std::make_unique<lir::Immediate>(mConstantFoldedValue);
+                return;
             }
             lir::OperandPtr vreg = std::make_unique<lir::VirtualReg>(mVReg, mType->getOperandSize());
             if (*mRight->getEmittedValue() == vreg)
@@ -159,27 +195,10 @@ namespace vipir
             mRight->lateEmit(builder);
             auto left = mLeft->getEmittedValue();
             auto right = mRight->getEmittedValue();
-            if (auto leftImm = dynamic_cast<lir::Immediate*>(left.get()))
+            if (mIsConstantFolded)
             {
-                if (auto rightImm = dynamic_cast<lir::Immediate*>(right.get()))
-                {
-                    int value;
-                    switch (op)
-                    {
-                        case lir::BinaryArithmetic::Operator::Mul:
-                            value = leftImm->value() * rightImm->value();
-                            break;
-                        case lir::BinaryArithmetic::Operator::Div:
-                        case lir::BinaryArithmetic::Operator::IDiv:
-                            value = leftImm->value() / rightImm->value();
-                            break;
-                            
-                        default:
-                            break; // Unreachable
-                    }
-                    mEmittedValue = std::make_unique<lir::Immediate>(value);
-                    return;
-                }
+                mEmittedValue = std::make_unique<lir::Immediate>(mConstantFoldedValue);
+                return;
             }
             lir::OperandPtr sourceReg = std::make_unique<lir::PhysicalReg>(0, mType->getOperandSize());
             builder.addValue(std::make_unique<lir::Move>(sourceReg->clone(), std::move(left)));
@@ -247,35 +266,10 @@ namespace vipir
             mRight->lateEmit(builder);
             auto left = mLeft->getEmittedValue();
             auto right = mRight->getEmittedValue();
-            if (auto leftImm = dynamic_cast<lir::Immediate*>(left.get()))
+            if (mIsConstantFolded)
             {
-                if (auto rightImm = dynamic_cast<lir::Immediate*>(right.get()))
-                {
-                    int value;
-                    switch (op)
-                    {
-                        case lir::CMP::Operator::EQ:
-                            value = leftImm->value() == rightImm->value();
-                            break;
-                        case lir::CMP::Operator::NE:
-                            value = leftImm->value() != rightImm->value();
-                            break;
-                        case lir::CMP::Operator::LT:
-                            value = leftImm->value() < rightImm->value();
-                            break;
-                        case lir::CMP::Operator::GT:
-                            value = leftImm->value() > rightImm->value();
-                            break;
-                        case lir::CMP::Operator::LE:
-                            value = leftImm->value() <= rightImm->value();
-                            break;
-                        case lir::CMP::Operator::GE:
-                            value = leftImm->value() >= rightImm->value();
-                            break;
-                    }
-                    mEmittedValue = std::make_unique<lir::Immediate>(value);
-                    return;
-                }
+                mEmittedValue = std::make_unique<lir::Immediate>(mConstantFoldedValue);
+                return;
             }
             builder.addValue(std::make_unique<lir::Compare>(std::move(left), op, std::move(right)));
             mEmittedValue = std::make_unique<lir::CMP>(op);

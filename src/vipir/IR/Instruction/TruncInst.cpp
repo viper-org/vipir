@@ -26,6 +26,10 @@ namespace vipir
         return std::format("{} %{}", mType->getName(), getName(mValueId));
     }
 
+    void TruncInst::doConstantFold()
+    {
+    }
+
     std::vector<Value*> TruncInst::getOperands()
     {
         return {mValue};

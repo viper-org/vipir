@@ -45,6 +45,10 @@ namespace vipir
         return std::format("%{}", getName(mValueId));
     }
 
+    void CallInst::doConstantFold()
+    {
+    }
+
     std::vector<Value*> CallInst::getOperands()
     {
         return { mCallee };

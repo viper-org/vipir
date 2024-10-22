@@ -96,6 +96,18 @@ namespace vipir
 
     void Module::printLIR(std::ostream& stream)
     {
+        if (std::find(mPasses.begin(), mPasses.end(), Pass::ConstantFolding) != mPasses.end())
+        {
+            for (auto& constant : mConstants)
+            {
+                constant->doConstantFold();
+            }
+            for (auto& global : mGlobals)
+            {
+                global->doConstantFold();
+            }
+        }
+
         if (auto it = std::find(mPasses.begin(), mPasses.end(), Pass::DeadCodeElimination); it!= mPasses.end())
         {
             opt::DeadCodeEliminator dce;
@@ -151,6 +163,18 @@ namespace vipir
 
     void Module::emit(std::ostream& stream, OutputFormat format)
     {
+        if (std::find(mPasses.begin(), mPasses.end(), Pass::ConstantFolding) != mPasses.end())
+        {
+            for (auto& constant : mConstants)
+            {
+                constant->doConstantFold();
+            }
+            for (auto& global : mGlobals)
+            {
+                global->doConstantFold();
+            }
+        }
+
         if (std::find(mPasses.begin(), mPasses.end(), Pass::DeadCodeElimination) != mPasses.end())
         {
             opt::DeadCodeEliminator dce;

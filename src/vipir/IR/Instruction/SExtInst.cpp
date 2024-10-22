@@ -26,6 +26,10 @@ namespace vipir
         return std::format("{} %{}", mType->getName(), getName(mValueId));
     }
 
+    void SExtInst::doConstantFold()
+    {
+    }
+
     std::vector<Value*> SExtInst::getOperands()
     {
         return {mValue};

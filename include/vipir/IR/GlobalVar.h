@@ -19,6 +19,8 @@ namespace vipir
         void print(std::ostream& stream) override;
         std::string ident() const override;
 
+        void doConstantFold() override;
+
         void setInitialValue(Value* value);
 
     protected:

@@ -49,6 +49,10 @@ namespace vipir
 
         std::string getName(int valueId) const { if (mVReg) return std::format("VREG{}", mVReg->getId()); else return std::format("{}", valueId); }
 
+        virtual void doConstantFold() = 0;
+        bool isConstantFolded() { return mIsConstantFolded; }
+        std::uintmax_t getConstantFoldedValue() { return mConstantFoldedValue; }
+
         virtual lir::OperandPtr getEmittedValue() { return mEmittedValue->clone(); }
         virtual void lateEmit(lir::Builder& builder) { }
         virtual std::vector<int> getRegisterSmashes() { return std::vector<int>(); }
@@ -63,6 +67,9 @@ namespace vipir
 
         std::pair<int, int> mInterval{-1,-1};
         int mId;
+
+        bool mIsConstantFolded{ false };
+        std::uintmax_t mConstantFoldedValue{ 0 };
 
         opt::VReg* mVReg{0};
         bool mRequiresVReg{true};

@@ -52,6 +52,10 @@ namespace vipir
         return getName(mValueId);
     }
 
+    void PhiInst::doConstantFold()
+    {
+    }
+
 
     PhiInst::PhiInst(BasicBlock* parent, Type* type)
         : Instruction(parent->getModule(), parent)

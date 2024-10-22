@@ -25,6 +25,10 @@ namespace vipir
         return std::format("{} %{}", mType->getName(), getName(mValueId));
     }
 
+    void PtrToIntInst::doConstantFold()
+    {
+    }
+
     std::vector<Value*> PtrToIntInst::getOperands()
     {
         return {mValue};

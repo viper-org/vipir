@@ -37,6 +37,26 @@ namespace vipir
         return std::format("%{}", getName(mValueId));
     }
 
+    void UnaryInst::doConstantFold()
+    {
+        if (mOperand->isConstantFolded())
+        {
+            std::uintmax_t value;
+            switch (mOperator)
+            {
+                case Instruction::NEG:
+                    value = -mOperand->getConstantFoldedValue();
+                    break;
+                case Instruction::NOT:
+                    value = ~mOperand->getConstantFoldedValue();
+                    break;
+            }
+            mConstantFoldedValue = value;
+            mIsConstantFolded = true;
+            mRequiresVReg = false; // No need for a virtual reg since emitted value will be an IMM
+        }
+    }
+
     std::vector<Value*> UnaryInst::getOperands()
     {
         return {mOperand};
@@ -46,6 +66,11 @@ namespace vipir
     void UnaryInst::emit(lir::Builder& builder)
     {
         auto createUnary = [&builder, this](lir::UnaryArithmetic::Operator op){
+            if (mIsConstantFolded)
+            {
+                mEmittedValue = std::make_unique<lir::Immediate>(mConstantFoldedValue);
+                return;
+            }
             mOperand->lateEmit(builder);
             lir::OperandPtr vreg = std::make_unique<lir::VirtualReg>(mVReg, mType->getOperandSize());
             builder.addValue(std::make_unique<lir::Move>(vreg->clone(), mOperand->getEmittedValue()));

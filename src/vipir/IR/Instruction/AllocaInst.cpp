@@ -30,6 +30,10 @@ namespace vipir
         return std::format("{} {}", mType->getName(), getName(mValueId));
     }
 
+    void AllocaInst::doConstantFold()
+    {
+    }
+
     void AllocaInst::emit(lir::Builder& builder)
     {
         mEmittedValue = std::make_unique<lir::VirtualReg>(mVReg, mAllocatedType->getOperandSize());

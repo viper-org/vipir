@@ -12,6 +12,7 @@
 #include "vasm/instruction/singleOperandInstruction/JmpInstruction.h"
 #include "vasm/instruction/singleOperandInstruction/JccInstruction.h"
 
+#include <algorithm>
 #include <cassert>
 #include <format>
 #include <iostream>
@@ -39,6 +40,24 @@ namespace vipir
     {
         if (mCondition) return { mCondition };
         return {};
+    }
+
+    void BranchInst::doConstantFold()
+    {
+        if (mCondition && mCondition->isConstantFolded())
+        {
+            auto value = mCondition->getConstantFoldedValue();
+            if (value)
+            {
+                std::erase(mFalseBranch->predecessors(), mParent);
+                std::erase(mParent->successors(), mFalseBranch);
+            }
+            else
+            {
+                std::erase(mTrueBranch->predecessors(), mParent);
+                std::erase(mParent->successors(), mTrueBranch);
+            }
+        }
     }
 
     bool BranchInst::isCritical()

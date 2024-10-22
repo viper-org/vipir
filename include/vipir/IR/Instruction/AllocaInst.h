@@ -19,6 +19,8 @@ namespace vipir
     public:
         void print(std::ostream& stream) override;
 
+        void doConstantFold() override;
+
         Type* getAllocatedType();
 
         void forceMemory();

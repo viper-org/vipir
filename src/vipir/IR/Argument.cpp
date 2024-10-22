@@ -28,6 +28,10 @@ namespace vipir
         return "%" + mName;
     }
 
+    void Argument::doConstantFold()
+    {
+    }
+
     void Argument::emit(lir::Builder&)
     {
         mEmittedValue = std::make_unique<lir::VirtualReg>(mVReg, mType->getOperandSize());

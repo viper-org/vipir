@@ -33,6 +33,10 @@ namespace vipir
         return "%undef";
     }
 
+    void StoreParamInst::doConstantFold()
+    {
+    }
+
 
     void StoreParamInst::emit(lir::Builder& builder)
     {

@@ -48,6 +48,10 @@ namespace vipir
         return "%undef";
     }
 
+    void RetInst::doConstantFold()
+    {
+    }
+
 
     void RetInst::emit(lir::Builder& builder)
     {
