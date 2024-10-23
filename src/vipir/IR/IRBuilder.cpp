@@ -302,7 +302,7 @@ namespace vipir
                 alignedStack = false;
         }
 
-        std::vector<StoreParamInst*> stores;
+        std::vector<Value*> stores;
         for (auto parameter : parameters)
         {
             StoreParamInst* store = new StoreParamInst(mInsertPoint, index++, parameter, !alignedStack);
@@ -312,11 +312,11 @@ namespace vipir
             mInsertPoint->insertValue(store);
         }
 
-        CallInst* call = new CallInst(mInsertPoint, function, std::move(parameters), stackRestore);
+        CallInst* call = new CallInst(mInsertPoint, function, stores, stackRestore);
 
         for (auto store : stores)
         {
-            store->mCall = call;
+            static_cast<StoreParamInst*>(store)->mCall = call;
         }
 
         mInsertPoint->insertValue(call);

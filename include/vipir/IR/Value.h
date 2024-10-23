@@ -76,7 +76,7 @@ namespace vipir
         std::vector<opt::VReg*> mDisallowedVRegs;
         bool mRegisterSmashesDone;
 
-        bool mMarked;
+        bool mMarked{ false };
 
         virtual void emit(lir::Builder& builder) = 0;
     };

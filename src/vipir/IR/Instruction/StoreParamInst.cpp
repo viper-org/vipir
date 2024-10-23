@@ -77,6 +77,7 @@ namespace vipir
         , mValue(value)
         , mAlignStack(alignStack)
     {
+        mType = value->getType();
         mRequiresVReg = false;
     }
 }

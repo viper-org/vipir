@@ -26,18 +26,7 @@ namespace vipir
 {
     void CallInst::print(std::ostream& stream)
     {
-        stream << std::format("call {}(", mCallee->ident());
-
-        if (!mParameters.empty())
-        {
-            for (int i = 0; i < mParameters.size() - 1; ++i)
-            {
-                stream << mParameters[i]->ident() << ", ";
-            }
-            stream << mParameters.back()->ident();
-        }
-
-        stream << std::format("), %{}", getName(mValueId));
+        stream << std::format("call {}, %{}", mCallee->ident(), getName(mValueId));
     }
 
     std::string CallInst::ident() const
@@ -51,7 +40,10 @@ namespace vipir
 
     std::vector<Value*> CallInst::getOperands()
     {
-        return { mCallee };
+        std::vector<Value*> operands = mParameters;
+        if (!dynamic_cast<Function*>(mCallee))
+            operands.push_back(mCallee);
+        return operands;
     }
 
     std::vector<int> CallInst::getRegisterSmashes()
