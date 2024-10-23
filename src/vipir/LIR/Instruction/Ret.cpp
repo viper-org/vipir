@@ -4,11 +4,13 @@
 #include "vipir/LIR/Instruction/Ret.h"
 
 #include "vasm/instruction/NoOperandInstruction.h"
+#include "vasm/instruction/twoOperandInstruction/LogicalInstruction.h"
 #include "vasm/instruction/twoOperandInstruction/MovInstruction.h"
 #include "vasm/instruction/singleOperandInstruction/PushInstruction.h"
 #include "vasm/instruction/singleOperandInstruction/PopInstruction.h"
 
 #include "vasm/instruction/operand/Register.h"
+#include "vasm/instruction/operand/Immediate.h"
 
 
 namespace vipir
@@ -42,7 +44,16 @@ namespace vipir
             else
             {
                 if (mSaveFramePointer)
-                    builder.addValue(std::make_unique<instruction::PopInstruction>(instruction::Register::Get("rbp")));
+                {
+                    if (mLeave)
+                        builder.addValue(std::make_unique<instruction::PopInstruction>(instruction::Register::Get("rbp")));
+                    else
+                    {
+                        instruction::OperandPtr rsp = instruction::Register::Get("rsp");
+                        instruction::OperandPtr stackOffset = std::make_unique<instruction::Immediate>(8);
+                        builder.addValue(std::make_unique<instruction::AddInstruction>(std::move(rsp), std::move(stackOffset)));
+                    }
+                }
             }
 
             builder.addValue(std::make_unique<instruction::RetInstruction>());

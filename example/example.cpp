@@ -62,6 +62,7 @@ int main()
     builder.CreateBr(mergebb);
 
     builder.setInsertPoint(bb2);
+    builder.CreateCall(func1, {});
     auto a1 = vipir::ConstantInt::Get(mod, 33, i32Type);
     auto a2 = vipir::ConstantInt::Get(mod, 66, i32Type);
     auto x2 = builder.CreateAdd(a1, a2);
