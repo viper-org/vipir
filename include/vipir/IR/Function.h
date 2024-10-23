@@ -25,6 +25,7 @@ namespace vipir
     friend class IRBuilder;
     friend class opt::RegAlloc;
     friend class opt::DeadCodeEliminator;
+    friend class opt::AliasAnalyzer;
     using BasicBlockPtr = std::unique_ptr<BasicBlock>;
     public:
         static Function* Create(FunctionType* type, Module& module, std::string_view name, bool pure);

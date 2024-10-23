@@ -25,6 +25,7 @@ namespace vipir
     friend class PhiInst;
     friend class opt::RegAlloc;
     friend class opt::DeadCodeEliminator;
+    friend class opt::AliasAnalyzer;
     public:
         static BasicBlock* Create(std::string_view name, Function* parent);
 

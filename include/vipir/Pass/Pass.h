@@ -23,6 +23,7 @@ namespace vipir
         DeadCodeElimination,
         PeepholeOptimization,
         ConstantFolding,
+        AliasAnalysis
     };
 
     class Pass

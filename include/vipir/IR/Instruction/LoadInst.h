@@ -15,6 +15,7 @@ namespace vipir
     class LoadInst : public Instruction
     {
     friend class IRBuilder;
+    friend class opt::AliasAnalyzer;
     public:
         void print(std::ostream& stream) override;
 

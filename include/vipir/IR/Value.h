@@ -14,6 +14,7 @@
 
 #include "vipir/Optimizer/RegAlloc/VReg.h"
 #include "vipir/Optimizer/DCE/DeadCodeElimination.h"
+#include "vipir/Optimizer/AA/AliasAnalysis.h"
 
 #include "vipir/LIR/Builder.h"
 
@@ -33,6 +34,7 @@ namespace vipir
     friend class Function;
     friend class opt::RegAlloc;
     friend class opt::DeadCodeEliminator;
+    friend class opt::AliasAnalyzer;
     public:
         Value(Module& module) : mModule(module), mType(Type::GetVoidType()), mRegisterSmashesDone(false), mId(0x69696969) { }
         virtual ~Value() { }

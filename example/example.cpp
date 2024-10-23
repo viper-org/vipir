@@ -49,38 +49,21 @@ int main()
 
     auto func1 = vipir::Function::Create(vipir::FunctionType::Create(i32Type, {i32Type}), mod, "main", false);
     auto entrybb = vipir::BasicBlock::Create("", func1);
-    auto bb1 = vipir::BasicBlock::Create("", func1);
-    auto bb2 = vipir::BasicBlock::Create("", func1);
-    auto mergebb = vipir::BasicBlock::Create("", func1);
 
     builder.setInsertPoint(entrybb);
-    builder.CreateBr(bb2);
 
+    auto alloca = builder.CreateAlloca(i32Type);
+    auto addr = builder.CreateAddrOf(alloca);
 
-    builder.setInsertPoint(bb1);
-    auto x1 = vipir::ConstantInt::Get(mod, 12, i32Type);
-    builder.CreateBr(mergebb);
-
-    builder.setInsertPoint(bb2);
-    builder.CreateCall(func1, {});
-    auto a1 = vipir::ConstantInt::Get(mod, 33, i32Type);
-    auto a2 = vipir::ConstantInt::Get(mod, 66, i32Type);
-    auto x2 = builder.CreateAdd(a1, a2);
-    builder.CreateBr(mergebb);
-
-    
-    builder.setInsertPoint(mergebb);
-    auto phi = builder.CreatePhi(i32Type);
-    phi->addIncoming(x1, bb1);
-    phi->addIncoming(x2, bb2);
-    builder.CreateRet(phi);
+    builder.CreateRet(builder.CreateLoad(addr));
 
     mod.setOutputFormat(vipir::OutputFormat::ELF);
-    mod.getPassManager().insertBefore(vipir::PassType::LIREmission, std::make_unique<vipir::opt::DCEPass>());
+    mod.getPassManager().insertBefore(vipir::PassType::LIREmission, std::make_unique<vipir::opt::AAPass>());
+    //mod.getPassManager().insertBefore(vipir::PassType::LIREmission, std::make_unique<vipir::opt::DCEPass>());
     mod.getPassManager().insertBefore(vipir::PassType::DeadCodeElimination, std::make_unique<vipir::ConstantFoldingPass>());
     mod.getPassManager().insertAfter(vipir::PassType::LIREmission, std::make_unique<vipir::opt::PeepholePass>());
 
-    //mod.print(std::cout);
+    mod.print(std::cout);
 
-    mod.emit(std::cout);
+    //mod.emit(std::cout);
 }
