@@ -50,7 +50,16 @@ namespace vipir
         mPtr->lateEmit(builder);
 
         lir::OperandPtr ptr = mPtr->getEmittedValue();
-        mEmittedValue = std::move(ptr);
+        if (dynamic_cast<AllocaInst*>(mPtr))
+        {
+            mEmittedValue = std::move(ptr);
+            return;
+        }
+
+        lir::OperandPtr vreg = std::make_unique<lir::VirtualReg>(mVReg, mType->getOperandSize());
+        builder.addValue(std::make_unique<lir::LoadAddress>(vreg->clone(), std::move(ptr)));
+
+        mEmittedValue = std::move(vreg);
     }
 
     AddrInst::AddrInst(BasicBlock* parent, Value* ptr)
@@ -59,10 +68,10 @@ namespace vipir
         , mValueId(mModule.getNextValueId())
     {
         mType = mPtr->getType();
-        mRequiresVReg = false;
 
         if (auto alloca = dynamic_cast<AllocaInst*>(mPtr))
         {
+            mRequiresVReg = false;
             alloca->forceMemory();
         }
         if (auto func = dynamic_cast<Function*>(mPtr))

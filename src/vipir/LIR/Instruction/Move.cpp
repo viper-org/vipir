@@ -43,6 +43,12 @@ namespace vipir
                 instruction::LabelOperandPtr lbl = instruction::LabelOperandPtr(label);
                 left = std::make_unique<instruction::Relative>(std::move(lbl), std::nullopt);
             }
+            if (auto label = dynamic_cast<instruction::LabelOperand*>(right.get()))
+            {
+                (void)right.release();
+                instruction::LabelOperandPtr lbl = instruction::LabelOperandPtr(label);
+                right = std::make_unique<instruction::Relative>(std::move(lbl), std::nullopt);
+            }
             if (auto cmp = dynamic_cast<CmpOperand*>(right.get()))
             {
                 auto createSetcc = [&builder, &left]<typename InstT>(){
@@ -71,7 +77,9 @@ namespace vipir
                 }
                 return;
             }
-            if (dynamic_cast<instruction::Memory*>(left.get()) && dynamic_cast<instruction::Memory*>(right.get()))
+            if (dynamic_cast<instruction::Memory*>(left.get()) && dynamic_cast<instruction::Memory*>(right.get())
+             || dynamic_cast<instruction::Memory*>(left.get()) && dynamic_cast<instruction::Relative*>(right.get())
+             || dynamic_cast<instruction::Relative*>(left.get()) && dynamic_cast<instruction::Memory*>(right.get()))
             {
                 instruction::OperandPtr reg = std::make_unique<instruction::Register>(11, mRight->size());
                 builder.addValue(std::make_unique<instruction::MovInstruction>(reg->clone(), std::move(right)));
