@@ -28,6 +28,11 @@ namespace vipir
         return {mModule.abi()->getParameterRegister(mParamIndex)};
     }
 
+    bool StoreParamInst::isCritical()
+    {
+        return mCall->isCritical();
+    }
+
     std::string StoreParamInst::ident() const
     {
         return "%undef";

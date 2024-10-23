@@ -47,7 +47,7 @@ int main()
     auto voidType = vipir::Type::GetVoidType();
     auto boolType = vipir::Type::GetBooleanType();
 
-    auto func1 = vipir::Function::Create(vipir::FunctionType::Create(i32Type, {i32Type}), mod, "main");
+    auto func1 = vipir::Function::Create(vipir::FunctionType::Create(i32Type, {i32Type}), mod, "main", false);
     auto entrybb = vipir::BasicBlock::Create("", func1);
     auto bb1 = vipir::BasicBlock::Create("", func1);
     auto bb2 = vipir::BasicBlock::Create("", func1);

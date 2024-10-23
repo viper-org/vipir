@@ -27,7 +27,7 @@ namespace vipir
     friend class opt::DeadCodeEliminator;
     using BasicBlockPtr = std::unique_ptr<BasicBlock>;
     public:
-        static Function* Create(FunctionType* type, Module& module, std::string_view name);
+        static Function* Create(FunctionType* type, Module& module, std::string_view name, bool pure);
 
         FunctionType* getFunctionType() const;
         Argument* getArgument(int index) const;
@@ -36,6 +36,7 @@ namespace vipir
 
         void insertBasicBlock(BasicBlock* basicBlock);
         void setEmittedValue();
+        bool isPure() const;
 
         void print(std::ostream& stream) override;
         std::string ident() const override;
@@ -46,7 +47,7 @@ namespace vipir
         void emit(lir::Builder& builder) override;
 
     private:
-        Function(FunctionType* type, Module& module, std::string_view name);
+        Function(FunctionType* type, Module& module, std::string_view name, bool pure);
 
         std::string mName;
         std::vector<ArgumentPtr> mArguments;
@@ -60,6 +61,8 @@ namespace vipir
         lir::Value* mEnterFuncNode;
         std::vector<lir::Value*> mRetNodes;
         bool mHasCallNodes;
+
+        bool mIsPure;
 
         void setCalleeSaved();
     };

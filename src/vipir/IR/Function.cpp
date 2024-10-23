@@ -24,9 +24,9 @@
 
 namespace vipir
 {
-    Function* Function::Create(FunctionType* type, Module& module, std::string_view name)
+    Function* Function::Create(FunctionType* type, Module& module, std::string_view name, bool pure)
     {
-        Function* func = new Function(type, module, name);
+        Function* func = new Function(type, module, name, pure);
 
         module.insertGlobal(func);
 
@@ -94,6 +94,11 @@ namespace vipir
         mEmittedValue = std::make_unique<lir::Lbl>(mName, plt);
     }
 
+    bool Function::isPure() const
+    {
+        return mIsPure;
+    }
+
     void Function::emit(lir::Builder& builder)
     {
         builder.setSection(lir::SectionType::Code);
@@ -140,11 +145,12 @@ namespace vipir
         std::move(newBuilder.getValues().begin(), newBuilder.getValues().end(), std::back_inserter(builder.getValues()));
     }
 
-    Function::Function(FunctionType* type, Module& module, std::string_view name)
+    Function::Function(FunctionType* type, Module& module, std::string_view name, bool pure)
         : Global(module)
         , mName(name)
         , mTotalStackOffset(0)
         , mHasCallNodes(false)
+        , mIsPure(pure)
     {
         mType = type;
 

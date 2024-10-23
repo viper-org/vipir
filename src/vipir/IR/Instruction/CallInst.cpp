@@ -61,7 +61,7 @@ namespace vipir
 
     bool CallInst::isCritical()
     {
-        return true;
+        return !mCalleePure;
     }
 
 
@@ -95,7 +95,12 @@ namespace vipir
         , mParameters(std::move(parameters))
         , mStackRestore(stackRestore)
         , mValueId(mModule.getNextValueId())
+        , mCalleePure(false)
     {
+        if (auto function = dynamic_cast<Function*>(callee))
+        {
+            if (function->isPure()) mCalleePure = true;
+        }
         FunctionType* functionType;
         if (callee->getType()->isPointerType())
         {

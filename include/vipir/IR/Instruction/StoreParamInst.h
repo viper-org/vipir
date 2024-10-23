@@ -23,6 +23,8 @@ namespace vipir
         std::vector<Value*> getOperands() override;
         std::vector<int> getRegisterSmashes() override;
 
+        bool isCritical() override;
+
     protected:
         void emit(lir::Builder& builder) override;
         std::string ident() const override;
@@ -33,6 +35,8 @@ namespace vipir
         int mParamIndex;
         Value* mValue;
         bool mAlignStack;
+
+        Value* mCall;
     };
 }
 

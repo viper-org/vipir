@@ -302,15 +302,22 @@ namespace vipir
                 alignedStack = false;
         }
 
+        std::vector<StoreParamInst*> stores;
         for (auto parameter : parameters)
         {
             StoreParamInst* store = new StoreParamInst(mInsertPoint, index++, parameter, !alignedStack);
+            stores.push_back(store);
             if (!alignedStack)
                 alignedStack = true;
             mInsertPoint->insertValue(store);
         }
 
         CallInst* call = new CallInst(mInsertPoint, function, std::move(parameters), stackRestore);
+
+        for (auto store : stores)
+        {
+            store->mCall = call;
+        }
 
         mInsertPoint->insertValue(call);
 

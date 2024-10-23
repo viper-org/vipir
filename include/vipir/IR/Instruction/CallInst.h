@@ -35,6 +35,7 @@ namespace vipir
         CallInst(BasicBlock* parent, Value* callee, std::vector<Value*> parameters, int stackRestore);
 
         Value* mCallee;
+        bool mCalleePure;
         std::vector<Value*> mParameters;
         int mStackRestore;
         int mValueId;
