@@ -87,7 +87,7 @@ namespace vipir
         bool DeadCodeEliminator::eliminateUnreachableBlocks(Function* function)
         {
             bool eliminatedSome = false;
-            for (auto it = function->mBasicBlockList.begin() + 1; it != function->mBasicBlockList.end(); ++it)
+            for (auto it = function->mBasicBlockList.begin() + 1; it < function->mBasicBlockList.end(); ++it)
             {
                 auto& basicBlock = *it;
 
