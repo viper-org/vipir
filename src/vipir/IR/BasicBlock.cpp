@@ -11,6 +11,7 @@
 
 #include "vasm/instruction/operand/Label.h"
 
+#include <algorithm>
 #include <format>
 
 namespace vipir
@@ -38,6 +39,20 @@ namespace vipir
     void BasicBlock::insertValue(Value* value)
     {
         mValueList.push_back(ValuePtr(value));
+    }
+
+    void BasicBlock::insertValue(Value* insertAfter, Value* value)
+    {
+        if (insertAfter == nullptr)
+        {
+            insertValue(value);
+            return;
+        }
+        auto it = std::find_if(mValueList.begin(), mValueList.end(), [insertAfter](const auto& value){
+            return value.get() == insertAfter;
+        });
+        if (it == mValueList.end()) mValueList.push_back(ValuePtr(value));
+        else mValueList.insert(it+1, ValuePtr(value));
     }
 
     void BasicBlock::eraseValue(Value* value)

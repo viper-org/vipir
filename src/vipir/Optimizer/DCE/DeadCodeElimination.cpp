@@ -39,10 +39,10 @@ namespace vipir
 
             while (!workList.empty())
             {
-                auto front = workList.front();
-                workList.erase(workList.begin());
+                auto back = workList.back();
+                workList.erase(workList.end() - 1);
 
-                for (auto operand : front->getOperands())
+                for (auto operand : back->getOperands())
                 {
                     if (!operand->mMarked)
                     {
@@ -55,9 +55,10 @@ namespace vipir
 
         void DeadCodeEliminator::sweepInstructions(Function* function)
         {
-            for (const auto& basicBlock : function->mBasicBlockList)
+            for (auto bbIt = function->mBasicBlockList.rbegin(); bbIt != function->mBasicBlockList.rend(); ++bbIt)
             {
-                for (size_t i = 0; i < basicBlock->mValueList.size(); ++i)
+                auto& basicBlock = *bbIt;
+                for (int i = basicBlock->mValueList.size() - 1; i >= 0; --i)
                 {
                     auto& value = basicBlock->mValueList[i];
 
@@ -67,7 +68,7 @@ namespace vipir
                         {
                             if (operand->mMarked)
                             {
-                                value->mMarked = true;
+                                markValueTree(value.get());
                             }
                         }
                         if (!value->mMarked)
@@ -75,11 +76,20 @@ namespace vipir
                             if (auto instruction = dynamic_cast<Instruction*>(value.get()))
                             {
                                 instruction->eraseFromParent();
-                                --i; // Don't increment at the end of the loop as we have just erased
+                                ++i; // Don't increment at the end of the loop as we have just erased
                             }
                         }
                     }
                 }
+            }
+        }
+
+        void DeadCodeEliminator::markValueTree(Value* value)
+        {
+            value->mMarked = true;
+            for (auto operand : value->getOperands())
+            {
+                markValueTree(operand);
             }
         }
 

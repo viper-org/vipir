@@ -21,6 +21,8 @@ namespace vipir
             void markCriticalInstructions(Function* function);
             void sweepInstructions(Function* function);
 
+            void markValueTree(Value* value);
+
             bool eliminateUnreachableBlocks(Function* function);
         };
 

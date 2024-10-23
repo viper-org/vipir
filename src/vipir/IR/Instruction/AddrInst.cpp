@@ -36,6 +36,11 @@ namespace vipir
         return std::format("%{}", getName(mValueId));
     }
 
+    std::vector<Value*> AddrInst::getOperands()
+    {
+        return { mPtr };
+    }
+
     void AddrInst::doConstantFold()
     {
     }

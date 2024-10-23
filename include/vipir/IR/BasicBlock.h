@@ -31,6 +31,7 @@ namespace vipir
         Function* getParent();
 
         void insertValue(Value* value);
+        void insertValue(Value* insertAfter, Value* value);
         void eraseValue(Value* value);
 
         std::vector<Value*>& liveIn();

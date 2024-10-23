@@ -44,13 +44,18 @@ namespace vipir
         return mInsertPoint;
     }
 
+    void IRBuilder::insertAfter(Value* value)
+    {
+        mInsertAfter = value;
+    }
+
 
 
     RetInst* IRBuilder::CreateRet(Value* returnValue)
     {
         RetInst* ret = new RetInst(mInsertPoint, returnValue);
 
-        mInsertPoint->insertValue(ret);
+        mInsertPoint->insertValue(mInsertAfter, ret);
 
         return ret;
     }
@@ -61,7 +66,7 @@ namespace vipir
     {
         AllocaInst* alloca = new AllocaInst(mInsertPoint, allocatedType);
 
-        mInsertPoint->insertValue(alloca);
+        mInsertPoint->insertValue(mInsertAfter, alloca);
 
         return alloca;
     }
@@ -72,7 +77,7 @@ namespace vipir
     {
         StoreInst* store = new StoreInst(mInsertPoint, ptr, value);
 
-        mInsertPoint->insertValue(store);
+        mInsertPoint->insertValue(mInsertAfter, store);
 
         return store;
     }
@@ -81,7 +86,7 @@ namespace vipir
     {
         LoadInst* load = new LoadInst(mInsertPoint, ptr);
 
-        mInsertPoint->insertValue(load);
+        mInsertPoint->insertValue(mInsertAfter, load);
 
         return load;
     }
@@ -90,7 +95,7 @@ namespace vipir
     {
         AddrInst* addr = new AddrInst(mInsertPoint, ptr);
 
-        mInsertPoint->insertValue(addr);
+        mInsertPoint->insertValue(mInsertAfter, addr);
 
         return addr;
     }
@@ -99,7 +104,7 @@ namespace vipir
     {
         GEPInst* gep = new GEPInst(mInsertPoint, ptr, offset);
 
-        mInsertPoint->insertValue(gep);
+        mInsertPoint->insertValue(mInsertAfter, gep);
 
         return gep;
     }
@@ -107,7 +112,7 @@ namespace vipir
     {
         GEPInst* gep = new GEPInst(mInsertPoint, ptr, ConstantInt::Get(mInsertPoint->getModule(), index, Type::GetIntegerType(32)));
 
-        mInsertPoint->insertValue(gep);
+        mInsertPoint->insertValue(mInsertAfter, gep);
 
         return gep;
     }
@@ -118,7 +123,7 @@ namespace vipir
     {
         BinaryInst* add = new BinaryInst(mInsertPoint, left, Instruction::ADD, right);
 
-        mInsertPoint->insertValue(add);
+        mInsertPoint->insertValue(mInsertAfter, add);
 
         return add;
     }
@@ -127,7 +132,7 @@ namespace vipir
     {
         BinaryInst* sub = new BinaryInst(mInsertPoint, left, Instruction::SUB, right);
 
-        mInsertPoint->insertValue(sub);
+        mInsertPoint->insertValue(mInsertAfter, sub);
 
         return sub;
     }
@@ -136,7 +141,7 @@ namespace vipir
     {
         BinaryInst* smul = new BinaryInst(mInsertPoint, left, Instruction::SMUL, right);
 
-        mInsertPoint->insertValue(smul);
+        mInsertPoint->insertValue(mInsertAfter, smul);
 
         return smul;
     }
@@ -145,7 +150,7 @@ namespace vipir
     {
         BinaryInst* umul = new BinaryInst(mInsertPoint, left, Instruction::UMUL, right);
 
-        mInsertPoint->insertValue(umul);
+        mInsertPoint->insertValue(mInsertAfter, umul);
 
         return umul;
     }
@@ -154,7 +159,7 @@ namespace vipir
     {
         BinaryInst* sdiv = new BinaryInst(mInsertPoint, left, Instruction::SDIV, right);
 
-        mInsertPoint->insertValue(sdiv);
+        mInsertPoint->insertValue(mInsertAfter, sdiv);
 
         return sdiv;
     }
@@ -163,7 +168,7 @@ namespace vipir
     {
         BinaryInst* udiv = new BinaryInst(mInsertPoint, left, Instruction::UDIV, right);
 
-        mInsertPoint->insertValue(udiv);
+        mInsertPoint->insertValue(mInsertAfter, udiv);
 
         return udiv;
     }
@@ -172,7 +177,7 @@ namespace vipir
     {
         BinaryInst* bwor = new BinaryInst(mInsertPoint, left, Instruction::BWOR, right);
 
-        mInsertPoint->insertValue(bwor);
+        mInsertPoint->insertValue(mInsertAfter, bwor);
 
         return bwor;
     }
@@ -181,7 +186,7 @@ namespace vipir
     {
         BinaryInst* bwand = new BinaryInst(mInsertPoint, left, Instruction::BWAND, right);
 
-        mInsertPoint->insertValue(bwand);
+        mInsertPoint->insertValue(mInsertAfter, bwand);
 
         return bwand;
     }
@@ -190,7 +195,7 @@ namespace vipir
     {
         BinaryInst* bwxor = new BinaryInst(mInsertPoint, left, Instruction::BWXOR, right);
 
-        mInsertPoint->insertValue(bwxor);
+        mInsertPoint->insertValue(mInsertAfter, bwxor);
 
         return bwxor;
     }
@@ -199,7 +204,7 @@ namespace vipir
     {
         BinaryInst* eq = new BinaryInst(mInsertPoint, left, Instruction::EQ, right);
 
-        mInsertPoint->insertValue(eq);
+        mInsertPoint->insertValue(mInsertAfter, eq);
 
         return eq;
     }
@@ -208,7 +213,7 @@ namespace vipir
     {
         BinaryInst* ne = new BinaryInst(mInsertPoint, left, Instruction::NE, right);
 
-        mInsertPoint->insertValue(ne);
+        mInsertPoint->insertValue(mInsertAfter, ne);
 
         return ne;
     }
@@ -217,7 +222,7 @@ namespace vipir
     {
         BinaryInst* lt = new BinaryInst(mInsertPoint, left, Instruction::LT, right);
 
-        mInsertPoint->insertValue(lt);
+        mInsertPoint->insertValue(mInsertAfter, lt);
 
         return lt;
     }
@@ -226,7 +231,7 @@ namespace vipir
     {
         BinaryInst* gt = new BinaryInst(mInsertPoint, left, Instruction::GT, right);
 
-        mInsertPoint->insertValue(gt);
+        mInsertPoint->insertValue(mInsertAfter, gt);
 
         return gt;
     }
@@ -235,7 +240,7 @@ namespace vipir
     {
         BinaryInst* le = new BinaryInst(mInsertPoint, left, Instruction::LE, right);
 
-        mInsertPoint->insertValue(le);
+        mInsertPoint->insertValue(mInsertAfter, le);
 
         return le;
     }
@@ -244,7 +249,7 @@ namespace vipir
     {
         BinaryInst* ge = new BinaryInst(mInsertPoint, left, Instruction::GE, right);
 
-        mInsertPoint->insertValue(ge);
+        mInsertPoint->insertValue(mInsertAfter, ge);
 
         return ge;
     }
@@ -255,7 +260,7 @@ namespace vipir
     {
         BranchInst* branch = new BranchInst(mInsertPoint, destination);
 
-        mInsertPoint->insertValue(branch);
+        mInsertPoint->insertValue(mInsertAfter, branch);
 
         return branch;
     }
@@ -264,7 +269,7 @@ namespace vipir
     {
         BranchInst* branch = new BranchInst(mInsertPoint, condition, trueBranch, falseBranch);
 
-        mInsertPoint->insertValue(branch);
+        mInsertPoint->insertValue(mInsertAfter, branch);
 
         return branch;
     }
@@ -274,7 +279,7 @@ namespace vipir
     {
         UnaryInst* neg = new UnaryInst(mInsertPoint, operand, Instruction::NEG);
 
-        mInsertPoint->insertValue(neg);
+        mInsertPoint->insertValue(mInsertAfter, neg);
 
         return neg;
     }
@@ -283,7 +288,7 @@ namespace vipir
     {
         UnaryInst* notInst = new UnaryInst(mInsertPoint, operand, Instruction::NOT);
 
-        mInsertPoint->insertValue(notInst);
+        mInsertPoint->insertValue(mInsertAfter, notInst);
 
         return notInst;
     }
@@ -302,6 +307,7 @@ namespace vipir
                 alignedStack = false;
         }
 
+        Value* insertAfter = mInsertAfter;
         std::vector<Value*> stores;
         for (auto parameter : parameters)
         {
@@ -309,7 +315,8 @@ namespace vipir
             stores.push_back(store);
             if (!alignedStack)
                 alignedStack = true;
-            mInsertPoint->insertValue(store);
+            mInsertPoint->insertValue(insertAfter, store);
+            insertAfter = store;
         }
 
         CallInst* call = new CallInst(mInsertPoint, function, stores, stackRestore);
@@ -319,7 +326,7 @@ namespace vipir
             static_cast<StoreParamInst*>(store)->mCall = call;
         }
 
-        mInsertPoint->insertValue(call);
+        mInsertPoint->insertValue(insertAfter, call);
 
         return call;
     }
@@ -328,7 +335,7 @@ namespace vipir
     {
         PtrCastInst* cast = new PtrCastInst(mInsertPoint, ptr, destType);
 
-        mInsertPoint->insertValue(cast);
+        mInsertPoint->insertValue(mInsertAfter, cast);
 
         return cast;
     }
@@ -337,7 +344,7 @@ namespace vipir
     {
         SExtInst* sext = new SExtInst(mInsertPoint, value, destType);
 
-        mInsertPoint->insertValue(sext);
+        mInsertPoint->insertValue(mInsertAfter, sext);
 
         return sext;
     }
@@ -346,7 +353,7 @@ namespace vipir
     {
         ZExtInst* zext = new ZExtInst(mInsertPoint, value, destType);
 
-        mInsertPoint->insertValue(zext);
+        mInsertPoint->insertValue(mInsertAfter, zext);
 
         return zext;
     }
@@ -355,7 +362,7 @@ namespace vipir
     {
         TruncInst* trunc = new TruncInst(mInsertPoint, value, destType);
 
-        mInsertPoint->insertValue(trunc);
+        mInsertPoint->insertValue(mInsertAfter, trunc);
 
         return trunc;
     }
@@ -364,7 +371,7 @@ namespace vipir
     {
         IntToPtrInst* inttoptr = new IntToPtrInst(mInsertPoint, value, destType);
 
-        mInsertPoint->insertValue(inttoptr);
+        mInsertPoint->insertValue(mInsertAfter, inttoptr);
 
         return inttoptr;
     }
@@ -373,7 +380,7 @@ namespace vipir
     {
         PtrToIntInst* ptrtoint = new PtrToIntInst(mInsertPoint, value, destType);
 
-        mInsertPoint->insertValue(ptrtoint);
+        mInsertPoint->insertValue(mInsertAfter, ptrtoint);
 
         return ptrtoint;
     }
@@ -383,7 +390,7 @@ namespace vipir
     {
         PhiInst* phi = new PhiInst(mInsertPoint, type);
 
-        mInsertPoint->insertValue(phi);
+        mInsertPoint->insertValue(mInsertAfter, phi);
 
         return phi;
     }
@@ -393,7 +400,7 @@ namespace vipir
     {
         ConstantBool* constantBool = new ConstantBool(mInsertPoint, value);
 
-        mInsertPoint->insertValue(constantBool);
+        mInsertPoint->insertValue(mInsertAfter, constantBool);
 
         return constantBool;
     }

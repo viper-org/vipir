@@ -45,6 +45,8 @@ namespace vipir
         void setInsertPoint(BasicBlock* newInsertPoint);
         BasicBlock* getInsertPoint();
 
+        void insertAfter(Value* value);
+
 
         RetInst* CreateRet(Value* returnValue);
 
@@ -104,6 +106,8 @@ namespace vipir
 
     private:
         BasicBlock* mInsertPoint;
+
+        Value* mInsertAfter;
     };
 }
 
