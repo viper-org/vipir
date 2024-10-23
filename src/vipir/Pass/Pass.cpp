@@ -40,7 +40,7 @@ namespace vipir
     void PassManager::insertBefore(PassType other, std::unique_ptr<Pass> pass)
     {
         auto position = findPass(other);
-        if (position == -1) addPass(std::move(pass));
+        if (position == -1) insertPass(0, std::move(pass));
         else insertPass(position, std::move(pass));
     }
 
