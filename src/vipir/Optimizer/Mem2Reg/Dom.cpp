@@ -35,15 +35,20 @@ namespace vipir
             while (changed)
             {
                 changed = false;
-                for (auto it = function->mBasicBlockList.rbegin(); it != function->mBasicBlockList.rend() - 1; ++it)
+                for (auto it = function->mBasicBlockList.begin() + 1; it != function->mBasicBlockList.end(); ++it)
                 {
                     auto& basicBlock = *it;
-                    BasicBlock* newIdom;
-                    if (basicBlock->predecessors().size() > 0) newIdom = basicBlock->predecessors().front();
+                    BasicBlock* newIdom = nullptr;
+                    bool foundFirst = false;
                     for (auto pIt = basicBlock->predecessors().begin() + 1; pIt < basicBlock->predecessors().end(); ++pIt)
                     {
                         auto predecessor = *pIt;
-                        if (predecessor->mDomCalculated) newIdom = Intersect(predecessor, newIdom);
+                        if (predecessor->mDomCalculated) 
+                        {
+                            if (foundFirst)
+                                newIdom = Intersect(predecessor, newIdom);
+                            else newIdom = predecessor;
+                        }
                     }
                     if (basicBlock->mDom != newIdom)
                     {
