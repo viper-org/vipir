@@ -17,6 +17,7 @@ namespace vipir
     friend class IRBuilder;
     friend class opt::AliasAnalyzer;
     friend class opt::DeadCodeEliminator;
+    friend class opt::Mem2Reg;
     public:
         void print(std::ostream& stream) override;
 

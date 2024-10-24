@@ -26,6 +26,8 @@ namespace vipir
     friend class opt::RegAlloc;
     friend class opt::DeadCodeEliminator;
     friend class opt::AliasAnalyzer;
+    friend class opt::DominatorAnalyzer;
+    friend class opt::Mem2Reg;
     public:
         static BasicBlock* Create(std::string_view name, Function* parent);
 
@@ -63,8 +65,15 @@ namespace vipir
 
         std::vector<ValuePtr> mValueList;
         std::vector<Value*> mLiveIn;
+
         std::vector<BasicBlock*> mSuccessors;
         std::vector<BasicBlock*> mPredecessors;
+
+        int mIndexInFunction;
+        bool mDomCalculated { false };
+        BasicBlock* mDom;
+        std::vector<BasicBlock*> mDominanceFrontier;
+
         std::vector<PhiInst*> mPhis;
         BasicBlock* mLoopEnd;
 

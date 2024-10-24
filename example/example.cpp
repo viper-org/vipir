@@ -23,6 +23,7 @@
 
 #include "vipir/Optimizer/Peephole/PeepholeV2.h"
 #include "vipir/Optimizer/RegAlloc/RegAlloc.h"
+#include "vipir/Optimizer/Mem2Reg/Mem2Reg.h"
 
 #include "vipir/Type/FunctionType.h"
 #include "vipir/Type/StructType.h"
@@ -60,7 +61,7 @@ int main()
     builder.CreateRet(builder.CreateLoad(alloca));
 
     mod.setOutputFormat(vipir::OutputFormat::ELF);
-    mod.getPassManager().insertBefore(vipir::PassType::LIREmission, std::make_unique<vipir::opt::AAPass>());
+    mod.getPassManager().insertBefore(vipir::PassType::LIREmission, std::make_unique<vipir::opt::Mem2RegPass>());
     mod.getPassManager().insertBefore(vipir::PassType::LIREmission, std::make_unique<vipir::opt::DCEPass>());
     mod.getPassManager().insertBefore(vipir::PassType::DeadCodeElimination, std::make_unique<vipir::ConstantFoldingPass>());
     mod.getPassManager().insertAfter(vipir::PassType::LIREmission, std::make_unique<vipir::opt::PeepholePass>());

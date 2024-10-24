@@ -153,6 +153,7 @@ namespace vipir
         , mParent(parent)
         , mLoopEnd(nullptr)
         , mExists(true)
+        , mIndexInFunction(parent->getNumBasicBlocks())
     {
         bool alldigits = true;
         for (char c : mName)

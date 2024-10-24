@@ -67,6 +67,8 @@ set(SOURCES
     "src/vipir/Optimizer/Peephole/PeepholeV2.cpp"
     "src/vipir/Optimizer/DCE/DeadCodeElimination.cpp"
     "src/vipir/Optimizer/AA/AliasAnalysis.cpp"
+    "src/vipir/Optimizer/Mem2Reg/Dom.cpp"
+    "src/vipir/Optimizer/Mem2Reg/Mem2Reg.cpp"
 
     "src/vipir/LIR/Builder.cpp"
     "src/vipir/LIR/Label.cpp"
@@ -144,6 +146,8 @@ set(HEADERS
     "include/vipir/Optimizer/Peephole/PeepholeV2.h"
     "include/vipir/Optimizer/DCE/DeadCodeElimination.h"
     "include/vipir/Optimizer/AA/AliasAnalysis.h"
+    "include/vipir/Optimizer/Mem2Reg/Dom.h"
+    "include/vipir/Optimizer/Mem2Reg/Mem2Reg.h"
 
     "include/vipir/LIR/Builder.h"
     "include/vipir/LIR/Value.h"

@@ -26,6 +26,8 @@ namespace vipir
     friend class opt::RegAlloc;
     friend class opt::DeadCodeEliminator;
     friend class opt::AliasAnalyzer;
+    friend class opt::DominatorAnalyzer;
+    friend class opt::Mem2Reg;
     using BasicBlockPtr = std::unique_ptr<BasicBlock>;
     public:
         static Function* Create(FunctionType* type, Module& module, std::string_view name, bool pure);
@@ -36,6 +38,7 @@ namespace vipir
         std::vector<int> getCalleeSaved();
 
         void insertBasicBlock(BasicBlock* basicBlock);
+        int getNumBasicBlocks();
         void setEmittedValue();
         bool isPure() const;
 
@@ -46,6 +49,8 @@ namespace vipir
 
     protected:
         void emit(lir::Builder& builder) override;
+
+        std::vector<AllocaInst*> getAllocaList();
 
     private:
         Function(FunctionType* type, Module& module, std::string_view name, bool pure);

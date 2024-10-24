@@ -15,6 +15,8 @@
 #include "vipir/Optimizer/RegAlloc/VReg.h"
 #include "vipir/Optimizer/DCE/DeadCodeElimination.h"
 #include "vipir/Optimizer/AA/AliasAnalysis.h"
+#include "vipir/Optimizer/Mem2Reg/Dom.h"
+#include "vipir/Optimizer/Mem2Reg/Mem2Reg.h"
 
 #include "vipir/LIR/Builder.h"
 

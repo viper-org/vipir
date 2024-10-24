@@ -1,6 +1,7 @@
 // Copyright 2024 solar-mist
 
 #include "vipir/IR/Function.h"
+#include "vipir/IR/Instruction/AllocaInst.h"
 
 #include "vipir/Module.h"
 
@@ -58,6 +59,11 @@ namespace vipir
     void Function::insertBasicBlock(BasicBlock* basicBlock)
     {
         mBasicBlockList.push_back(BasicBlockPtr(basicBlock));
+    }
+
+    int Function::getNumBasicBlocks()
+    {
+        return mBasicBlockList.size();
     }
 
     void Function::print(std::ostream& stream)
@@ -143,6 +149,19 @@ namespace vipir
             }
         }
         std::move(newBuilder.getValues().begin(), newBuilder.getValues().end(), std::back_inserter(builder.getValues()));
+    }
+
+    std::vector<AllocaInst*> Function::getAllocaList()
+    {
+        std::vector<AllocaInst*> ret;
+        for (auto& basicBlock : mBasicBlockList)
+        {
+            for (auto& value : basicBlock->mValueList)
+            {
+                if (auto alloca = dynamic_cast<AllocaInst*>(value.get())) ret.push_back(alloca);
+            }
+        }
+        return ret;
     }
 
     Function::Function(FunctionType* type, Module& module, std::string_view name, bool pure)
