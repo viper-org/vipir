@@ -18,7 +18,7 @@ namespace vipir
         stream << std::format("store {} -> PARAM{}", mValue->ident(), mParamIndex);
     }
 
-    std::vector<Value*> StoreParamInst::getOperands()
+    std::vector<std::reference_wrapper<Value*> > StoreParamInst::getOperands()
     {
         return {mValue};
     }

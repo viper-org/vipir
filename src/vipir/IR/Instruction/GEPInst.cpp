@@ -42,9 +42,9 @@ namespace vipir
     {
     }
 
-    std::vector<Value*> GEPInst::getOperands()
+    std::vector<std::reference_wrapper<Value*> > GEPInst::getOperands()
     {
-        return std::vector<Value*>{mPtr, mOffset};
+        return {mPtr, mOffset};
     }
 
     void GEPInst::emit(lir::Builder& builder)

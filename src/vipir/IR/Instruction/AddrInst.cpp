@@ -36,7 +36,7 @@ namespace vipir
         return std::format("%{}", getName(mValueId));
     }
 
-    std::vector<Value*> AddrInst::getOperands()
+    std::vector<std::reference_wrapper<Value*> > AddrInst::getOperands()
     {
         return { mPtr };
     }

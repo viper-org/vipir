@@ -151,7 +151,7 @@ namespace vipir
         }
     }
 
-    std::vector<Value*> BinaryInst::getOperands()
+    std::vector<std::reference_wrapper<Value*> > BinaryInst::getOperands()
     {
         return {mLeft, mRight};
     }

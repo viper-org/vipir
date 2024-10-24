@@ -29,7 +29,7 @@ namespace vipir
     {
     }
 
-    std::vector<Value*> PtrToIntInst::getOperands()
+    std::vector<std::reference_wrapper<Value*> > PtrToIntInst::getOperands()
     {
         return {mValue};
     }

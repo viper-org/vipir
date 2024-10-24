@@ -27,7 +27,7 @@ namespace vipir
     {
     }
 
-    std::vector<Value*> ZExtInst::getOperands()
+    std::vector<std::reference_wrapper<Value*> > ZExtInst::getOperands()
     {
         return {mValue};
     }

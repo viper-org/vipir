@@ -21,7 +21,7 @@ namespace vipir
 
         void doConstantFold() override;
     
-        std::vector<Value*> getOperands() override;
+        std::vector<std::reference_wrapper<Value*> > getOperands() override;
 
     protected:
         void emit(lir::Builder& builder) override;

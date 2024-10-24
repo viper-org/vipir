@@ -8,6 +8,9 @@
 #include "vipir/IR/BasicBlock.h"
 #include "vipir/IR/Instruction/StoreInst.h"
 #include "vipir/IR/Instruction/AllocaInst.h"
+#include "vipir/IR/Instruction/PhiInst.h"
+#include "vipir/IR/Instruction/LoadInst.h"
+#include "vipir/IR/Instruction/BranchInst.h"
 
 #include <algorithm>
 
@@ -19,7 +22,9 @@ namespace vipir
         {
             DominatorAnalyzer dom;
             dom.computeDominanceFrontiers(function);
-            phiInsertPosition(function);
+            auto wherePhi = phiInsertPosition(function);
+            insertPhi(wherePhi);
+            decideValuesStartFrom(function, function->mBasicBlockList.front().get(), {}, {});
         }
 
         std::unordered_map<AllocaInst*, std::set<BasicBlock*> > Mem2Reg::phiInsertPosition(Function* function)
@@ -60,6 +65,107 @@ namespace vipir
                 }
             }
             return result;
+        }
+
+        void Mem2Reg::insertPhi(std::unordered_map<AllocaInst*, std::set<BasicBlock*> > where)
+        {
+            for (auto [var, bbs] : where)
+            {
+                for (auto bb : bbs)
+                {
+                    auto phi = new PhiInst(bb, var->getAllocatedType(), var);
+                    bb->mValueList.insert(bb->mValueList.begin(), std::unique_ptr<PhiInst>(phi));
+                }
+            }
+        }
+
+        std::pair<BasicBlock*, Value*> Mem2Reg::decideVariableValue(AllocaInst* var,
+            std::deque<std::unordered_map<AllocaInst*, std::pair<BasicBlock*, Value*> > > current)
+        {
+            for (auto it = current.rbegin(); it != current.rend(); ++it)
+            {
+                auto frame = *it;
+                if (frame.find(var) != frame.end()) return frame[var];
+            }
+            __builtin_unreachable();
+        }
+        
+        void Mem2Reg::decideValuesStartFrom(Function* function, BasicBlock* basicBlock, std::set<BasicBlock*> visited,
+            std::deque<std::unordered_map<AllocaInst*, std::pair<BasicBlock*, Value*> > > current)
+        {
+            for (auto& value : basicBlock->mValueList)
+            {
+                if (auto phi = dynamic_cast<PhiInst*>(value.get()))
+                {
+                    auto [currentFrom, currentValue] = decideVariableValue(phi->mAlloca, current);
+                    phi->addIncoming(currentValue, currentFrom);
+                    current.front()[phi->mAlloca] = std::make_pair(basicBlock, phi);
+                }
+            }
+
+            if (visited.contains(basicBlock)) return;
+            visited.insert(basicBlock);
+
+            for (auto it = basicBlock->mValueList.begin(); it != basicBlock->mValueList.end();)
+            {
+                auto& value = *it;
+                bool changed = false;
+                if (auto load = dynamic_cast<LoadInst*>(value.get()))
+                {
+                    changed = true;
+
+                    auto ptr = load->getPointer();
+                    auto [_, loadValue] = decideVariableValue(static_cast<AllocaInst*>(ptr), current);
+                    replace(function, load, loadValue);
+                    load->eraseFromParent();
+                }
+                if (auto store = dynamic_cast<StoreInst*>(value.get()))
+                {
+                    changed = true;
+                    auto value = store->mValue;
+                    auto ptr = store->mPtr;
+                    if (current.empty()) current.push_back(std::unordered_map<AllocaInst*, std::pair<BasicBlock*, Value*> >());
+                    current.back()[static_cast<AllocaInst*>(ptr)] = std::make_pair(basicBlock, value);
+                    store->eraseFromParent();
+                }
+                if (auto branch = dynamic_cast<BranchInst*>(value.get()))
+                {
+                    if (branch->mCondition)
+                    {
+                        current.push_back(std::unordered_map<AllocaInst*, std::pair<BasicBlock*, Value*> >());
+                        decideValuesStartFrom(function, branch->mTrueBranch, visited, current);
+                        current.pop_back();
+
+                        current.push_back(std::unordered_map<AllocaInst*, std::pair<BasicBlock*, Value*> >());
+                        decideValuesStartFrom(function, branch->mFalseBranch, visited, current);
+                        current.pop_back();
+                    }
+                    else
+                    {
+                        decideValuesStartFrom(function, branch->mTrueBranch, visited, current);
+                    }
+                }
+                
+                if (!changed) ++it;
+            }
+        }
+
+        void Mem2Reg::replace(Function* function, Value* old, Value* newValue)
+        {
+            for (auto& basicBlock : function->mBasicBlockList)
+            {
+                for (auto& value : basicBlock->mValueList)
+                {
+                    for (auto operandR : value->getOperands())
+                    {
+                        auto& operand = operandR.get();
+                        if (operand == old)
+                        {
+                            operand = newValue;
+                        }
+                    }
+                }
+            }
         }
 
 

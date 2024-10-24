@@ -30,7 +30,7 @@ namespace vipir
     {
     }
 
-    std::vector<Value*> TruncInst::getOperands()
+    std::vector<std::reference_wrapper<Value*> > TruncInst::getOperands()
     {
         return {mValue};
     }

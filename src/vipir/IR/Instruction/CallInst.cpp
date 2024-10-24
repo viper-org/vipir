@@ -38,9 +38,13 @@ namespace vipir
     {
     }
 
-    std::vector<Value*> CallInst::getOperands()
+    std::vector<std::reference_wrapper<Value*> > CallInst::getOperands()
     {
-        std::vector<Value*> operands = mParameters;
+        std::vector<std::reference_wrapper<Value*> > operands;
+        for (auto& parameter : mParameters)
+        {
+            operands.push_back(parameter);
+        }
         if (!dynamic_cast<Function*>(mCallee))
             operands.push_back(mCallee);
         return operands;

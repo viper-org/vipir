@@ -20,7 +20,7 @@ namespace vipir
 
         void doConstantFold() override;
     
-        std::vector<Value*> getOperands() override;
+        std::vector<std::reference_wrapper<Value*> > getOperands() override;
         std::vector<int> getRegisterSmashes() override;
 
         bool isCritical() override;

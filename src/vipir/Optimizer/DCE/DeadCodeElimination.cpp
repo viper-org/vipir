@@ -43,8 +43,9 @@ namespace vipir
                 auto back = workList.back();
                 workList.erase(workList.end() - 1);
 
-                for (auto operand : back->getOperands())
+                for (auto operandR : back->getOperands())
                 {
+                    auto operand = operandR.get();
                     if (!operand->mMarked)
                     {
                         operand->mMarked = true;

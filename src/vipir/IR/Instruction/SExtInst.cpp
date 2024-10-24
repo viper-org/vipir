@@ -30,7 +30,7 @@ namespace vipir
     {
     }
 
-    std::vector<Value*> SExtInst::getOperands()
+    std::vector<std::reference_wrapper<Value*> > SExtInst::getOperands()
     {
         return {mValue};
     }

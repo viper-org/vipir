@@ -19,9 +19,9 @@ namespace vipir
         stream << std::format("{} : {} ]", mIncoming.back().first->ident(), mIncoming.back().second->ident());
     }
 
-    std::vector<Value*> PhiInst::getOperands()
+    std::vector<std::reference_wrapper<Value*> > PhiInst::getOperands()
     {
-        std::vector<Value*> operands;
+        std::vector<std::reference_wrapper<Value*> > operands;
         for (auto& incoming : mIncoming)
         {
             operands.push_back(incoming.first);
@@ -60,9 +60,10 @@ namespace vipir
     }
 
 
-    PhiInst::PhiInst(BasicBlock* parent, Type* type)
+    PhiInst::PhiInst(BasicBlock* parent, Type* type, AllocaInst* alloca)
         : Instruction(parent->getModule(), parent)
         , mValueId(mModule.getNextValueId())
+        , mAlloca(alloca)
     {
         mParent->getPhis().push_back(this);
         mType = type;

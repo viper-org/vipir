@@ -32,10 +32,10 @@ namespace vipir
         }
     }
 
-    std::vector<Value*> RetInst::getOperands()
+    std::vector<std::reference_wrapper<Value*> > RetInst::getOperands()
     {
         if (mReturnValue) return {mReturnValue};
-        else return std::vector<Value*>();
+        else return {};
     }
 
     bool RetInst::isCritical()

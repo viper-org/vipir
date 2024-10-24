@@ -8,6 +8,7 @@
 #include "vipir/Pass/Pass.h"
 
 #include <set>
+#include <deque>
 #include <unordered_map>
 
 namespace vipir
@@ -26,6 +27,14 @@ namespace vipir
 
         private:
             std::unordered_map<AllocaInst*, std::set<BasicBlock*> > phiInsertPosition(Function* function);
+            void insertPhi(std::unordered_map<AllocaInst*, std::set<BasicBlock*> > where);
+
+            std::pair<BasicBlock*, Value*> decideVariableValue(AllocaInst* var,
+                std::deque<std::unordered_map<AllocaInst*, std::pair<BasicBlock*, Value*> > > current);
+            void decideValuesStartFrom(Function* function, BasicBlock* basicBlock, std::set<BasicBlock*> visited,
+                std::deque<std::unordered_map<AllocaInst*, std::pair<BasicBlock*, Value*> > > current);
+
+            void replace(Function* function, Value* old, Value* newValue);
         };
 
         class Mem2RegPass : public Pass

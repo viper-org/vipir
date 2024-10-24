@@ -36,7 +36,7 @@ namespace vipir
         return "%undef";
     }
 
-    std::vector<Value*> BranchInst::getOperands()
+    std::vector<std::reference_wrapper<Value*> > BranchInst::getOperands()
     {
         if (mCondition) return { mCondition };
         return {};

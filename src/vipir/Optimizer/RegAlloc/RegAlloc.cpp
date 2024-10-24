@@ -190,8 +190,9 @@ namespace vipir
                     auto& value = *valueIt;
                     if (dynamic_cast<PhiInst*>(value.get())) continue;
 
-                    for (auto operand : value->getOperands())
+                    for (auto operandR : value->getOperands())
                     {
+                        auto operand = operandR.get();
                         operand->mInterval.second = std::max(operand->mInterval.second, value->mInterval.first);
                         live.push_back(operand);
                     }

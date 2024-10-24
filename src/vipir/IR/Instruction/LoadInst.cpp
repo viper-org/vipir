@@ -31,7 +31,7 @@ namespace vipir
     {
         return mPtr;
     }
-    std::vector<Value*> LoadInst::getOperands()
+    std::vector<std::reference_wrapper<Value*> > LoadInst::getOperands()
     {
         return {mPtr};
     }

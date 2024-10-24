@@ -23,7 +23,7 @@ namespace vipir
         return std::format("{} %{}", mType->getName(), getName(mValueId));
     }
 
-    std::vector<Value*> PtrCastInst::getOperands()
+    std::vector<std::reference_wrapper<Value*> > PtrCastInst::getOperands()
     {
         return {mPtr};
     }

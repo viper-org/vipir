@@ -43,7 +43,7 @@ namespace vipir
 
         Module& getModule() { return mModule; }
         Type* getType() { return mType; }
-        virtual std::vector<Value*> getOperands() { return std::vector<Value*>(); }
+        virtual std::vector<std::reference_wrapper<Value*> > getOperands() { return std::vector<std::reference_wrapper<Value*> >(); }
         virtual bool isConstant() const { return false; }
 
         virtual void print(std::ostream& stream) = 0;

@@ -57,7 +57,7 @@ namespace vipir
         }
     }
 
-    std::vector<Value*> UnaryInst::getOperands()
+    std::vector<std::reference_wrapper<Value*> > UnaryInst::getOperands()
     {
         return {mOperand};
     }

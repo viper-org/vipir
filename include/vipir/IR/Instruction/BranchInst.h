@@ -15,13 +15,14 @@ namespace vipir
     class BranchInst : public Instruction
     {
     friend class IRBuilder;
+    friend class opt::Mem2Reg;
     public:
         void print(std::ostream& stream) override;
         std::string ident() const override;
 
         void doConstantFold() override;
         
-        std::vector<Value*> getOperands() override;
+        std::vector<std::reference_wrapper<Value*> > getOperands() override;
 
         bool isCritical() override;
 

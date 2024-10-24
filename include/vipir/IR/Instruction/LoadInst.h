@@ -23,7 +23,7 @@ namespace vipir
 
         Value* getPointer();
 
-        std::vector<Value*> getOperands() override;
+        std::vector<std::reference_wrapper<Value*> > getOperands() override;
 
     protected:
         void emit(lir::Builder& builder) override;
