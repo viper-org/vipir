@@ -71,7 +71,7 @@ namespace vipir
 
         int mIndexInFunction;
         bool mDomCalculated { false };
-        BasicBlock* mDom;
+        BasicBlock* mDom{ nullptr };
         std::vector<BasicBlock*> mDominanceFrontier;
 
         std::vector<PhiInst*> mPhis;
