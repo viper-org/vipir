@@ -53,17 +53,19 @@ int main()
     builder.setInsertPoint(entrybb);
 
     auto alloca = builder.CreateAlloca(i32Type);
+    auto val = vipir::ConstantInt::Get(mod, 5, i32Type);
+    builder.CreateStore(alloca, val);
     auto addr = builder.CreateAddrOf(alloca);
 
-    builder.CreateRet(builder.CreateLoad(addr));
+    builder.CreateRet(builder.CreateLoad(alloca));
 
     mod.setOutputFormat(vipir::OutputFormat::ELF);
     mod.getPassManager().insertBefore(vipir::PassType::LIREmission, std::make_unique<vipir::opt::AAPass>());
-    //mod.getPassManager().insertBefore(vipir::PassType::LIREmission, std::make_unique<vipir::opt::DCEPass>());
+    mod.getPassManager().insertBefore(vipir::PassType::LIREmission, std::make_unique<vipir::opt::DCEPass>());
     mod.getPassManager().insertBefore(vipir::PassType::DeadCodeElimination, std::make_unique<vipir::ConstantFoldingPass>());
     mod.getPassManager().insertAfter(vipir::PassType::LIREmission, std::make_unique<vipir::opt::PeepholePass>());
 
-    mod.print(std::cout);
+    //mod.print(std::cout);
 
-    //mod.emit(std::cout);
+    mod.emit(std::cout);
 }

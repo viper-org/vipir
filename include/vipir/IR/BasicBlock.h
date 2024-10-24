@@ -47,6 +47,8 @@ namespace vipir
 
         void doConstantFold() override;
 
+        void cleanup() override;
+
     protected:
         void setEmittedValue();
         void emit(lir::Builder& builder) override;

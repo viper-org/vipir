@@ -45,6 +45,14 @@ namespace vipir
     {
     }
 
+    void AddrInst::cleanup()
+    {
+        if (auto alloca = dynamic_cast<AllocaInst*>(mPtr))
+        {
+            alloca->forceMemoryCount()--;
+        }
+    }
+
     void AddrInst::emit(lir::Builder& builder)
     {
         mPtr->lateEmit(builder);
@@ -72,7 +80,7 @@ namespace vipir
         if (auto alloca = dynamic_cast<AllocaInst*>(mPtr))
         {
             mRequiresVReg = false;
-            alloca->forceMemory();
+            alloca->forceMemoryCount()++;
         }
         if (auto func = dynamic_cast<Function*>(mPtr))
         {

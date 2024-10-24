@@ -20,9 +20,9 @@ namespace vipir
         return mAllocatedType;
     }
 
-    void AllocaInst::forceMemory()
+    int& AllocaInst::forceMemoryCount()
     {
-        mForceMemory = true;
+        return mForceMemoryCount;
     }
 
     std::string AllocaInst::ident() const
@@ -43,9 +43,9 @@ namespace vipir
         : Instruction(parent->getModule(), parent)
         , mAllocatedType(allocatedType)
         , mValueId(mModule.getNextValueId())
-        , mForceMemory(false)
+        , mForceMemoryCount(0)
     {
         mType = Type::GetPointerType(mAllocatedType);
-        if (mAllocatedType->isStructType()) mForceMemory = true; // Structs cannot fit inside a register
+        if (mAllocatedType->isStructType()) mForceMemoryCount = 1; // Structs cannot fit inside a register
     }
 }

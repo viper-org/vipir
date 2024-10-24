@@ -4,6 +4,7 @@
 
 #include "vipir/IR/Function.h"
 #include "vipir/IR/Instruction/Instruction.h"
+#include "vipir/IR/Instruction/StoreInst.h"
 
 #include "vipir/Module.h"
 
@@ -64,17 +65,16 @@ namespace vipir
 
                     if (!value->mMarked)
                     {
-                        for (auto operand : value->getOperands())
+                        if (auto store = dynamic_cast<StoreInst*>(value.get()))
                         {
-                            if (operand->mMarked)
-                            {
-                                markValueTree(value.get());
-                            }
+                            if (store->mPtr->mMarked)
+                                markValueTree(store);
                         }
                         if (!value->mMarked)
                         {
                             if (auto instruction = dynamic_cast<Instruction*>(value.get()))
                             {
+                                instruction->cleanup();
                                 instruction->eraseFromParent();
                                 ++i; // Don't increment at the end of the loop as we have just erased
                             }
@@ -103,6 +103,7 @@ namespace vipir
 
                 if (basicBlock->exists() && basicBlock->predecessors().empty())
                 {
+                    basicBlock->cleanup();
                     for (auto successor : basicBlock->successors())
                     {
                         std::erase(successor->predecessors(), basicBlock.get());

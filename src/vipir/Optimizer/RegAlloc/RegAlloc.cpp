@@ -128,7 +128,7 @@ namespace vipir
                         bool requireMemory = false;
                         if (auto alloca = dynamic_cast<AllocaInst*>(value.get()))
                         {
-                            if (alloca->mForceMemory) requireMemory = true;
+                            if (alloca->mForceMemoryCount > 0) requireMemory = true;
                         }
                         activeValues.push_back(value.get());
                         std::sort(activeValues.begin(), activeValues.end(), [](Value* a, Value* b){

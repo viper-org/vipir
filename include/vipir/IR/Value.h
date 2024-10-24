@@ -60,6 +60,7 @@ namespace vipir
         virtual std::vector<int> getRegisterSmashes() { return std::vector<int>(); }
 
         virtual bool isCritical() { return false; }
+        virtual void cleanup() {} // In case cleanup needs to be done when instruction is optimized away
     
     protected:
         Module& mModule;

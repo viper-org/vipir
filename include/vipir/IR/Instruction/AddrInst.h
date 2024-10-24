@@ -24,6 +24,8 @@ namespace vipir
 
         void doConstantFold() override;
 
+        void cleanup() override;
+
         Value* getPointer();
 
     protected:

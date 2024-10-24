@@ -23,7 +23,7 @@ namespace vipir
 
         Type* getAllocatedType();
 
-        void forceMemory();
+        int& forceMemoryCount();
 
     protected:
         void emit(lir::Builder& builder) override;
@@ -35,7 +35,7 @@ namespace vipir
         Type* mAllocatedType;
         int mValueId;
 
-        bool mForceMemory;
+        int mForceMemoryCount;
     };
 }
 

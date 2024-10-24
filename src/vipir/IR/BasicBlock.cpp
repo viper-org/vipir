@@ -116,6 +116,14 @@ namespace vipir
         }
     }
 
+    void BasicBlock::cleanup()
+    {
+        for (auto& value : mValueList)
+        {
+            value->cleanup();
+        }
+    }
+
     void BasicBlock::setEmittedValue()
     {
         mEmittedValue = std::make_unique<lir::Lbl>(mName, false);
