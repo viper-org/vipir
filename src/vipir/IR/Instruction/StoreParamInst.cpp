@@ -78,6 +78,7 @@ namespace vipir
         , mAlignStack(alignStack)
     {
         mType = value->getType();
+        mValue->setPreferredRegisterID(mModule.abi()->getParameterRegister(mParamIndex));
         mRequiresVReg = false;
     }
 }

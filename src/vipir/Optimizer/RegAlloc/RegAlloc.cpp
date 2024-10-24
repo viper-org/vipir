@@ -43,7 +43,7 @@ namespace vipir
                 return function->mVirtualRegs.back().get();
             };
 
-            auto getNextFreeVReg = [&virtualRegs, &virtualRegCount, abi, createStackVReg](bool requireMemory, std::vector<VReg*> disallowed){
+            auto getNextFreeVReg = [&virtualRegs, &virtualRegCount, abi, createStackVReg](bool requireMemory, std::vector<VReg*> disallowed, int preferred){
                 if (virtualRegs.empty())
                 {
                     return createStackVReg();
@@ -58,6 +58,19 @@ namespace vipir
                     VReg* vreg = it->second;
                     virtualRegs.erase(it);
                     return vreg;
+                }
+                if (preferred != -1)
+                {
+                    auto it = std::find_if(virtualRegs.begin(), virtualRegs.end(), [preferred, &disallowed](const auto& vreg){
+                        return std::find(disallowed.begin(), disallowed.end(), vreg.second) == disallowed.end() && vreg.second->getPhysicalRegister() == preferred;
+                    });
+                    if (it != virtualRegs.end())
+                    {
+                        VReg* reg = it->second;
+                        virtualRegs.erase(it);
+                        ++reg->mUses;
+                        return reg;
+                    }
                 }
                 auto it = std::find_if(virtualRegs.begin(), virtualRegs.end(), [&disallowed](const auto& vreg){
                     return std::find(disallowed.begin(), disallowed.end(), vreg.second) == disallowed.end();
@@ -134,7 +147,7 @@ namespace vipir
                         std::sort(activeValues.begin(), activeValues.end(), [](Value* a, Value* b){
                                 return a->mInterval.second < b->mInterval.second;
                         });
-                        value->mVReg = getNextFreeVReg(requireMemory, value->mDisallowedVRegs);
+                        value->mVReg = getNextFreeVReg(requireMemory, value->mDisallowedVRegs, value->mPreferredRegisterID);
                     }
                 }
             }

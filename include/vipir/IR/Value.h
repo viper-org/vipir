@@ -50,6 +50,7 @@ namespace vipir
         virtual std::string ident() const = 0;
 
         bool requiresVReg() const { return mRequiresVReg; }
+        void setPreferredRegisterID(int id) { mPreferredRegisterID = id; }
 
         std::string getName(int valueId) const { if (mVReg) return std::format("VREG{}", mVReg->getId()); else return std::format("{}", valueId); }
 
@@ -80,6 +81,7 @@ namespace vipir
         bool mRequiresVReg{true};
         std::vector<opt::VReg*> mDisallowedVRegs;
         bool mRegisterSmashesDone;
+        int mPreferredRegisterID{ -1 };
 
         bool mMarked{ false };
 
