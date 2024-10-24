@@ -7,6 +7,8 @@
 
 #include "vipir/LIR/Instruction/Move.h"
 
+#include <algorithm>
+
 namespace vipir
 {
     void PhiInst::print(std::ostream& stream)
@@ -38,10 +40,13 @@ namespace vipir
     {
         lir::OperandPtr vreg = std::make_unique<lir::VirtualReg>(mVReg, mType->getOperandSize());
 
+        std::vector<BasicBlock*> done;
         for (auto& incoming : mIncoming)
         {
+            if (std::find(done.begin(), done.end(), incoming.second) != done.end()) continue;
             if (incoming.second->exists())
             {
+                done.push_back(incoming.second);
                 auto position = incoming.second->endPosition();
                 position += builder.getInsertsBefore(position);
                 builder.insertValue(std::make_unique<lir::Move>(vreg->clone(), incoming.first->getEmittedValue()), position);

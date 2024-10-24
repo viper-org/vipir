@@ -27,9 +27,9 @@ namespace vipir
             decideValuesStartFrom(function, function->mBasicBlockList.front().get(), {}, {});
         }
 
-        std::unordered_map<AllocaInst*, std::set<BasicBlock*> > Mem2Reg::phiInsertPosition(Function* function)
+        std::map<AllocaInst*, std::set<BasicBlock*> > Mem2Reg::phiInsertPosition(Function* function)
         {
-            std::unordered_map<AllocaInst*, std::set<BasicBlock*> > result;
+            std::map<AllocaInst*, std::set<BasicBlock*> > result;
 
             for (auto variable : function->getAllocaList())
             {
@@ -67,7 +67,7 @@ namespace vipir
             return result;
         }
 
-        void Mem2Reg::insertPhi(std::unordered_map<AllocaInst*, std::set<BasicBlock*> > where)
+        void Mem2Reg::insertPhi(std::map<AllocaInst*, std::set<BasicBlock*> > where)
         {
             for (auto [var, bbs] : where)
             {
@@ -80,9 +80,9 @@ namespace vipir
         }
 
         std::pair<BasicBlock*, Value*> Mem2Reg::decideVariableValue(AllocaInst* var,
-            std::deque<std::unordered_map<AllocaInst*, std::pair<BasicBlock*, Value*> > > current)
+            std::deque<std::map<AllocaInst*, std::pair<BasicBlock*, Value*> > > current)
         {
-            for (auto it = current.rbegin(); it != current.rend(); ++it)
+            for (auto it = current.begin(); it != current.end(); ++it)
             {
                 auto frame = *it;
                 if (frame.find(var) != frame.end()) return frame[var];
@@ -91,7 +91,7 @@ namespace vipir
         }
         
         void Mem2Reg::decideValuesStartFrom(Function* function, BasicBlock* basicBlock, std::set<BasicBlock*> visited,
-            std::deque<std::unordered_map<AllocaInst*, std::pair<BasicBlock*, Value*> > > current)
+            std::deque<std::map<AllocaInst*, std::pair<BasicBlock*, Value*> > > current)
         {
             for (auto& value : basicBlock->mValueList)
             {
@@ -124,7 +124,7 @@ namespace vipir
                     changed = true;
                     auto value = store->mValue;
                     auto ptr = store->mPtr;
-                    if (current.empty()) current.push_back(std::unordered_map<AllocaInst*, std::pair<BasicBlock*, Value*> >());
+                    if (current.empty()) current.push_back(std::map<AllocaInst*, std::pair<BasicBlock*, Value*> >());
                     current.back()[static_cast<AllocaInst*>(ptr)] = std::make_pair(basicBlock, value);
                     store->eraseFromParent();
                 }
@@ -132,13 +132,13 @@ namespace vipir
                 {
                     if (branch->mCondition)
                     {
-                        current.push_back(std::unordered_map<AllocaInst*, std::pair<BasicBlock*, Value*> >());
+                        current.push_front(std::map<AllocaInst*, std::pair<BasicBlock*, Value*> >());
                         decideValuesStartFrom(function, branch->mTrueBranch, visited, current);
-                        current.pop_back();
+                        current.pop_front();
 
-                        current.push_back(std::unordered_map<AllocaInst*, std::pair<BasicBlock*, Value*> >());
+                        current.push_front(std::map<AllocaInst*, std::pair<BasicBlock*, Value*> >());
                         decideValuesStartFrom(function, branch->mFalseBranch, visited, current);
-                        current.pop_back();
+                        current.pop_front();
                     }
                     else
                     {

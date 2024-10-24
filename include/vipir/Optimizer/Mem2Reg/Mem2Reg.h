@@ -9,7 +9,7 @@
 
 #include <set>
 #include <deque>
-#include <unordered_map>
+#include <map>
 
 namespace vipir
 {
@@ -26,13 +26,13 @@ namespace vipir
             void doMem2Reg(Function* function);
 
         private:
-            std::unordered_map<AllocaInst*, std::set<BasicBlock*> > phiInsertPosition(Function* function);
-            void insertPhi(std::unordered_map<AllocaInst*, std::set<BasicBlock*> > where);
+            std::map<AllocaInst*, std::set<BasicBlock*> > phiInsertPosition(Function* function);
+            void insertPhi(std::map<AllocaInst*, std::set<BasicBlock*> > where);
 
             std::pair<BasicBlock*, Value*> decideVariableValue(AllocaInst* var,
-                std::deque<std::unordered_map<AllocaInst*, std::pair<BasicBlock*, Value*> > > current);
+                std::deque<std::map<AllocaInst*, std::pair<BasicBlock*, Value*> > > current);
             void decideValuesStartFrom(Function* function, BasicBlock* basicBlock, std::set<BasicBlock*> visited,
-                std::deque<std::unordered_map<AllocaInst*, std::pair<BasicBlock*, Value*> > > current);
+                std::deque<std::map<AllocaInst*, std::pair<BasicBlock*, Value*> > > current);
 
             void replace(Function* function, Value* old, Value* newValue);
         };
