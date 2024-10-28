@@ -115,6 +115,11 @@ namespace vipir
                     changed = true;
 
                     auto ptr = load->getPointer();
+                    if (auto alloca = dynamic_cast<AllocaInst*>(ptr))
+                    {
+                        if (alloca->forceMemoryCount()) continue;
+                    }
+                    else continue;
                     auto [_, loadValue] = decideVariableValue(static_cast<AllocaInst*>(ptr), current);
                     replace(function, load, loadValue);
                     load->eraseFromParent();
@@ -124,6 +129,11 @@ namespace vipir
                     changed = true;
                     auto value = store->mValue;
                     auto ptr = store->mPtr;
+                    if (auto alloca = dynamic_cast<AllocaInst*>(ptr))
+                    {
+                        if (alloca->forceMemoryCount()) continue;
+                    }
+                    else continue;
                     if (current.empty()) current.push_back(std::map<AllocaInst*, std::pair<BasicBlock*, Value*> >());
                     current.back()[static_cast<AllocaInst*>(ptr)] = std::make_pair(basicBlock, value);
                     store->eraseFromParent();
