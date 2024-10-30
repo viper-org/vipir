@@ -97,9 +97,12 @@ namespace vipir
             {
                 if (auto phi = dynamic_cast<PhiInst*>(value.get()))
                 {
-                    auto [currentFrom, currentValue] = decideVariableValue(phi->mAlloca, current);
-                    phi->addIncoming(currentValue, currentFrom);
-                    current.front()[phi->mAlloca] = std::make_pair(basicBlock, phi);
+                    if (phi->mAlloca) // Only check phis that were created by mem2reg
+                    {
+                        auto [currentFrom, currentValue] = decideVariableValue(phi->mAlloca, current);
+                        phi->addIncoming(currentValue, currentFrom);
+                        current.front()[phi->mAlloca] = std::make_pair(basicBlock, phi);
+                    }
                 }
             }
 
