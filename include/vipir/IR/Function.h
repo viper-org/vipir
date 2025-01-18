@@ -8,6 +8,8 @@
 #ifndef VIPIR_IR_FUNCTION_H
 #define VIPIR_IR_FUNCTION_H 1
 
+#include "vipir/ABI/CallingConvention.h"
+
 #include "vipir/IR/Global.h"
 #include "vipir/IR/Argument.h"
 #include "vipir/IR/BasicBlock.h"
@@ -19,19 +21,29 @@
 namespace vipir
 {
     class AllocaInst;
+
     class Function : public Global
     {
-    friend class Module;
-    friend class IRBuilder;
-    friend class opt::RegAlloc;
-    friend class opt::DeadCodeEliminator;
-    friend class opt::AliasAnalyzer;
-    friend class opt::DominatorAnalyzer;
-    friend class opt::Mem2Reg;
-    using BasicBlockPtr = std::unique_ptr<BasicBlock>;
-    public:
-        static Function* Create(FunctionType* type, Module& module, std::string_view name, bool pure);
+        friend class Module;
 
+        friend class IRBuilder;
+
+        friend class opt::RegAlloc;
+
+        friend class opt::DeadCodeEliminator;
+
+        friend class opt::AliasAnalyzer;
+
+        friend class opt::DominatorAnalyzer;
+
+        friend class opt::Mem2Reg;
+
+        using BasicBlockPtr = std::unique_ptr<BasicBlock>;
+    public:
+        static Function* Create(FunctionType* type, Module& module, std::string_view name, bool pure, const abi::CallingConvention* callingConvention);
+        static Function* Create(FunctionType* type, Module& module, std::string_view name, bool pure); // can't use another parameter in a default parameter
+
+        const abi::CallingConvention* getCallingConvention() const;
         FunctionType* getFunctionType() const;
         Argument* getArgument(int index) const;
         bool usesStack() const;
@@ -53,7 +65,10 @@ namespace vipir
         std::vector<AllocaInst*> getAllocaList();
 
     private:
-        Function(FunctionType* type, Module& module, std::string_view name, bool pure);
+        Function(FunctionType* type, Module& module, std::string_view name, bool pure,
+                 const abi::CallingConvention* callingConvention);
+
+        const abi::CallingConvention* mCallingConvention;
 
         std::string mName;
         std::vector<ArgumentPtr> mArguments;

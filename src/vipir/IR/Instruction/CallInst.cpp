@@ -41,7 +41,7 @@ namespace vipir
     std::vector<std::reference_wrapper<Value*> > CallInst::getOperands()
     {
         std::vector<std::reference_wrapper<Value*> > operands;
-        for (auto& parameter : mParameters)
+        for (auto& parameter: mParameters)
         {
             operands.push_back(parameter);
         }
@@ -52,14 +52,13 @@ namespace vipir
 
     std::vector<int> CallInst::getRegisterSmashes()
     {
-        return mModule.abi()->getCallerSavedRegisters();
+        return mCallingConvention->getCallerSavedRegisters();
     }
 
     bool CallInst::isCritical()
     {
         return !mCalleePure;
     }
-
 
     void CallInst::emit(lir::Builder& builder)
     {
@@ -70,7 +69,7 @@ namespace vipir
 
         builder.addValue(std::make_unique<lir::Call>(std::move(callee)));
 
-        if (mStackRestore > 0)
+        if (mCallingConvention->getStackCleaner() == abi::StackCleaner::Caller && mStackRestore > 0)
         {
             assert(mStackRestore % 16 == 0);
 
@@ -80,18 +79,19 @@ namespace vipir
         }
 
         lir::OperandPtr vreg = std::make_unique<lir::VirtualReg>(mVReg, mType->getOperandSize());
-        lir::OperandPtr returnRegister = std::make_unique<lir::PhysicalReg>(mModule.abi()->getReturnRegister(), mType->getOperandSize());
+        lir::OperandPtr returnRegister = std::make_unique<lir::PhysicalReg>(mCallingConvention->getReturnRegister(), mType->getOperandSize());
         builder.addValue(std::make_unique<lir::Move>(vreg->clone(), std::move(returnRegister)));
         mEmittedValue = std::move(vreg);
     }
 
-    CallInst::CallInst(BasicBlock* parent, Value* callee, std::vector<Value*> parameters, int stackRestore)
-        : Instruction(parent->getModule(), parent)
-        , mCallee(callee)
-        , mParameters(std::move(parameters))
-        , mStackRestore(stackRestore)
-        , mValueId(mModule.getNextValueId())
-        , mCalleePure(false)
+    CallInst::CallInst(BasicBlock* parent, Value* callee, std::vector<Value*> parameters, int stackRestore, const abi::CallingConvention* callingConvention)
+            : Instruction(parent->getModule(), parent)
+            , mCallingConvention(callingConvention)
+            , mCallee(callee)
+            , mParameters(std::move(parameters))
+            , mStackRestore(stackRestore)
+            , mValueId(mModule.getNextValueId())
+            , mCalleePure(false)
     {
         if (auto function = dynamic_cast<Function*>(callee))
         {
@@ -107,7 +107,7 @@ namespace vipir
         mType = functionType->getReturnType();
 
         int index = 0;
-        for (auto parameter : mParameters)
+        for (auto parameter: mParameters)
         {
             assert(parameter->getType() == functionType->getArgumentTypes()[index++]);
         }

@@ -20,12 +20,12 @@ namespace vipir
 
     std::vector<std::reference_wrapper<Value*> > StoreParamInst::getOperands()
     {
-        return {mValue};
+        return { mValue };
     }
 
     std::vector<int> StoreParamInst::getRegisterSmashes()
     {
-        return {mModule.abi()->getParameterRegister(mParamIndex)};
+        return { mCallingConvention->getParameterRegister(mParamIndex) };
     }
 
     bool StoreParamInst::isCritical()
@@ -42,12 +42,11 @@ namespace vipir
     {
     }
 
-
     void StoreParamInst::emit(lir::Builder& builder)
     {
         mValue->lateEmit(builder);
 
-        int regID = mModule.abi()->getParameterRegister(mParamIndex);
+        int regID = mCallingConvention->getParameterRegister(mParamIndex);
         lir::OperandPtr ptr;
         lir::OperandPtr value = mValue->getEmittedValue();
 
@@ -71,14 +70,15 @@ namespace vipir
         }
     }
 
-    StoreParamInst::StoreParamInst(BasicBlock* parent, int paramIndex, Value* value, bool alignStack)
-        : Instruction(parent->getModule(), parent)
-        , mParamIndex(paramIndex)
-        , mValue(value)
-        , mAlignStack(alignStack)
+    StoreParamInst::StoreParamInst(BasicBlock* parent, int paramIndex, Value* value, bool alignStack, const abi::CallingConvention* callingConvention)
+            : Instruction(parent->getModule(), parent)
+            , mCallingConvention(callingConvention)
+            , mParamIndex(paramIndex)
+            , mValue(value)
+            , mAlignStack(alignStack)
     {
         mType = value->getType();
-        mValue->setPreferredRegisterID(mModule.abi()->getParameterRegister(mParamIndex));
+        mValue->setPreferredRegisterID(mCallingConvention->getParameterRegister(mParamIndex));
         mRequiresVReg = false;
     }
 }

@@ -10,7 +10,7 @@ namespace vipir
 {
     namespace abi
     {
-        class SysV : public ABI
+        class SysVCall : public CallingConvention
         {
         public:
             int getReturnRegister() const override;
@@ -18,12 +18,27 @@ namespace vipir
             int getParameterRegister(int index) const override;
             int getParameterRegisterCount() const override;
 
+            std::vector<int> getCallerSavedRegisters() const override;
+            std::vector<int> getCalleeSavedRegisters() const override;
+
+            ArgumentPassingOrder getArgumentPassingOrder() const override;
+            StackCleaner getStackCleaner() const override;
+
+            std::string decorateName(std::string_view name, FunctionType* type) const override;
+        };
+
+        class SysV : public ABI
+        {
+        public:
+            const CallingConvention* getDefaultCallingConvention() const override;
+
             int getStackOffsetRegister() const override;
             int getStackArgumentRegister() const override;
 
             std::vector<int> getGeneralPurposeRegisters() const override;
-            std::vector<int> getCallerSavedRegisters() const override;
-            std::vector<int> getCalleeSavedRegisters() const override;
+
+        private:
+            SysVCall mCallingConvention;
         };
     }
 }

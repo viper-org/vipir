@@ -164,6 +164,7 @@ set(HEADERS
     "include/vipir/LIR/Instruction/EnterFunc.h"
 
     "include/vipir/ABI/ABI.h"
+    "include/vipir/ABI/CallingConvention.h"
     "include/vipir/ABI/SysV.h"
 )
 
