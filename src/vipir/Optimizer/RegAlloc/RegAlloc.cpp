@@ -291,7 +291,8 @@ namespace vipir
 
             const abi::CallingConvention* callingConvention = function->getCallingConvention();
 
-            for (int i = 0; i < callingConvention->getParameterRegisterCount(); ++i)
+            auto iterations = std::min(callingConvention->getParameterRegisterCount(), static_cast<int>(function->mArguments.size()));
+            for (int i = 0; i < iterations; ++i)
             {
                 auto it = std::find_if(virtualRegs.begin(), virtualRegs.end(), [argumentIndex, function](const auto& vreg) {
                     return vreg.second->mPhysicalRegister == function->getCallingConvention()->getParameterRegister(argumentIndex);
@@ -306,11 +307,11 @@ namespace vipir
             {
                 if (callingConvention->getArgumentPassingOrder() == abi::ArgumentPassingOrder::RightToLeft)
                 {
-                    addStackParams(function->mArguments.begin() + callingConvention->getParameterRegisterCount(), function->mArguments.end(), function, abi, activeValues);
+                    addStackParams(function->mArguments.rbegin(), function->mArguments.rend() - callingConvention->getParameterRegisterCount(), function, abi, activeValues);
                 }
                 else if (callingConvention->getArgumentPassingOrder() == abi::ArgumentPassingOrder::LeftToRight)
                 {
-                    addStackParams(function->mArguments.rbegin(), function->mArguments.rend() - callingConvention->getParameterRegisterCount(), function, abi, activeValues);
+                    addStackParams(function->mArguments.begin() + callingConvention->getParameterRegisterCount(), function->mArguments.end(), function, abi, activeValues);
                 }
             }
         }

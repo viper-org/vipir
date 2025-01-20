@@ -324,7 +324,7 @@ namespace vipir
         {
             if (function->getCallingConvention()->getArgumentPassingOrder() == abi::ArgumentPassingOrder::RightToLeft)
             {
-                for (auto it = parameters.begin() + function->getCallingConvention()->getParameterRegisterCount(); it < parameters.end(); ++it)
+                for (auto it = parameters.rbegin(); it < parameters.rend() - function->getCallingConvention()->getParameterRegisterCount(); ++it)
                 {
                     StoreParamInst* store = new StoreParamInst(mInsertPoint, index++, *it, !alignedStack, function->getCallingConvention());
                     stores.push_back(store);
@@ -336,7 +336,7 @@ namespace vipir
             }
             else if (function->getCallingConvention()->getArgumentPassingOrder() == abi::ArgumentPassingOrder::LeftToRight)
             {
-                for (auto it = parameters.rbegin(); it < parameters.rend() - function->getCallingConvention()->getParameterRegisterCount(); ++it)
+                for (auto it = parameters.begin() + function->getCallingConvention()->getParameterRegisterCount(); it < parameters.end(); ++it)
                 {
                     StoreParamInst* store = new StoreParamInst(mInsertPoint, index++, *it, !alignedStack, function->getCallingConvention());
                     stores.push_back(store);
@@ -346,10 +346,6 @@ namespace vipir
                     insertAfter = store;
                 }
             }
-        }
-
-        for (auto parameter: parameters)
-        {
         }
 
         CallInst* call = new CallInst(mInsertPoint, function, stores, stackRestore, function->getCallingConvention());

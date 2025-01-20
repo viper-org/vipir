@@ -34,11 +34,62 @@
 
 #include <iostream>
 #include <fstream>
+#include <sstream>
+
+class FreakyCallingConvention : public vipir::abi::CallingConvention
+{
+public:
+    int getReturnRegister() const override
+    {
+        return 8;
+    }
+
+    int getParameterRegister(int index) const override
+    {
+        constexpr std::array registers { 2, 1, 3 };
+
+        if (index >= registers.size()) return -1;
+
+        return registers[index];
+    }
+
+    int getParameterRegisterCount() const override
+    {
+        return 3;
+    }
+
+    std::vector<int> getCallerSavedRegisters() const override
+    {
+        return { 0, 1, 2, 6, 7, 8, 9, 10, 11 };
+    }
+
+    std::vector<int> getCalleeSavedRegisters() const override
+    {
+        return { 3, 12, 13, 14, 15 };
+    }
+
+    vipir::abi::ArgumentPassingOrder getArgumentPassingOrder() const override
+    {
+        return vipir::abi::ArgumentPassingOrder::LeftToRight;
+    }
+
+    vipir::abi::StackCleaner getStackCleaner() const override
+    {
+        return vipir::abi::StackCleaner::Callee;
+    }
+
+    std::string decorateName(std::string_view name, vipir::FunctionType* type) const override
+    {
+        return std::format("freaky_{}", name);
+    }
+};
 
 int main()
 {
     vipir::Module mod("test.tst");
     mod.setABI<vipir::abi::SysV>();
+
+    FreakyCallingConvention freakyCall;
 
     vipir::IRBuilder builder;
 
@@ -48,8 +99,10 @@ int main()
     auto voidType = vipir::Type::GetVoidType();
     auto boolType = vipir::Type::GetBooleanType();
 
-    auto func1 = vipir::Function::Create(vipir::FunctionType::Create(i32Type, {i32Type}), mod, "main", false);
+    auto func1 = vipir::Function::Create(vipir::FunctionType::Create(i32Type, { i32Type }), mod, "main", false);
+    auto func2 = vipir::Function::Create(vipir::FunctionType::Create(voidType, { i32Type, i32Type, i32Type, i32Type, i32Type, i32Type, i32Type, i32Type }), mod, "test", false, &freakyCall);
     auto entrybb = vipir::BasicBlock::Create("", func1);
+    auto entrybb2 = vipir::BasicBlock::Create("", func2);
 
     builder.setInsertPoint(entrybb);
 
@@ -58,15 +111,20 @@ int main()
     builder.CreateStore(alloca, val);
     auto addr = builder.CreateAddrOf(alloca);
 
+    builder.CreateCall(func2, { vipir::ConstantInt::Get(mod, 1, i32Type), vipir::ConstantInt::Get(mod, 2, i32Type), vipir::ConstantInt::Get(mod, 3, i32Type), vipir::ConstantInt::Get(mod, 4, i32Type), vipir::ConstantInt::Get(mod, 5, i32Type), vipir::ConstantInt::Get(mod, 6, i32Type), vipir::ConstantInt::Get(mod, 7, i32Type), vipir::ConstantInt::Get(mod, 8, i32Type) });
+
     builder.CreateRet(builder.CreateLoad(alloca));
 
+    builder.setInsertPoint(entrybb2);
+    builder.CreateRet(nullptr);
+
     mod.setOutputFormat(vipir::OutputFormat::ELF);
-    mod.getPassManager().insertBefore(vipir::PassType::LIREmission, std::make_unique<vipir::opt::Mem2RegPass>());
-    mod.getPassManager().insertBefore(vipir::PassType::LIREmission, std::make_unique<vipir::opt::DCEPass>());
-    mod.getPassManager().insertBefore(vipir::PassType::DeadCodeElimination, std::make_unique<vipir::ConstantFoldingPass>());
-    mod.getPassManager().insertAfter(vipir::PassType::LIREmission, std::make_unique<vipir::opt::PeepholePass>());
 
-    //mod.print(std::cout);
+    std::ofstream freakyCode("test");
 
-    mod.emit(std::cout);
+    mod.emit(freakyCode);
+
+    mod.printLIR(std::cout);
+
+    //mod.emit(std::cout);
 }
