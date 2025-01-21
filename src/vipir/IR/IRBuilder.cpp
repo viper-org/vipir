@@ -50,16 +50,14 @@ namespace vipir
     }
 
 
-
     RetInst* IRBuilder::CreateRet(Value* returnValue)
     {
-        RetInst* ret = new RetInst(mInsertPoint, returnValue);
+        RetInst* ret = new RetInst(mInsertPoint, returnValue, mInsertPoint->getParent()->getCallingConvention()); // calling convention of current function should be all good
 
         mInsertPoint->insertValue(mInsertAfter, ret);
 
         return ret;
     }
-
 
 
     AllocaInst* IRBuilder::CreateAlloca(Type* allocatedType)
@@ -70,7 +68,6 @@ namespace vipir
 
         return alloca;
     }
-
 
 
     StoreInst* IRBuilder::CreateStore(Value* ptr, Value* value)
@@ -108,6 +105,7 @@ namespace vipir
 
         return gep;
     }
+
     GEPInst* IRBuilder::CreateStructGEP(Value* ptr, int index)
     {
         GEPInst* gep = new GEPInst(mInsertPoint, ptr, ConstantInt::Get(mInsertPoint->getModule(), index, Type::GetIntegerType(32)));
@@ -116,7 +114,6 @@ namespace vipir
 
         return gep;
     }
-
 
 
     BinaryInst* IRBuilder::CreateAdd(Value* left, Value* right)
@@ -255,7 +252,6 @@ namespace vipir
     }
 
 
-
     BranchInst* IRBuilder::CreateBr(BasicBlock* destination)
     {
         BranchInst* branch = new BranchInst(mInsertPoint, destination);
@@ -299,19 +295,24 @@ namespace vipir
         int index = 0;
         bool alignedStack = true;
         int stackRestore = 0;
-        if (parameters.size() >= mInsertPoint->getModule().abi()->getParameterRegisterCount())
+
+        if (function->getCallingConvention()->getStackCleaner() == abi::StackCleaner::Caller)
         {
-            stackRestore = 8 * (parameters.size() - mInsertPoint->getModule().abi()->getParameterRegisterCount());
-            stackRestore = (stackRestore + 15) & ~15; // align to 16 bytes
-            if ((parameters.size() - mInsertPoint->getModule().abi()->getParameterRegisterCount()) % 2 != 0) // misaligned stack
-                alignedStack = false;
+            if (parameters.size() >= function->getCallingConvention()->getParameterRegisterCount())
+            {
+                stackRestore = 8 * (parameters.size() - function->getCallingConvention()->getParameterRegisterCount());
+                stackRestore = (stackRestore + 15) & ~15; // align to 16 bytes
+                if ((parameters.size() - function->getCallingConvention()->getParameterRegisterCount()) % 2 != 0) // misaligned stack
+                    alignedStack = false;
+            }
         }
 
         Value* insertAfter = mInsertAfter;
         std::vector<Value*> stores;
-        for (auto parameter : parameters)
+
+        for (int i = 0; i < function->getCallingConvention()->getParameterRegisterCount(); ++i)
         {
-            StoreParamInst* store = new StoreParamInst(mInsertPoint, index++, parameter, !alignedStack);
+            StoreParamInst* store = new StoreParamInst(mInsertPoint, index++, parameters[i], !alignedStack, function->getCallingConvention());
             stores.push_back(store);
             if (!alignedStack)
                 alignedStack = true;
@@ -319,9 +320,37 @@ namespace vipir
             insertAfter = store;
         }
 
-        CallInst* call = new CallInst(mInsertPoint, function, stores, stackRestore);
+        if (parameters.size() > function->getCallingConvention()->getParameterRegisterCount())
+        {
+            if (function->getCallingConvention()->getArgumentPassingOrder() == abi::ArgumentPassingOrder::RightToLeft)
+            {
+                for (auto it = parameters.rbegin(); it < parameters.rend() - function->getCallingConvention()->getParameterRegisterCount(); ++it)
+                {
+                    StoreParamInst* store = new StoreParamInst(mInsertPoint, index++, *it, !alignedStack, function->getCallingConvention());
+                    stores.push_back(store);
+                    if (!alignedStack)
+                        alignedStack = true;
+                    mInsertPoint->insertValue(insertAfter, store);
+                    insertAfter = store;
+                }
+            }
+            else if (function->getCallingConvention()->getArgumentPassingOrder() == abi::ArgumentPassingOrder::LeftToRight)
+            {
+                for (auto it = parameters.begin() + function->getCallingConvention()->getParameterRegisterCount(); it < parameters.end(); ++it)
+                {
+                    StoreParamInst* store = new StoreParamInst(mInsertPoint, index++, *it, !alignedStack, function->getCallingConvention());
+                    stores.push_back(store);
+                    if (!alignedStack)
+                        alignedStack = true;
+                    mInsertPoint->insertValue(insertAfter, store);
+                    insertAfter = store;
+                }
+            }
+        }
 
-        for (auto store : stores)
+        CallInst* call = new CallInst(mInsertPoint, function, stores, stackRestore, function->getCallingConvention());
+
+        for (auto store: stores)
         {
             static_cast<StoreParamInst*>(store)->mCall = call;
         }

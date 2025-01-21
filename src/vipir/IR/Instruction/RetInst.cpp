@@ -34,7 +34,7 @@ namespace vipir
 
     std::vector<std::reference_wrapper<Value*> > RetInst::getOperands()
     {
-        if (mReturnValue) return {mReturnValue};
+        if (mReturnValue) return { mReturnValue };
         else return {};
     }
 
@@ -52,24 +52,24 @@ namespace vipir
     {
     }
 
-
     void RetInst::emit(lir::Builder& builder)
     {
         mParent->endPosition() = builder.getPosition();
-        
+
         if (mReturnValue)
         {
             mReturnValue->lateEmit(builder);
 
-            lir::OperandPtr returnRegister = std::make_unique<lir::PhysicalReg>(mModule.abi()->getReturnRegister(), mReturnValue->getType()->getOperandSize());
+            lir::OperandPtr returnRegister = std::make_unique<lir::PhysicalReg>(mCallingConvention->getReturnRegister(), mReturnValue->getType()->getOperandSize());
             builder.addValue(std::make_unique<lir::Move>(std::move(returnRegister), mReturnValue->getEmittedValue()));
         }
         builder.addValue(std::make_unique<lir::Ret>(mParent->getParent()->usesStack(), mParent->getParent()->getCalleeSaved()));
     }
 
-    RetInst::RetInst(BasicBlock* parent, Value* returnValue)
-        : Instruction(parent->getModule(), parent)
-        , mReturnValue(returnValue)
+    RetInst::RetInst(BasicBlock* parent, Value* returnValue, const abi::CallingConvention* callingConvention)
+            : Instruction(parent->getModule(), parent)
+            , mCallingConvention(callingConvention)
+            , mReturnValue(returnValue)
     {
         mRequiresVReg = false;
         if (!mReturnValue)
@@ -78,7 +78,7 @@ namespace vipir
         }
         else
         {
-            mReturnValue->setPreferredRegisterID(mModule.abi()->getReturnRegister());
+            mReturnValue->setPreferredRegisterID(mCallingConvention->getReturnRegister());
             assert(mReturnValue->getType() == mParent->getParent()->getFunctionType()->getReturnType());
         }
     }

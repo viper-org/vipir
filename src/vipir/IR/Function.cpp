@@ -25,13 +25,23 @@
 
 namespace vipir
 {
-    Function* Function::Create(FunctionType* type, Module& module, std::string_view name, bool pure)
+    Function* Function::Create(FunctionType* type, Module& module, std::string_view name, bool pure, const abi::CallingConvention* callingConvention)
     {
-        Function* func = new Function(type, module, name, pure);
+        Function* func = new Function(type, module, name, pure, callingConvention);
 
         module.insertGlobal(func);
 
         return func;
+    }
+
+    Function* Function::Create(FunctionType* type, Module& module, std::string_view name, bool pure)
+    {
+        return Function::Create(type, module, name, pure, module.abi()->getDefaultCallingConvention());
+    }
+
+    const abi::CallingConvention* Function::getCallingConvention() const
+    {
+        return mCallingConvention;
     }
 
     FunctionType* Function::getFunctionType() const
@@ -72,7 +82,7 @@ namespace vipir
         if (!mBasicBlockList.empty())
         {
             stream << "{\n";
-            for (auto& basicBlock : mBasicBlockList)
+            for (auto& basicBlock: mBasicBlockList)
             {
                 basicBlock->print(stream);
             }
@@ -87,7 +97,7 @@ namespace vipir
 
     void Function::doConstantFold()
     {
-        for (auto& basicBlock : mBasicBlockList)
+        for (auto& basicBlock: mBasicBlockList)
         {
             basicBlock->doConstantFold();
         }
@@ -116,28 +126,28 @@ namespace vipir
         }
 
         builder.addValue(std::make_unique<lir::Label>(mName, true));
-        
+
         builder.addValue(std::make_unique<lir::EnterFunc>(mTotalStackOffset, mCalleeSaved));
         mEnterFuncNode = builder.getValues().back().get();
 
         lir::Builder newBuilder;
 
-        for (auto& basicBlock : mBasicBlockList)
+        for (auto& basicBlock: mBasicBlockList)
         {
             basicBlock->setEmittedValue();
         }
 
-        for (auto& argument : mArguments)
+        for (auto& argument: mArguments)
         {
             argument->emit(newBuilder);
         }
 
-        for (auto& basicBlock : mBasicBlockList)
+        for (auto& basicBlock: mBasicBlockList)
         {
             basicBlock->emit(newBuilder);
         }
 
-        for (auto& value : newBuilder.getValues())
+        for (auto& value: newBuilder.getValues())
         {
             if (auto ret = dynamic_cast<lir::Ret*>(value.get()))
             {
@@ -154,9 +164,9 @@ namespace vipir
     std::vector<AllocaInst*> Function::getAllocaList()
     {
         std::vector<AllocaInst*> ret;
-        for (auto& basicBlock : mBasicBlockList)
+        for (auto& basicBlock: mBasicBlockList)
         {
-            for (auto& value : basicBlock->mValueList)
+            for (auto& value: basicBlock->mValueList)
             {
                 if (auto alloca = dynamic_cast<AllocaInst*>(value.get())) ret.push_back(alloca);
             }
@@ -164,30 +174,30 @@ namespace vipir
         return ret;
     }
 
-    Function::Function(FunctionType* type, Module& module, std::string_view name, bool pure)
-        : Global(module)
-        , mName(name)
-        , mTotalStackOffset(0)
-        , mHasCallNodes(false)
-        , mIsPure(pure)
+    Function::Function(FunctionType* type, Module& module, std::string_view name, bool pure, const abi::CallingConvention* callingConvention)
+            : Global(module)
+            , mCallingConvention(callingConvention)
+            , mName(callingConvention->decorateName(name, type))
+            , mTotalStackOffset(0)
+            , mHasCallNodes(false)
+            , mIsPure(pure)
     {
         mType = type;
 
         int index = 0;
-        for (auto type : getFunctionType()->getArgumentTypes())
+        for (auto type: getFunctionType()->getArgumentTypes())
         {
             std::string id = std::to_string(module.getNextValueId());
             mArguments.push_back(std::make_unique<Argument>(module, type, std::move(id), index++));
         }
     }
 
-
     void Function::setCalleeSaved()
     {
         if (mBasicBlockList.empty()) return;
         mCalleeSaved.clear();
-        std::vector<int> abiCalleeSaved = mModule.abi()->getCalleeSavedRegisters();
-        for (auto& vreg : mVirtualRegs)
+        std::vector<int> abiCalleeSaved = mCallingConvention->getCalleeSavedRegisters();
+        for (auto& vreg: mVirtualRegs)
         {
             if (!vreg->onStack() && vreg->getUses() > 0)
             {
@@ -204,7 +214,7 @@ namespace vipir
         node->setStackSize(mTotalStackOffset);
         node->setCalleeSaved(mCalleeSaved);
         node->setSaveFramePointer(mHasCallNodes);
-        for (auto node : mRetNodes)
+        for (auto node: mRetNodes)
         {
             lir::Ret* ret = static_cast<lir::Ret*>(node);
             ret->setLeave(mTotalStackOffset > 0);

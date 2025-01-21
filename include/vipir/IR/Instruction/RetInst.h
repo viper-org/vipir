@@ -8,13 +8,16 @@
 #ifndef VIPIR_IR_INSTRUCTION_RET_INST_H
 #define VIPIR_IR_INSTRUCTION_RET_INST_H 1
 
+#include "vipir/ABI/CallingConvention.h"
+
 #include "vipir/IR/Instruction/Instruction.h"
 
 namespace vipir
 {
     class RetInst : public Instruction
     {
-    friend class IRBuilder;
+        friend class IRBuilder;
+
     public:
         void print(std::ostream& stream) override;
 
@@ -29,8 +32,9 @@ namespace vipir
         std::string ident() const override;
 
     private:
-        RetInst(BasicBlock* parent, Value* returnValue);
+        RetInst(BasicBlock* parent, Value* returnValue, const abi::CallingConvention* callingConvention);
 
+        const abi::CallingConvention* mCallingConvention;
         Value* mReturnValue;
     };
 }
