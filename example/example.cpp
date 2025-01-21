@@ -36,7 +36,7 @@
 #include <fstream>
 #include <sstream>
 
-class FreakyCallingConvention : public vipir::abi::CallingConvention
+class ExampleCallingConvention : public vipir::abi::CallingConvention
 {
 public:
     int getReturnRegister() const override
@@ -89,7 +89,7 @@ int main()
     vipir::Module mod("test.tst");
     mod.setABI<vipir::abi::SysV>();
 
-    FreakyCallingConvention freakyCall;
+    ExampleCallingConvention callingConvention;
 
     vipir::IRBuilder builder;
 
@@ -100,7 +100,7 @@ int main()
     auto boolType = vipir::Type::GetBooleanType();
 
     auto func1 = vipir::Function::Create(vipir::FunctionType::Create(i32Type, { i32Type }), mod, "main", false);
-    auto func2 = vipir::Function::Create(vipir::FunctionType::Create(voidType, { i32Type, i32Type, i32Type, i32Type, i32Type, i32Type, i32Type, i32Type }), mod, "test", false, &freakyCall);
+    auto func2 = vipir::Function::Create(vipir::FunctionType::Create(voidType, { i32Type, i32Type, i32Type, i32Type, i32Type, i32Type, i32Type, i32Type }), mod, "test", false, &callingConvention);
     auto entrybb = vipir::BasicBlock::Create("", func1);
     auto entrybb2 = vipir::BasicBlock::Create("", func2);
 
@@ -120,9 +120,9 @@ int main()
 
     mod.setOutputFormat(vipir::OutputFormat::ELF);
 
-    std::ofstream freakyCode("test");
+    std::ofstream exampleCode("test");
 
-    mod.emit(freakyCode);
+    mod.emit(exampleCode);
 
     mod.printLIR(std::cout);
 
