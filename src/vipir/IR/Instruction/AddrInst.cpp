@@ -58,7 +58,9 @@ namespace vipir
         mPtr->lateEmit(builder);
 
         lir::OperandPtr ptr = mPtr->getEmittedValue();
-        if (dynamic_cast<AllocaInst*>(mPtr))
+
+        // This might be needed?
+        if (false) //if (dynamic_cast<AllocaInst*>(mPtr))
         {
             mEmittedValue = std::move(ptr);
             return;
@@ -79,7 +81,7 @@ namespace vipir
 
         if (auto alloca = dynamic_cast<AllocaInst*>(mPtr))
         {
-            mRequiresVReg = false;
+            //mRequiresVReg = false;
             alloca->forceMemoryCount()++;
         }
         if (auto func = dynamic_cast<Function*>(mPtr))
