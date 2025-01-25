@@ -310,7 +310,7 @@ namespace vipir
         Value* insertAfter = mInsertAfter;
         std::vector<Value*> stores;
 
-        for (int i = 0; i < function->getCallingConvention()->getParameterRegisterCount(); ++i)
+        for (int i = 0; i < function->getCallingConvention()->getParameterRegisterCount() && i < function->mArguments.size(); ++i)
         {
             StoreParamInst* store = new StoreParamInst(mInsertPoint, index++, parameters[i], !alignedStack, function->getCallingConvention());
             stores.push_back(store);
