@@ -31,6 +31,7 @@ namespace vipir
         virtual bool isPointerType()  const { return false; }
         virtual bool isStructType()   const { return false; }
         virtual bool isArrayType()    const { return false; }
+        virtual bool isBooleanType()  const { return false; }
 
         static Type* GetIntegerType(int bits);
         static Type* GetVoidType();

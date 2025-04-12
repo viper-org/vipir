@@ -60,8 +60,12 @@ namespace vipir
         , mValueId(mModule.getNextValueId())
     {
         assert(destType->isIntegerType());
-        assert(mValue->getType()->isIntegerType());
-        assert(mValue->getType()->getSizeInBits() < destType->getSizeInBits());
+        assert(mValue->getType()->isIntegerType() || mValue->getType()->isBooleanType());
+        
+        if (mValue->getType()->isIntegerType())
+        {
+            assert(mValue->getType()->getSizeInBits() < destType->getSizeInBits());
+        }
 
         mType = destType;
     }

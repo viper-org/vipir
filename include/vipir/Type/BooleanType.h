@@ -16,6 +16,8 @@ namespace vipir
     {
     public:
         BooleanType();
+
+        virtual bool isBooleanType() const;
     };
 }
 

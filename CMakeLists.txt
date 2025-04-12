@@ -47,6 +47,7 @@ set(SOURCES
     "src/vipir/IR/Instruction/IntToPtrInst.cpp"
     "src/vipir/IR/Instruction/PtrToIntInst.cpp"
     "src/vipir/IR/Instruction/PhiInst.cpp"
+    "src/vipir/IR/Instruction/BoolToIntInst.cpp"
 
     "src/vipir/Type/Type.cpp"
     "src/vipir/Type/IntegerType.cpp"
@@ -126,6 +127,7 @@ set(HEADERS
     "include/vipir/IR/Instruction/IntToPtrInst.h"
     "include/vipir/IR/Instruction/PtrToIntInst.h"
     "include/vipir/IR/Instruction/PhiInst.h"
+    "include/vipir/IR/Instruction/BoolToIntInst.h"
 
     "include/vipir/Type/Type.h"
     "include/vipir/Type/IntegerType.h"
