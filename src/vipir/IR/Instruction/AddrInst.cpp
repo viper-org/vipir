@@ -59,8 +59,7 @@ namespace vipir
 
         lir::OperandPtr ptr = mPtr->getEmittedValue();
 
-        // This might be needed?
-        if (false) //if (dynamic_cast<AllocaInst*>(mPtr))
+        if (dynamic_cast<AllocaInst*>(mPtr))
         {
             mEmittedValue = std::move(ptr);
             return;
