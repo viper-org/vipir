@@ -15,6 +15,7 @@ namespace vipir
     class Argument : public Value
     {
     friend class Function;
+    friend class opt::RegAlloc;
     public:
         Argument(Module& module, Type* type, std::string&& name, int index);
 
@@ -29,6 +30,9 @@ namespace vipir
     private:
         std::string mName;
         int mIdx;
+
+        // In case we cannot use the physical register of this argument
+        opt::VReg* mMoveTo;
     };
 
     using ArgumentPtr = std::unique_ptr<Argument>;

@@ -94,7 +94,12 @@ namespace vipir
                 });
             };
 
-            setArguments(function, abi, activeValues, virtualRegs);
+            auto arguments = setArguments(function, abi, activeValues, virtualRegs);
+            for (auto argument : arguments)
+            {
+                argument->mMoveTo = getNextFreeVReg(false, argument->mDisallowedVRegs, -1);
+            }
+
             std::sort(activeValues.begin(), activeValues.end(), [](Value* a, Value* b) {
                 return a->mInterval.second < b->mInterval.second;
             });
@@ -157,6 +162,11 @@ namespace vipir
         void RegAlloc::setLiveIntervals(Function* function)
         {
             int index = 0;
+
+            for (auto& argument : function->mArguments)
+            {
+                argument->mInterval.first = 0;
+            }
 
             for (auto& basicBlock: function->mBasicBlockList)
             {
@@ -286,8 +296,10 @@ namespace vipir
             function->mTotalStackOffset = (offset + 15) & ~15; // Align to 16 bytes
         }
 
-        void RegAlloc::setArguments(Function* function, abi::ABI* abi, std::vector<Value*>& activeValues, std::map<int, VReg*>& virtualRegs)
+        std::vector<Argument*> RegAlloc::setArguments(Function* function, abi::ABI* abi, std::vector<Value*>& activeValues, std::map<int, VReg*>& virtualRegs)
         {
+            std::vector<Argument*> todo;
+
             int argumentIndex = 0;
 
             const abi::CallingConvention* callingConvention = function->getCallingConvention();
@@ -299,6 +311,12 @@ namespace vipir
                     return vreg.second->mPhysicalRegister == function->getCallingConvention()->getParameterRegister(argumentIndex);
                 });
                 ++argumentIndex;
+                auto& disallowed = function->mArguments[i]->mDisallowedVRegs;
+                if (std::find(disallowed.begin(), disallowed.end(), it->second) != disallowed.end())
+                {
+                    todo.push_back(function->mArguments[i].get());
+                }
+
                 function->mArguments[i]->mVReg = it->second;
                 virtualRegs.erase(it);
                 activeValues.push_back(function->mArguments[i].get());
@@ -315,6 +333,8 @@ namespace vipir
                     addStackParams(function->mArguments.begin() + callingConvention->getParameterRegisterCount(), function->mArguments.end(), function, abi, activeValues);
                 }
             }
+
+            return todo;
         }
     }
 }

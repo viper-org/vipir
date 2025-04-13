@@ -271,6 +271,16 @@ namespace vipir
                 mEmittedValue = std::make_unique<lir::Immediate>(mConstantFoldedValue);
                 return;
             }
+            if (dynamic_cast<lir::Immediate*>(left.get()))
+            {
+                // Flip the operator as the instruction order will be flipped
+                // eg 1 < x == x > 1
+                if (op == lir::CMP::Operator::LT)      op = lir::CMP::Operator::GT;
+                else if (op == lir::CMP::Operator::GT) op = lir::CMP::Operator::LT;
+                else if (op == lir::CMP::Operator::LE) op = lir::CMP::Operator::GE;
+                else if (op == lir::CMP::Operator::GE) op = lir::CMP::Operator::LE;
+                std::swap(left, right);
+            }
             builder.addValue(std::make_unique<lir::Compare>(std::move(left), op, std::move(right)));
             mEmittedValue = std::make_unique<lir::CMP>(op);
         };

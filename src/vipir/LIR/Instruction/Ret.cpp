@@ -37,9 +37,16 @@ namespace vipir
                 builder.addValue(std::make_unique<instruction::PopInstruction>(std::move(reg)));
             }
 
-            if (mLeave || !mCalleeSaved.empty())
+            if (!mCalleeSaved.empty())
             {
-                builder.addValue(std::make_unique<instruction::LeaveInstruction>());
+                if (mLeave)
+                    builder.addValue(std::make_unique<instruction::LeaveInstruction>());
+                else
+                {
+                    instruction::OperandPtr rsp = instruction::Register::Get("rsp");
+                    instruction::OperandPtr stackOffset = std::make_unique<instruction::Immediate>(8);
+                    builder.addValue(std::make_unique<instruction::AddInstruction>(std::move(rsp), std::move(stackOffset)));
+                }
             }
             else
             {

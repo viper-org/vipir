@@ -55,7 +55,7 @@ namespace vipir
                 }
             }
 
-            void setArguments(Function* function, abi::ABI* abi, std::vector<Value*>& activeValues, std::map<int, VReg*>& virtualRegs);
+            std::vector<Argument*> setArguments(Function* function, abi::ABI* abi, std::vector<Value*>& activeValues, std::map<int, VReg*>& virtualRegs);
         };
     }
 }

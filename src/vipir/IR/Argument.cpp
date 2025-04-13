@@ -6,6 +6,7 @@
 #include "vipir/Module.h"
 
 #include "vipir/LIR/Operand.h"
+#include "vipir/LIR/Instruction/Move.h"
 
 #include "vasm/instruction/operand/Register.h"
 
@@ -15,6 +16,7 @@ namespace vipir
         : Value(module)
         , mName(std::move(name))
         , mIdx(index)
+        , mMoveTo(nullptr)
     {
         mType = type;
     }
@@ -32,8 +34,15 @@ namespace vipir
     {
     }
 
-    void Argument::emit(lir::Builder&)
+    void Argument::emit(lir::Builder& builder)
     {
-        mEmittedValue = std::make_unique<lir::VirtualReg>(mVReg, mType->getOperandSize());
+        if (mMoveTo)
+        {
+            auto source = std::make_unique<lir::VirtualReg>(mVReg, mType->getOperandSize());
+            mEmittedValue = std::make_unique<lir::VirtualReg>(mMoveTo, mType->getOperandSize());
+            builder.addValue(std::make_unique<lir::Move>(mEmittedValue->clone(), std::move(source)));
+        }
+        else
+            mEmittedValue = std::make_unique<lir::VirtualReg>(mVReg, mType->getOperandSize());
     }
 }
