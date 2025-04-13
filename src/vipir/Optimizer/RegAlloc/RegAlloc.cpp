@@ -206,7 +206,8 @@ namespace vipir
                     for (auto operandR: value->getOperands())
                     {
                         auto operand = operandR.get();
-                        operand->mInterval.second = std::max(operand->mInterval.second, value->mInterval.first);
+                        operand->mInterval.first = std::min(operand->mInterval.first, bb->mInterval.first);
+                        operand->mInterval.second = std::max(operand->mInterval.second, value->mId);
                         live.push_back(operand);
                     }
                     value->mInterval.first = value->mId;
