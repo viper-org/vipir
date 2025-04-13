@@ -78,7 +78,17 @@ namespace vipir
 
     void Function::print(std::ostream& stream)
     {
-        stream << std::format("\n\nfunction @{}() -> {} ", mName, getFunctionType()->getReturnType()->getName());
+        stream << std::format("\n\nfunction @{}(", mName);
+        if (!mArguments.empty())
+        {
+            for (int i = 0; i < mArguments.size()-1; ++i)
+            {
+                stream << std::format("{} {}, ", mArguments[i]->mType->getName(), mArguments[i]->ident());
+            }
+            stream << std::format("{} {}", mArguments.back()->mType->getName(), mArguments.back()->ident());
+        }
+        stream << std::format(") -> {} ", getFunctionType()->getReturnType()->getName());
+
         if (!mBasicBlockList.empty())
         {
             stream << "{\n";

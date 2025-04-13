@@ -17,7 +17,7 @@ namespace vipir
 {
     void PtrToIntInst::print(std::ostream& stream)
     {
-        stream << std::format("ptrtoint {} -> {} %{}", mValue->ident(), mType->getName(), getName(mValueId));
+        stream << std::format("%{} = ptrtoint {} -> {}", getName(mValueId), mValue->ident(), mType->getName());
     }
 
     std::string PtrToIntInst::ident() const

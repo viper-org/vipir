@@ -29,7 +29,7 @@ namespace vipir
                 operatorName = "not";
                 break;
         }
-        stream << std::format("{} %{}, {}", operatorName, getName(mValueId), mOperand->ident());
+        stream << std::format("%{} = {} {}", getName(mValueId), operatorName, mOperand->ident());
     }
 
     std::string UnaryInst::ident() const

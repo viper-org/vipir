@@ -12,7 +12,7 @@ namespace vipir
 {
     void AllocaInst::print(std::ostream& stream)
     {
-        stream << std::format("alloca {}: {}", getName(mValueId), mAllocatedType->getName());
+        stream << std::format("%{} = alloca {}", getName(mValueId), mAllocatedType->getName());
     }
 
     Type* AllocaInst::getAllocatedType()

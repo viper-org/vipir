@@ -45,6 +45,7 @@ namespace vipir
         void setInsertPoint(BasicBlock* newInsertPoint);
         BasicBlock* getInsertPoint();
 
+        void insertAtFront();
         void insertAfter(Value* value);
 
 

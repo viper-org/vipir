@@ -27,7 +27,7 @@ namespace vipir
         }
         else
         {
-            stream << std::format("branch if {}, {}, {}", mCondition->ident(), mTrueBranch->ident(), mFalseBranch->ident());
+            stream << std::format("branch if {} ? {} : {}", mCondition->ident(), mTrueBranch->ident(), mFalseBranch->ident());
         }
     }
 
@@ -51,12 +51,15 @@ namespace vipir
             {
                 std::erase(mFalseBranch->predecessors(), mParent);
                 std::erase(mParent->successors(), mFalseBranch);
+                mFalseBranch = nullptr;
             }
             else
             {
                 std::erase(mTrueBranch->predecessors(), mParent);
                 std::erase(mParent->successors(), mTrueBranch);
+                mTrueBranch = nullptr;
             }
+            mIsConstantFolded = true;
         }
     }
 
@@ -70,7 +73,12 @@ namespace vipir
     {
         mParent->endPosition() = builder.getPosition();
 
-        if (!mFalseBranch) // Unconditional branch won't have a false branch
+        if (mIsConstantFolded && !mTrueBranch)
+        {
+            builder.addValue(std::make_unique<lir::Jump>(mFalseBranch->getEmittedValue()));
+        }
+
+        if (!mFalseBranch) // Unconditional/constant folded branch won't have a false branch
         {
             builder.addValue(std::make_unique<lir::Jump>(mTrueBranch->getEmittedValue()));
         }

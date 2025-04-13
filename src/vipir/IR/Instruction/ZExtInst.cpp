@@ -15,7 +15,7 @@ namespace vipir
 {
     void ZExtInst::print(std::ostream& stream)
     {
-        stream << std::format("zext {} -> {} %{}", mValue->ident(), mType->getName(), getName(mValueId));
+        stream << std::format("%{} = zext {} -> {}", getName(mValueId), mValue->ident(), mType->getName());
     }
 
     std::string ZExtInst::ident() const

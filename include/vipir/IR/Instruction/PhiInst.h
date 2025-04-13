@@ -15,6 +15,7 @@ namespace vipir
     class PhiInst : public Instruction
     {
     friend class IRBuilder;
+    friend class BasicBlock;
     friend class opt::RegAlloc;
     friend class opt::Mem2Reg;
     public:
@@ -28,6 +29,7 @@ namespace vipir
 
     protected:
         void emit(lir::Builder& builder) override;
+        void setEmittedValue();
         std::string ident() const override;
 
     private:

@@ -82,7 +82,7 @@ namespace vipir
                 operatorName = "cmp ge";
                 break;
         }
-        stream << std::format("{} %{}, {}, {}", operatorName, getName(mValueId), mLeft->ident(), mRight->ident());
+        stream << std::format("%{} = {} {}, {}", getName(mValueId), operatorName, mLeft->ident(), mRight->ident());
     }
 
     std::string BinaryInst::ident() const

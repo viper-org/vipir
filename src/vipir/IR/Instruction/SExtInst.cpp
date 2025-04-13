@@ -18,7 +18,7 @@ namespace vipir
 {
     void SExtInst::print(std::ostream& stream)
     {
-        stream << std::format("sext {} -> {} %{}", mValue->ident(), mType->getName(), getName(mValueId));
+        stream << std::format("%{} = sext {} -> {}", getName(mValueId), mValue->ident(), mType->getName());
     }
 
     std::string SExtInst::ident() const

@@ -18,7 +18,7 @@ namespace vipir
 {
     void TruncInst::print(std::ostream& stream)
     {
-        stream << std::format("trunc {} -> {} %{}", mValue->ident(), mType->getName(), getName(mValueId));
+        stream << std::format("%{} = trunc {} -> {}", getName(mValueId), mValue->ident(), mType->getName());
     }
 
     std::string TruncInst::ident() const

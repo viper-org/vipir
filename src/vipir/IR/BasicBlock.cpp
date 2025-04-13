@@ -3,6 +3,8 @@
 #include "vipir/IR/BasicBlock.h"
 #include "vipir/IR/Function.h"
 
+#include "vipir/IR/Instruction/PhiInst.h"
+
 #include "vipir/Module.h"
 
 #include "vipir/LIR/Label.h"
@@ -136,7 +138,16 @@ namespace vipir
             builder.addValue(std::make_unique<lir::Label>(mName, false));
             for (auto& value : mValueList)
             {
-                value->emit(builder);
+                auto phi = dynamic_cast<PhiInst*>(value.get());
+                if (!phi)
+                    value->emit(builder);
+                else
+                    phi->setEmittedValue();
+            }
+            for (auto& value : mValueList)
+            {
+                if (dynamic_cast<PhiInst*>(value.get()))
+                    value->emit(builder);
             }
         }
     }

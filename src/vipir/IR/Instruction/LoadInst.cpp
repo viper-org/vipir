@@ -24,7 +24,7 @@ namespace vipir
 {
     void LoadInst::print(std::ostream& stream)
     {
-        stream << std::format("load {} %{}, {}", mType->getName(), getName(mValueId), mPtr->ident());
+        stream << std::format("%{} = load {}", getName(mValueId), mPtr->ident());
     }
 
     Value* LoadInst::getPointer()

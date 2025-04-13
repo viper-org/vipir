@@ -30,7 +30,7 @@ namespace vipir
 {
     void GEPInst::print(std::ostream& stream)
     {
-        stream << std::format("gep %{}, {}, {}", getName(mValueId), mPtr->ident(), mOffset->ident());
+        stream << std::format("%{} = gep {}, {}", getName(mValueId), mPtr->ident(), mOffset->ident());
     }
 
     std::string GEPInst::ident() const

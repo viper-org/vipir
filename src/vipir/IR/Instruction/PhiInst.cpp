@@ -38,8 +38,6 @@ namespace vipir
 
     void PhiInst::emit(lir::Builder& builder)
     {
-        lir::OperandPtr vreg = std::make_unique<lir::VirtualReg>(mVReg, mType->getOperandSize());
-
         std::vector<BasicBlock*> done;
         for (auto& incoming : mIncoming)
         {
@@ -49,15 +47,19 @@ namespace vipir
                 done.push_back(incoming.second);
                 auto position = incoming.second->endPosition();
                 position += builder.getInsertsBefore(position);
-                builder.insertValue(std::make_unique<lir::Move>(vreg->clone(), incoming.first->getEmittedValue()), position);
+                builder.insertValue(std::make_unique<lir::Move>(mEmittedValue->clone(), incoming.first->getEmittedValue()), position);
             }
         }
-        mEmittedValue = std::move(vreg);
+    }
+
+    void PhiInst::setEmittedValue()
+    {
+        mEmittedValue = std::make_unique<lir::VirtualReg>(mVReg, mType->getOperandSize());
     }
 
     std::string PhiInst::ident() const
     {
-        return getName(mValueId);
+        return "%" + getName(mValueId);
     }
 
     void PhiInst::doConstantFold()
