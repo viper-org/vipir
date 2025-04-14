@@ -42,7 +42,7 @@ namespace vipir
         std::vector<BasicBlock*>& predecessors();
         BasicBlock*& loopEnd();
         bool exists();
-        int& endPosition();
+        lir::Value*& endNode();
 
         void print(std::ostream& stream) override;
         std::string ident() const override;
@@ -79,7 +79,7 @@ namespace vipir
 
         bool mExists;
 
-        int mEndPosition { -1 }; // for phi nodes
+        lir::Value* mEndNode; // for phi nodes
     };
 }
 

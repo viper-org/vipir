@@ -17,11 +17,11 @@ namespace vipir
         {
         public:
             void addValue(ValuePtr value);
-            void insertValue(ValuePtr value, int position);
+            void insertValue(ValuePtr value, Value* after);
             void setSection(SectionType sect);
 
+            lir::Value* getLastNode();
             int getPosition();
-            int getInsertsBefore(int position);
 
             std::vector<ValuePtr>& getValues();
 

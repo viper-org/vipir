@@ -228,6 +228,7 @@ namespace vipir
         {
             lir::Ret* ret = static_cast<lir::Ret*>(node);
             ret->setLeave(mTotalStackOffset > 0);
+            ret->setStackSize(mTotalStackOffset);
             ret->setCalleeSaved(mCalleeSaved);
             ret->setSaveFramePointer(mHasCallNodes);
         }

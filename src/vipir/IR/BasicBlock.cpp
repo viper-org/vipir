@@ -89,9 +89,13 @@ namespace vipir
         return mExists;
     }
 
-    int& BasicBlock::endPosition()
+    //int& BasicBlock::endPosition()
+    //{
+    //    return mEndPosition;
+    //}
+    lir::Value*& BasicBlock::endNode()
     {
-        return mEndPosition;
+        return mEndNode;
     }
 
     void BasicBlock::print(std::ostream& stream)

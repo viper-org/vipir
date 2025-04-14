@@ -27,7 +27,7 @@ namespace vipir
 
     std::string AllocaInst::ident() const
     {
-        return std::format("{} {}", mType->getName(), getName(mValueId));
+        return std::format("{} %{}", mType->getName(), getName(mValueId));
     }
 
     void AllocaInst::doConstantFold()
@@ -46,6 +46,6 @@ namespace vipir
         , mForceMemoryCount(0)
     {
         mType = Type::GetPointerType(mAllocatedType);
-        if (mAllocatedType->isStructType()) mForceMemoryCount = 1; // Structs cannot fit inside a register
+        if (mAllocatedType->isStructType() || mAllocatedType->isArrayType()) mForceMemoryCount = 1; // Structs cannot fit inside a register
     }
 }

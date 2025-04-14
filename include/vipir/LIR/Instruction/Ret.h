@@ -20,11 +20,13 @@ namespace vipir
 
             void setLeave(bool leave);
             void setCalleeSaved(std::vector<int> calleeSaved);
+            void setStackSize(int stackSize);
             void setSaveFramePointer(bool saveFramePointer);
 
         private:
             bool mLeave;
             std::vector<int> mCalleeSaved;
+            int mStackSize;
             bool mSaveFramePointer;
         };
     }

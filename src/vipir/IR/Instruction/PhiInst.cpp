@@ -45,9 +45,7 @@ namespace vipir
             if (incoming.second->exists())
             {
                 done.push_back(incoming.second);
-                auto position = incoming.second->endPosition();
-                position += builder.getInsertsBefore(position);
-                builder.insertValue(std::make_unique<lir::Move>(mEmittedValue->clone(), incoming.first->getEmittedValue()), position);
+                builder.insertValue(std::make_unique<lir::Move>(mEmittedValue->clone(), incoming.first->getEmittedValue()), incoming.second->endNode());
             }
         }
     }

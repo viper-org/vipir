@@ -37,7 +37,27 @@ namespace vipir
                 builder.addValue(std::make_unique<instruction::PopInstruction>(std::move(reg)));
             }
 
-            if (!mCalleeSaved.empty())
+            if (mStackSize)
+            {
+                instruction::OperandPtr rsp = instruction::Register::Get("rsp");
+                instruction::OperandPtr stackOffset = std::make_unique<instruction::Immediate>(mStackSize);
+                builder.addValue(std::make_unique<instruction::AddInstruction>(std::move(rsp), std::move(stackOffset)));
+            }
+            if (mSaveFramePointer)
+            {
+                if (mStackSize)
+                {
+                    builder.addValue(std::make_unique<instruction::LeaveInstruction>());
+                }
+                else
+                {
+                    instruction::OperandPtr rsp = instruction::Register::Get("rsp");
+                    instruction::OperandPtr stackOffset = std::make_unique<instruction::Immediate>(8);
+                    builder.addValue(std::make_unique<instruction::AddInstruction>(std::move(rsp), std::move(stackOffset)));
+                }
+            }
+
+            /*if (!mCalleeSaved.empty())
             {
                 if (mLeave)
                     builder.addValue(std::make_unique<instruction::LeaveInstruction>());
@@ -61,7 +81,7 @@ namespace vipir
                         builder.addValue(std::make_unique<instruction::AddInstruction>(std::move(rsp), std::move(stackOffset)));
                     }
                 }
-            }
+            }*/
 
             builder.addValue(std::make_unique<instruction::RetInstruction>());
         }
@@ -74,6 +94,11 @@ namespace vipir
         void Ret::setCalleeSaved(std::vector<int> calleeSaved)
         {
             mCalleeSaved = std::move(calleeSaved);
+        }
+
+        void Ret::setStackSize(int stackSize)
+        {
+            mStackSize = stackSize;
         }
 
         void Ret::setSaveFramePointer(bool saveFramePointer)
