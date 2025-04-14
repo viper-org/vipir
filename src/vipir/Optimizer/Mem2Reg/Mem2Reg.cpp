@@ -20,6 +20,8 @@ namespace vipir
     {
         void Mem2Reg::doMem2Reg(Function* function)
         {
+            if (function->mBasicBlockList.empty()) return;
+    
             DominatorAnalyzer dom;
             dom.computeDominanceFrontiers(function);
             auto wherePhi = phiInsertPosition(function);
