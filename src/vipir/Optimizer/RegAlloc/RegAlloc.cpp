@@ -174,6 +174,7 @@ namespace vipir
                 for (auto& value: basicBlock->mValueList)
                 {
                     value->mInterval.first = index;
+                    value->mInterval.second = index+1;
                     value->mId = index;
                     index++;
                 }
@@ -199,6 +200,7 @@ namespace vipir
                         {
                             live.push_back(incomingIt->first);
                         }
+                        live.push_back(phi);
                     }
                 }
 
