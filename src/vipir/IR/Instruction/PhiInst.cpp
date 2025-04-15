@@ -46,8 +46,13 @@ namespace vipir
             if (std::find(done.begin(), done.end(), incoming.second) != done.end()) continue;
             if (incoming.second->exists())
             {
+                if (incoming.first == this) continue;
+
                 done.push_back(incoming.second);
-                builder.insertValue(std::make_unique<lir::Move>(mEmittedValue->clone(), incoming.first->getEmittedValue()), incoming.second->endNode());
+                auto value = std::make_unique<lir::Move>(mEmittedValue->clone(), incoming.first->getEmittedValue());
+                auto ptr = value.get();
+                builder.insertValue(std::move(value), incoming.second->endNode());
+                incoming.second->endNode() = ptr;
             }
         }
     }

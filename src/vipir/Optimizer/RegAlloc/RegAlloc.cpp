@@ -200,7 +200,7 @@ namespace vipir
                         {
                             live.push_back(incomingIt->first);
                         }
-                        live.push_back(phi);
+                        //live.push_back(phi);
                     }
                 }
 
