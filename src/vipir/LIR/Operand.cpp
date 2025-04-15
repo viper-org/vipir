@@ -98,9 +98,10 @@ namespace vipir
         }
 
 
-        VirtualReg::VirtualReg(opt::VReg* vreg, codegen::OperandSize size)
+        VirtualReg::VirtualReg(opt::VReg* vreg, codegen::OperandSize size, bool pointer)
             : mVreg(vreg)
             , mSize(size)
+            , mPointer(pointer)
         {
         }
 
@@ -116,7 +117,7 @@ namespace vipir
 
         OperandPtr VirtualReg::clone()
         {
-            return std::make_unique<VirtualReg>(mVreg, mSize);
+            return std::make_unique<VirtualReg>(mVreg, mSize, mPointer);
         }
         
         bool VirtualReg::operator==(OperandPtr& other)
@@ -140,6 +141,11 @@ namespace vipir
         codegen::OperandSize VirtualReg::size()
         {
             return mSize;
+        }
+
+        bool& VirtualReg::pointer()
+        {
+            return mPointer;
         }
 
 
@@ -284,7 +290,7 @@ namespace vipir
             {
                 assert(mem->getIndex() == nullptr);
                 assert(mem->getScale().value_or(0) == 0);
-                base = std::make_unique<instruction::Register>(mem->getBase()->getID(), mem->getBase()->getSize());
+                base = mem->getBase()->clone(mem->getBase()->getSize());
                 if (mem->getDisplacement())
                 {
                     if (displacement) *displacement += *mem->getDisplacement();

@@ -4,6 +4,7 @@
 #include "vipir/LIR/Instruction/Move.h"
 
 #include "vasm/instruction/singleOperandInstruction/SetccInstruction.h"
+#include "vasm/instruction/twoOperandInstruction/LeaInstruction.h"
 #include "vipir/MC/CmpOperand.h"
 
 #include "vasm/instruction/twoOperandInstruction/MovInstruction.h"
@@ -84,6 +85,14 @@ namespace vipir
                 instruction::OperandPtr reg = std::make_unique<instruction::Register>(11, mRight->size());
                 builder.addValue(std::make_unique<instruction::MovInstruction>(reg->clone(), std::move(right)));
                 right = std::move(reg);
+            }
+            if (auto vreg = dynamic_cast<VirtualReg*>(mRight.get()))
+            {
+                if (vreg->pointer())
+                {
+                    builder.addValue(std::make_unique<instruction::LeaInstruction>(std::move(left), std::move(right), mLeft->size()));
+                    return;
+                }
             }
             builder.addValue(std::make_unique<instruction::MovInstruction>(std::move(left), std::move(right), mLeft->size()));
         }

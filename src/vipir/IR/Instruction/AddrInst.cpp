@@ -61,6 +61,8 @@ namespace vipir
 
         if (dynamic_cast<AllocaInst*>(mPtr))
         {
+            lir::VirtualReg* vreg = static_cast<lir::VirtualReg*>(ptr.get());
+            vreg->pointer() = true;
             mEmittedValue = std::move(ptr);
             return;
         }
@@ -80,7 +82,7 @@ namespace vipir
 
         if (auto alloca = dynamic_cast<AllocaInst*>(mPtr))
         {
-            //mRequiresVReg = false;
+            mRequiresVReg = false;
             alloca->forceMemoryCount()++;
         }
         if (auto func = dynamic_cast<Function*>(mPtr))

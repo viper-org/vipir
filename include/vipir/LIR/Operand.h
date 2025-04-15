@@ -88,7 +88,7 @@ namespace vipir
         friend class opt::PeepholeV2;
         friend class PhysicalReg;
         public:
-            VirtualReg(opt::VReg* reg, codegen::OperandSize size);
+            VirtualReg(opt::VReg* reg, codegen::OperandSize size, bool pointer = false);
 
             std::string ident() const override;
             instruction::OperandPtr asmOperand() override;
@@ -97,9 +97,12 @@ namespace vipir
             bool isMemory() override;
             codegen::OperandSize size() override;
 
+            bool& pointer();
+
         private:
             opt::VReg* mVreg;
             codegen::OperandSize mSize;
+            bool mPointer;
         };
 
         class Lbl : public Operand

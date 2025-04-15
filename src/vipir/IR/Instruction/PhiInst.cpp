@@ -47,18 +47,7 @@ namespace vipir
             if (incoming.second->exists())
             {
                 done.push_back(incoming.second);
-                lir::ValuePtr value;
-                // This is really hacky, maybe find a better way to do it?
-                // All of alloca/addr stuff needs to be reworked really
-                if (dynamic_cast<AddrInst*>(incoming.first))
-                {
-                    value = std::make_unique<lir::LoadAddress>(mEmittedValue->clone(), incoming.first->getEmittedValue());
-                }
-                else
-                {
-                    value = std::make_unique<lir::Move>(mEmittedValue->clone(), incoming.first->getEmittedValue());
-                }
-                builder.insertValue(std::move(value), incoming.second->endNode());
+                builder.insertValue(std::make_unique<lir::Move>(mEmittedValue->clone(), incoming.first->getEmittedValue()), incoming.second->endNode());
             }
         }
     }
