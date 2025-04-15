@@ -3,9 +3,11 @@
 #include "vipir/IR/Instruction/PhiInst.h"
 #include "vipir/IR/BasicBlock.h"
 
+#include "vipir/IR/Instruction/AddrInst.h"
 #include "vipir/Module.h"
 
 #include "vipir/LIR/Instruction/Move.h"
+#include "vipir/LIR/Instruction/LoadAddress.h"
 
 #include <algorithm>
 
@@ -45,7 +47,18 @@ namespace vipir
             if (incoming.second->exists())
             {
                 done.push_back(incoming.second);
-                builder.insertValue(std::make_unique<lir::Move>(mEmittedValue->clone(), incoming.first->getEmittedValue()), incoming.second->endNode());
+                lir::ValuePtr value;
+                // This is really hacky, maybe find a better way to do it?
+                // All of alloca/addr stuff needs to be reworked really
+                if (dynamic_cast<AddrInst*>(incoming.first))
+                {
+                    value = std::make_unique<lir::LoadAddress>(mEmittedValue->clone(), incoming.first->getEmittedValue());
+                }
+                else
+                {
+                    value = std::make_unique<lir::Move>(mEmittedValue->clone(), incoming.first->getEmittedValue());
+                }
+                builder.insertValue(std::move(value), incoming.second->endNode());
             }
         }
     }

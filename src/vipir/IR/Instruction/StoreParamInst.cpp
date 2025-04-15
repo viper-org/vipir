@@ -4,6 +4,8 @@
 
 #include "vipir/IR/BasicBlock.h"
 
+#include "vipir/IR/Instruction/AddrInst.h"
+#include "vipir/LIR/Instruction/LoadAddress.h"
 #include "vipir/Module.h"
 
 #include "vipir/LIR/Instruction/Move.h"
@@ -61,7 +63,15 @@ namespace vipir
         if (regID != -1)
         {
             ptr = std::make_unique<lir::PhysicalReg>(regID, mValue->getType()->getOperandSize());
-            builder.addValue(std::make_unique<lir::Move>(std::move(ptr), std::move(value)));
+            // See phi inst for why this is done
+            if (dynamic_cast<AddrInst*>(mValue))
+            {
+                builder.addValue(std::make_unique<lir::LoadAddress>(std::move(ptr), std::move(value)));
+            }
+            else
+            {
+                builder.addValue(std::make_unique<lir::Move>(std::move(ptr), std::move(value)));
+            }
         }
         else
         {
