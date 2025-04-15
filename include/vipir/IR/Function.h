@@ -42,6 +42,8 @@ namespace vipir
     public:
         static Function* Create(FunctionType* type, Module& module, std::string_view name, bool pure, const abi::CallingConvention* callingConvention);
         static Function* Create(FunctionType* type, Module& module, std::string_view name, bool pure); // can't use another parameter in a default parameter
+        
+        void replaceAllUsesWith(Value* old, Value* newValue);
 
         const abi::CallingConvention* getCallingConvention() const;
         FunctionType* getFunctionType() const;

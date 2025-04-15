@@ -24,6 +24,7 @@ namespace vipir
         void doConstantFold() override;
 
         std::vector<std::reference_wrapper<Value*> > getOperands() override;
+        void eraseFromParent() override;
 
         void addIncoming(Value* value, BasicBlock* basicBlock);
 

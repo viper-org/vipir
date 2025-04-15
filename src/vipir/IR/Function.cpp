@@ -38,6 +38,28 @@ namespace vipir
     {
         return Function::Create(type, module, name, pure, module.abi()->getDefaultCallingConvention());
     }
+    
+    void Function::replaceAllUsesWith(Value* old, Value* newValue)
+    {
+        std::vector<Value*> done;
+        for (auto& bb : mBasicBlockList)
+        {
+            for (auto& value : bb->mValueList)
+            {
+                //if (std::find(done.begin(), done.end(), value.get()) == done.end())
+                {
+                    done.push_back(value.get());
+                    for (auto operand : value->getOperands())
+                    {
+                        if (operand == old)
+                        {
+                            operand.get() = newValue;
+                        }
+                    }
+                }
+            }
+        }
+    }
 
     const abi::CallingConvention* Function::getCallingConvention() const
     {

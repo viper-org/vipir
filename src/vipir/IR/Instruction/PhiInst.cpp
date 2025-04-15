@@ -32,6 +32,13 @@ namespace vipir
         }
         return operands;
     }
+    
+    void PhiInst::eraseFromParent()
+    {
+        std::erase(mParent->mPhis, this);
+        
+        Instruction::eraseFromParent();
+    }
 
     void PhiInst::addIncoming(Value* value, BasicBlock* basicBlock)
     {
