@@ -281,6 +281,8 @@ namespace vipir
 
             instruction::RegisterPtr base;
             std::optional<int> displacement = mDisplacement;
+            instruction::RegisterPtr index = nullptr;
+            std::optional<int> scale = mScale;
 
             if (auto reg = dynamic_cast<instruction::Register*>(baseOperand.get()))
             {
@@ -288,8 +290,18 @@ namespace vipir
             }
             else if (auto mem = dynamic_cast<instruction::Memory*>(baseOperand.get()))
             {
-                assert(mem->getIndex() == nullptr);
-                assert(mem->getScale().value_or(0) == 0);
+                if (mIndex == nullptr && mScale.value_or(0) == 0)
+                {
+                    if (mem->getIndex())
+                        index = mem->getIndex()->clone(mem->getIndex()->getSize());
+                    scale = mem->getScale();
+                }
+                else
+                {
+                    assert(mem->getIndex() == nullptr);
+                    //assert(mem->getScale().value_or(0) == 0);
+                }
+
                 base = mem->getBase()->clone(mem->getBase()->getSize());
                 if (mem->getDisplacement())
                 {
@@ -298,7 +310,6 @@ namespace vipir
                 }
             }
 
-            instruction::RegisterPtr index = nullptr;
             if (mIndex)
             {
                 instruction::OperandPtr indexOperand = mIndex->asmOperand();
@@ -313,7 +324,7 @@ namespace vipir
                 }
             }
 
-            return std::make_unique<instruction::Memory>(std::move(base), displacement, std::move(index), mScale);
+            return std::make_unique<instruction::Memory>(std::move(base), displacement, std::move(index), scale);
         }
 
         OperandPtr Memory::clone()

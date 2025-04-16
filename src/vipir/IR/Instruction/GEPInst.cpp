@@ -98,6 +98,8 @@ namespace vipir
         codegen::OperandSize size = static_cast<PointerType*>(mType)->getBaseType()->getOperandSize();
         
         lir::OperandPtr mem = std::make_unique<lir::Memory>(mType->getOperandSize(), std::move(ptr), displacement, std::move(offset), scale);
+        mEmittedValue = std::move(mem);
+        return;
         builder.addValue(std::make_unique<lir::LoadAddress>(vreg->clone(), std::move(mem)));
         mEmittedValue = std::move(vreg);
     }
