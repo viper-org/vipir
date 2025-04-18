@@ -35,6 +35,8 @@ namespace vipir
     class PtrToIntInst;
     class PhiInst;
 
+    class EmitDebugInfo;
+
     class ConstantBool;
 
     class IRBuilder
@@ -104,6 +106,9 @@ namespace vipir
 
 
         ConstantBool* CreateConstantBool(bool value);
+
+
+        EmitDebugInfo* CreateDebugInfo(int line, int col);
 
     private:
         BasicBlock* mInsertPoint;

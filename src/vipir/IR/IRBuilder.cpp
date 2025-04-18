@@ -2,6 +2,7 @@
 
 #include "vipir/IR/IRBuilder.h"
 #include "vipir/IR/BasicBlock.h"
+#include "vipir/IR/Debug/EmitDebugInfo.h"
 #include "vipir/IR/Function.h"
 
 #include "vipir/IR/Instruction/RetInst.h"
@@ -432,5 +433,15 @@ namespace vipir
         mInsertPoint->insertValue(mInsertAfter, constantBool);
 
         return constantBool;
+    }
+
+
+    EmitDebugInfo* IRBuilder::CreateDebugInfo(int line, int col)
+    {
+        EmitDebugInfo* info = new EmitDebugInfo(mInsertPoint->getModule(), line, col);
+
+        mInsertPoint->insertValue(mInsertAfter, info);
+
+        return info;
     }
 }
