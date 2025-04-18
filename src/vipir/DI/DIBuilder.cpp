@@ -391,7 +391,7 @@ namespace vipir
         writeULEB128(1, ".debug_line");
         // source filename
         mOpcodeBuilder->createInstruction(".debug_line")
-            .immediate(getLineStringPosition("test.tst"))
+            .immediate(getLineStringPosition(mFilename))
             .emit();
         
         // header length
