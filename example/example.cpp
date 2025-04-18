@@ -115,13 +115,15 @@ int main()
 
     builder.setInsertPoint(entrybb);
 
+    builder.CreateDebugInfo(2, 5);
     auto alloca = builder.CreateAlloca(i32Type);
     auto val = vipir::ConstantInt::Get(mod, 5, i32Type);
     builder.CreateStore(alloca, val);
-    auto addr = builder.CreateAddrOf(alloca);
+    //auto addr = builder.CreateAddrOf(alloca);
 
     //auto call = builder.CreateCall(func2, { vipir::ConstantInt::Get(mod, 1, i32Type), vipir::ConstantInt::Get(mod, 2, i32Type), vipir::ConstantInt::Get(mod, 3, i32Type), vipir::ConstantInt::Get(mod, 4, i32Type), vipir::ConstantInt::Get(mod, 5, i32Type), vipir::ConstantInt::Get(mod, 6, i32Type), vipir::ConstantInt::Get(mod, 7, i32Type), vipir::ConstantInt::Get(mod, 8, i32Type) });
 
+    builder.CreateDebugInfo(5, 5);
     auto ret = builder.CreateRet(builder.CreateLoad(alloca));
 
     //builder.setInsertPoint(entrybb2);
@@ -131,14 +133,8 @@ int main()
     //auto voidDbgType = diBuilder.createDebugType("void", vipir::Type::GetVoidType(), DW_ATE_void);
 
     diBuilder.setDebugType(func1, intDbgType);
-    //diBuilder.setDebugType(func2, voidDbgType);
 
     diBuilder.setSourceInfo(func1, 1, 3, 6, 1);
-    //diBuilder.setSourceInfo(func2, 8, 3, 10, 1);
-    diBuilder.setSourceInfo(alloca, 2, 5);
-    //diBuilder.setSourceInfo(call, 4, 5);
-    diBuilder.setSourceInfo(ret, 5, 5);
-    //diBuilder.setSourceInfo(ret2, 9, 5);
 
     diBuilder.createDebugVariable("x", func1, alloca, intDbgType, 4, 8);
 

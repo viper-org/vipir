@@ -107,6 +107,33 @@ namespace vipir
         }
     }
 
+    static inline int PhysicalToDwarfRegister(int id)
+    {
+        switch (id)
+        {
+            case 0: return 0; // rax
+            case 1: return 2; // rcx
+            case 2: return 1; // rdx
+            case 3: return 3; // rbx
+            case 4: return 7; // rsp
+            case 5: return 6; // rbp
+            case 6: return 4; // rsi
+            case 7: return 5; // rdi
+
+            // r8-r15
+            case 8:
+            case 9:
+            case 10:
+            case 11:
+            case 12:
+            case 13:
+            case 14:
+            case 15:
+                return id;
+        }
+        return -1;
+    }
+
 
     std::uint32_t DIBuilder::getStringPosition(std::string str)
     {
@@ -633,6 +660,12 @@ namespace vipir
                             variableInfo.info.push_back(ULEB128(2));
                             variableInfo.info.push_back((uint8_t)DW_OP_fbreg);
                             variableInfo.info.push_back(SLEB128(-vreg->mVreg->getStackOffset() - 16));
+                        }
+                        else
+                        {
+                            variableInfo.info.push_back(ULEB128(2));
+                            variableInfo.info.push_back((uint8_t)DW_OP_regx);
+                            variableInfo.info.push_back(ULEB128(PhysicalToDwarfRegister(vreg->mVreg->getPhysicalRegister())));
                         }
                     }
                     // TODO: Potential other locations here
