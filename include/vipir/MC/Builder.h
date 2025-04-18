@@ -9,8 +9,26 @@
 
 namespace vipir
 {
+    class DIBuilder;
+
     namespace MC
     {
+        class EmitSourceInfo : public instruction::Value
+        {
+        friend class vipir::DIBuilder;
+        public:
+            EmitSourceInfo(int line, int col);
+
+            virtual void emit(codegen::OpcodeBuilder& builder, codegen::Section section) override;
+            virtual void print(std::ostream& stream) override;
+
+        private:
+            int mLine;
+            int mCol;
+
+            int mAddress{ -1 };
+        };
+
         class Builder
         {
         public:
@@ -19,9 +37,11 @@ namespace vipir
             void addValue(instruction::ValuePtr value);
 
             std::vector<instruction::ValuePtr>& getValues();
+            std::vector<EmitSourceInfo*>& getSourceInfo();
 
         private:
             std::vector<instruction::ValuePtr> mValues;
+            std::vector<EmitSourceInfo*> mSourceInfo;
         };
     }
 }

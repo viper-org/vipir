@@ -183,6 +183,11 @@ namespace vipir
             return codegen::OperandSize::None;
         }
 
+        std::string Lbl::getName()
+        {
+            return mName;
+        }
+
 
         CMP::CMP(Operator op)
             : mOperator(op)

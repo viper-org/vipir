@@ -4,12 +4,30 @@
 
 #include <algorithm>
 #include <cassert>
+#include <format>
 #include <iostream>
 
 namespace vipir
 {
     namespace lir
     {
+        EmitSourceInfo::EmitSourceInfo(int line, int col)
+            : mLine(line)
+            , mCol(col)
+        {
+        }
+
+        void EmitSourceInfo::print(std::ostream& stream) const
+        {
+            stream << std::format("SourceInfo - {}:{}", mLine, mCol);
+        }
+
+        void EmitSourceInfo::emit(MC::Builder& builder)
+        {
+            builder.addValue(std::make_unique<MC::EmitSourceInfo>(mLine, mCol));
+        }
+
+
         void Builder::addValue(ValuePtr value)
         {
             mValues.push_back(std::move(value));

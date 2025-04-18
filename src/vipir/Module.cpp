@@ -181,20 +181,24 @@ namespace vipir
 
     void Module::lirCodegen()
     {
-        MC::Builder mcBuilder;
         for (auto& value : mBuilder.getValues())
         {
-            value->emit(mcBuilder);
+            value->emit(mInstructionBuilder);
         }
 
-        codegen::OpcodeBuilder opcodeBuilder = codegen::OpcodeBuilder(mOutputFormat.get(), mName);
+        mOpcodeBuilder = codegen::OpcodeBuilder(mOutputFormat.get(), mName);
 
-        for (const auto& value : mcBuilder.getValues())
+        for (const auto& value : mInstructionBuilder.getValues())
         {
-            value->emit(opcodeBuilder, opcodeBuilder.getSection());
+            value->emit(mOpcodeBuilder, mOpcodeBuilder.getSection());
         }
 
-        opcodeBuilder.patchForwardLabels();
+        mOpcodeBuilder.patchForwardLabels();
+    }
+
+    void Module::generateDebugInfo(DIBuilder* builder)
+    {
+        builder->generateDwarf(mInstructionBuilder, mOpcodeBuilder);
     }
 
     void Module::emit(std::ostream& stream)

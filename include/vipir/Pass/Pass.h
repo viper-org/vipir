@@ -20,6 +20,8 @@ namespace vipir
         LIREmission,
         LIRCodegen,
 
+        DebugInfoEmission,
+
         DeadCodeElimination,
         PeepholeOptimization,
         ConstantFolding,

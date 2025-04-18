@@ -20,6 +20,7 @@
 #include "vipir/IR/Instruction/SExtInst.h"
 #include "vipir/IR/Instruction/ZExtInst.h"
 #include "vipir/IR/Instruction/PhiInst.h"
+#include "vipir/IR/Instruction/RetInst.h"
 
 #include "vipir/Optimizer/Peephole/PeepholeV2.h"
 #include "vipir/Optimizer/RegAlloc/RegAlloc.h"
@@ -32,8 +33,10 @@
 
 #include "vipir/ABI/SysV.h"
 
+#include <dwarf.h>
 #include <iostream>
 #include <fstream>
+#include <filesystem>
 #include <sstream>
 
 class ExampleCallingConvention : public vipir::abi::CallingConvention
@@ -80,7 +83,7 @@ public:
 
     std::string decorateName(std::string_view name, vipir::FunctionType* type) const override
     {
-        return std::format("freaky_{}", name);
+        return std::format("test_{}", name);
     }
 };
 
@@ -88,6 +91,12 @@ int main()
 {
     vipir::Module mod("test.tst");
     mod.setABI<vipir::abi::SysV>();
+    
+    vipir::DIBuilder diBuilder(mod);
+    diBuilder.setFilename("test.tst");
+    diBuilder.setDirectory(std::filesystem::current_path().string());
+    diBuilder.setProducer("Example vipIR project");
+    mod.getPassManager().addPass(std::make_unique<vipir::DebugInfoEmissionPass>(&diBuilder));
 
     ExampleCallingConvention callingConvention;
 
@@ -100,9 +109,9 @@ int main()
     auto boolType = vipir::Type::GetBooleanType();
 
     auto func1 = vipir::Function::Create(vipir::FunctionType::Create(i32Type, { i32Type }), mod, "main", false);
-    auto func2 = vipir::Function::Create(vipir::FunctionType::Create(voidType, { i32Type, i32Type, i32Type, i32Type, i32Type, i32Type, i32Type, i32Type }), mod, "test", false, &callingConvention);
+    //auto func2 = vipir::Function::Create(vipir::FunctionType::Create(voidType, { i32Type, i32Type, i32Type, i32Type, i32Type, i32Type, i32Type, i32Type }), mod, "test", false, &callingConvention);
     auto entrybb = vipir::BasicBlock::Create("", func1);
-    auto entrybb2 = vipir::BasicBlock::Create("", func2);
+    //auto entrybb2 = vipir::BasicBlock::Create("", func2);
 
     builder.setInsertPoint(entrybb);
 
@@ -111,12 +120,27 @@ int main()
     builder.CreateStore(alloca, val);
     auto addr = builder.CreateAddrOf(alloca);
 
-    builder.CreateCall(func2, { vipir::ConstantInt::Get(mod, 1, i32Type), vipir::ConstantInt::Get(mod, 2, i32Type), vipir::ConstantInt::Get(mod, 3, i32Type), vipir::ConstantInt::Get(mod, 4, i32Type), vipir::ConstantInt::Get(mod, 5, i32Type), vipir::ConstantInt::Get(mod, 6, i32Type), vipir::ConstantInt::Get(mod, 7, i32Type), vipir::ConstantInt::Get(mod, 8, i32Type) });
+    //auto call = builder.CreateCall(func2, { vipir::ConstantInt::Get(mod, 1, i32Type), vipir::ConstantInt::Get(mod, 2, i32Type), vipir::ConstantInt::Get(mod, 3, i32Type), vipir::ConstantInt::Get(mod, 4, i32Type), vipir::ConstantInt::Get(mod, 5, i32Type), vipir::ConstantInt::Get(mod, 6, i32Type), vipir::ConstantInt::Get(mod, 7, i32Type), vipir::ConstantInt::Get(mod, 8, i32Type) });
 
-    builder.CreateRet(builder.CreateLoad(alloca));
+    auto ret = builder.CreateRet(builder.CreateLoad(alloca));
 
-    builder.setInsertPoint(entrybb2);
-    builder.CreateRet(nullptr);
+    //builder.setInsertPoint(entrybb2);
+    //auto ret2 = builder.CreateRet(nullptr);
+    
+    auto intDbgType = diBuilder.createDebugType("int", vipir::Type::GetIntegerType(32), DW_ATE_signed);
+    //auto voidDbgType = diBuilder.createDebugType("void", vipir::Type::GetVoidType(), DW_ATE_void);
+
+    diBuilder.setDebugType(func1, intDbgType);
+    //diBuilder.setDebugType(func2, voidDbgType);
+
+    diBuilder.setSourceInfo(func1, 1, 3, 6, 1);
+    //diBuilder.setSourceInfo(func2, 8, 3, 10, 1);
+    diBuilder.setSourceInfo(alloca, 2, 5);
+    //diBuilder.setSourceInfo(call, 4, 5);
+    diBuilder.setSourceInfo(ret, 5, 5);
+    //diBuilder.setSourceInfo(ret2, 9, 5);
+
+    diBuilder.createDebugVariable("x", func1, alloca, intDbgType, 4, 8);
 
     mod.setOutputFormat(vipir::OutputFormat::ELF);
 

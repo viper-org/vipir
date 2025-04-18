@@ -12,6 +12,19 @@ namespace vipir
 {
     namespace lir
     {
+        class EmitSourceInfo : public Value
+        {
+        public:
+            EmitSourceInfo(int line, int col);
+
+            virtual void print(std::ostream& stream) const override;
+            virtual void emit(MC::Builder& builder) override;
+
+        private:
+            int mLine;
+            int mCol;
+        };
+
         using ValuePtr = std::unique_ptr<Value>;
         class Builder
         {

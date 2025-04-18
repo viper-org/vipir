@@ -142,6 +142,11 @@ namespace vipir
             builder.addValue(std::make_unique<lir::Label>(mName, false));
             for (auto& value : mValueList)
             {
+                if (value->mLine)
+                {
+                    builder.addValue(std::make_unique<lir::EmitSourceInfo>(value->mLine, value->mCol));
+                }
+
                 auto phi = dynamic_cast<PhiInst*>(value.get());
                 if (!phi)
                     value->emit(builder);

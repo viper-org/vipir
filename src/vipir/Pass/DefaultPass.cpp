@@ -27,6 +27,17 @@ namespace vipir
     {
         module.lirCodegen();
     }
+    
+    DebugInfoEmissionPass::DebugInfoEmissionPass(DIBuilder* builder)
+        : Pass(PassType::DebugInfoEmission)
+        , mBuilder(builder)
+    {
+    }
+
+    void DebugInfoEmissionPass::execute(Module& module)
+    {
+        module.generateDebugInfo(mBuilder);
+    }
 
 
     ConstantFoldingPass::ConstantFoldingPass()

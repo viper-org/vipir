@@ -135,6 +135,12 @@ namespace vipir
         }
     }
 
+    void Function::setDebugEndLocation(int endLine, int endCol)
+    {
+        mEndLine = endLine;
+        mEndCol = endCol;
+    }
+
     void Function::setEmittedValue()
     {
         bool plt = mBasicBlockList.empty();
@@ -156,8 +162,13 @@ namespace vipir
             builder.addValue(std::make_unique<lir::ExternLabel>(mName));
             return;
         }
-
+        
         builder.addValue(std::make_unique<lir::Label>(mName, true));
+
+        if (mLine)
+        {
+            builder.addValue(std::make_unique<lir::EmitSourceInfo>(mLine, mCol));
+        }
 
         builder.addValue(std::make_unique<lir::EnterFunc>(mTotalStackOffset, mCalleeSaved));
         mEnterFuncNode = builder.getValues().back().get();
@@ -179,6 +190,7 @@ namespace vipir
             basicBlock->emit(newBuilder);
         }
 
+
         for (auto& value: newBuilder.getValues())
         {
             if (auto ret = dynamic_cast<lir::Ret*>(value.get()))
@@ -191,6 +203,11 @@ namespace vipir
             }
         }
         std::move(newBuilder.getValues().begin(), newBuilder.getValues().end(), std::back_inserter(builder.getValues()));
+
+        if (mEndLine)
+        {
+            builder.addValue(std::make_unique<lir::EmitSourceInfo>(mEndLine, mEndCol));
+        }
     }
 
     std::vector<AllocaInst*> Function::getAllocaList()
@@ -245,14 +262,14 @@ namespace vipir
         lir::EnterFunc* node = static_cast<lir::EnterFunc*>(mEnterFuncNode);
         node->setStackSize(mTotalStackOffset);
         node->setCalleeSaved(mCalleeSaved);
-        node->setSaveFramePointer(mHasCallNodes);
+        node->setSaveFramePointer(mHasCallNodes || mTotalStackOffset);
         for (auto node: mRetNodes)
         {
             lir::Ret* ret = static_cast<lir::Ret*>(node);
             ret->setLeave(mTotalStackOffset > 0);
             ret->setStackSize(mTotalStackOffset);
             ret->setCalleeSaved(mCalleeSaved);
-            ret->setSaveFramePointer(mHasCallNodes);
+            ret->setSaveFramePointer(mHasCallNodes || mTotalStackOffset);
         }
     }
 }

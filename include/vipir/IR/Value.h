@@ -28,12 +28,14 @@
 namespace vipir
 {
     class Module;
+    class DIType;
     
     class Value
     {
     friend class Module;
     friend class BasicBlock;
     friend class Function;
+    friend class DIBuilder;
     friend class opt::RegAlloc;
     friend class opt::DeadCodeEliminator;
     friend class opt::AliasAnalyzer;
@@ -64,6 +66,10 @@ namespace vipir
 
         virtual bool isCritical() { return false; }
         virtual void cleanup() {} // In case cleanup needs to be done when instruction is optimized away
+
+
+        int getLine() { return mLine; }
+        int getCol() { return mCol; }
     
     protected:
         Module& mModule;
@@ -84,6 +90,10 @@ namespace vipir
         int mPreferredRegisterID{ -1 };
 
         bool mMarked{ false };
+
+        DIType* mDebugType { nullptr };
+        int mLine{ 0 };
+        int mCol{ 0 };
 
         virtual void emit(lir::Builder& builder) = 0;
     };

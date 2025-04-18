@@ -84,6 +84,9 @@ set(SOURCES
     "src/vipir/LIR/Instruction/EnterFunc.cpp"
 
     "src/vipir/ABI/SysV.cpp"
+
+    "src/vipir/DI/DIBuilder.cpp"
+    "src/vipir/DI/DIVariable.cpp"
 )
 
 set(HEADERS
@@ -166,6 +169,9 @@ set(HEADERS
     "include/vipir/ABI/ABI.h"
     "include/vipir/ABI/CallingConvention.h"
     "include/vipir/ABI/SysV.h"
+
+    "include/vipir/DI/DIBuilder.h"
+    "include/vipir/DI/DIVariable.h"
 )
 
 add_library(vipir ${SOURCES} ${HEADERS})
