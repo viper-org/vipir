@@ -787,11 +787,17 @@ namespace vipir
 
                         for (auto& value : debugVariable->mValues)
                         {
+                            uint64_t endAddress = 0;
+                            if (value.endAddress)
+                                endAddress = value.endAddress->getAddress();
+                            else
+                                endAddress = mOpcodeBuilder->getPosition(".text");
+
                             opcodeBuilder.createInstruction(".debug_loclists")
                                 .immediate((uint8_t)DW_LLE_offset_pair)
                                 .emit();
                             writeULEB128(value.startAddress->getAddress(), ".debug_loclists");
-                            writeULEB128(value.endAddress->getAddress(), ".debug_loclists");
+                            writeULEB128(endAddress, ".debug_loclists");
                             auto emittedValue = value.value->getEmittedValue();
                             encodeValue(emittedValue, ".debug_loclists");
                         }
