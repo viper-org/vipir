@@ -47,6 +47,11 @@ namespace vipir
         return {mPtr, mOffset};
     }
 
+    constexpr std::size_t AlignUp(std::size_t value, std::size_t align)
+    {
+        return (value + align - 1) & ~(align - 1);
+    }
+
     void GEPInst::emit(lir::Builder& builder)
     {
         mPtr->lateEmit(builder);
@@ -68,7 +73,8 @@ namespace vipir
                 if (structType->getField(i)->isArrayType())
                 {
                     ArrayType* arrayType = static_cast<ArrayType*>(structType->getField(i));
-                    *displacement += std::max(arrayType->getSizeInBits() / 8, (std::size_t)scale);
+                    
+                    *displacement += AlignUp(arrayType->getSizeInBits() / 8, (std::size_t)scale);
                 }
                 else
                 {

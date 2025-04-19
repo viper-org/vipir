@@ -5,7 +5,8 @@
 namespace vipir
 {
     DIBasicType::DIBasicType(std::string name, Type* type, uint8_t encoding)
-        : mName(std::move(name))
+        : DIType(type->getAlignment())
+        , mName(std::move(name))
         , mType(type)
         , mEncoding(encoding)
     {
@@ -13,7 +14,23 @@ namespace vipir
 
 
     DIPointerType::DIPointerType(DIType* baseType)
-        : mBaseType(baseType)
+        : DIType(8)
+        , mBaseType(baseType)
+    {
+    }
+
+
+    void DIStructureType::addMember(std::string name, DIType* type, int line, int col)
+    {
+        mMembers.push_back({std::move(name), line, col, type, -1});
+    }
+
+    DIStructureType::DIStructureType(std::string name, StructType* structType, int line, int col)
+        : DIType(0)
+        , mName(std::move(name))
+        , mLine(line)
+        , mCol(col)
+        , mStructType(structType)
     {
     }
 }

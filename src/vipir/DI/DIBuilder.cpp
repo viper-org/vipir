@@ -72,6 +72,15 @@ namespace vipir
         return ptr;
     }
 
+    DIType* DIBuilder::createStructureType(std::string name, StructType* structType, int line, int col)
+    {
+        auto ptr = new DIStructureType(std::move(name), structType, line, col);
+
+        mDebugTypes.push_back(std::unique_ptr<DIType>(ptr));
+
+        return ptr;
+    }
+
     DIVariable* DIBuilder::createLocalVariable(std::string name, Function* parent, DIType* type, int line, int col)
     {
         auto ptr = new DIVariable(std::move(name), parent, type, line, col);
@@ -583,6 +592,11 @@ namespace vipir
             .emit();
     }
 
+    constexpr std::size_t AlignUp(std::size_t value, std::size_t align)
+    {
+        return (value + align - 1) & ~(align - 1);
+    }
+
     void DIBuilder::generateDwarf(MC::Builder& mcBuilder, codegen::OpcodeBuilder& opcodeBuilder)
     {
         mOpcodeBuilder = &opcodeBuilder;
@@ -634,6 +648,24 @@ namespace vipir
         }};
         createAbbrevEntry(pointerTypeAbbrev);
 
+        DebugAbbrevEntry structTypeAbbrev = { getNextAbbrevId(), DW_TAG_structure_type, true, {
+            { DW_AT_name, DW_FORM_strp },
+            { DW_AT_byte_size, DW_FORM_data2 },
+            { DW_AT_decl_file, DW_FORM_strp },
+            { DW_AT_decl_line, DW_FORM_data1 },
+            { DW_AT_decl_column, DW_FORM_data1 },
+        }};
+        createAbbrevEntry(structTypeAbbrev);
+        DebugAbbrevEntry memberAbbrev = { getNextAbbrevId(), DW_TAG_member, false, {
+            { DW_AT_name, DW_FORM_strp },
+            { DW_AT_byte_size, DW_FORM_data2 },
+            { DW_AT_decl_file, DW_FORM_strp },
+            { DW_AT_decl_line, DW_FORM_data1 },
+            { DW_AT_decl_column, DW_FORM_data1 },
+            { DW_AT_type, DW_FORM_ref4 },
+            { DW_AT_data_member_location, DW_FORM_data2 },
+        }};
+
         for (auto& type : mDebugTypes)
         {
             type->mOffset = getDebugInfoSize();
@@ -653,6 +685,35 @@ namespace vipir
                     (uint32_t)pointerType->mBaseType->mOffset
                 }};
                 createInfoEntry(typeInfo);
+            }
+            else if (auto structureType = dynamic_cast<DIStructureType*>(type.get()))
+            {
+                DebugInfoEntry typeInfo = { &structTypeAbbrev, {
+                    getStringPosition(structureType->mName),
+                    (uint16_t)(structureType->mStructType->getSizeInBits() / 8),
+                    getStringPosition(mFilename),
+                    (uint8_t)structureType->mLine,
+                    (uint8_t)structureType->mCol,
+                }};
+                createInfoEntry(typeInfo);
+                int idx = 0;
+                for (auto& member : structureType->mMembers)
+                {
+                    DebugInfoEntry memberInfo = { &memberAbbrev, {
+                        getStringPosition(member.name),
+                        structureType->mStructType->getField(idx)->getSizeInBits(),
+                        getStringPosition(mFilename),
+                        (uint8_t)structureType->mLine,
+                        (uint8_t)structureType->mCol,
+                        (uint32_t)member.type->mOffset,
+                        (uint16_t)AlignUp(idx, structureType->mStructType->getAlignment())
+                    }};
+                    createInfoEntry(memberInfo);
+                    ++idx;
+                }
+                opcodeBuilder.createInstruction(".debug_info")
+                    .immediate((uint8_t)0)
+                    .emit();
             }
         }
 
