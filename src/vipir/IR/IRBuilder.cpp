@@ -2,8 +2,10 @@
 
 #include "vipir/IR/IRBuilder.h"
 #include "vipir/IR/BasicBlock.h"
-#include "vipir/IR/Debug/EmitDebugInfo.h"
 #include "vipir/IR/Function.h"
+
+#include "vipir/IR/Debug/EmitDebugInfo.h"
+#include "vipir/IR/Debug/QueryAddress.h"
 
 #include "vipir/IR/Instruction/RetInst.h"
 #include "vipir/IR/Instruction/AllocaInst.h"
@@ -443,5 +445,14 @@ namespace vipir
         mInsertPoint->insertValue(mInsertAfter, info);
 
         return info;
+    }
+
+    QueryAddress* IRBuilder::CreateQueryAddress()
+    {
+        QueryAddress* query = new QueryAddress(mInsertPoint->getModule());
+
+        mInsertPoint->insertValue(mInsertAfter, query);
+
+        return query;
     }
 }

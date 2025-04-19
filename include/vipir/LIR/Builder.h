@@ -25,6 +25,18 @@ namespace vipir
             int mCol;
         };
 
+        class QueryAddress : public Value
+        {
+        public:
+            QueryAddress(uint64_t* location);
+
+            virtual void print(std::ostream& stream) const override;
+            virtual void emit(MC::Builder& builder) override;
+
+        private:
+            uint64_t* mLocation;
+        };
+
         using ValuePtr = std::unique_ptr<Value>;
         class Builder
         {

@@ -19,12 +19,27 @@ namespace vipir
 
         void EmitSourceInfo::print(std::ostream& stream) const
         {
-            stream << std::format("SourceInfo - {}:{}", mLine, mCol);
+            stream << std::format("SourceInfo - {}:{}\n", mLine, mCol);
         }
 
         void EmitSourceInfo::emit(MC::Builder& builder)
         {
             builder.addValue(std::make_unique<MC::EmitSourceInfo>(mLine, mCol));
+        }
+
+        QueryAddress::QueryAddress(uint64_t* location)
+            : mLocation(location)
+        {
+        }
+
+        void QueryAddress::print(std::ostream& stream) const
+        {
+            stream << "Query Address\n";
+        }
+
+        void QueryAddress::emit(MC::Builder& builder)
+        {
+            builder.addValue(std::make_unique<MC::QueryAddress>(mLocation));
         }
 
 

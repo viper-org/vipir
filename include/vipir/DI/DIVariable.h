@@ -5,22 +5,36 @@
 #define VIPIR_DI_DI_VARIABLE_H 1
 
 #include <string>
+#include <vector>
 
 namespace vipir
 {
     class Function;
     class Value;
+    class QueryAddress;
     class DIBuilder;
     class DIType;
+
+    struct ScopedValue
+    {
+        QueryAddress* startAddress;
+        Value* value;
+        QueryAddress* endAddress;
+    };
 
     class DIVariable
     {
     friend class DIBuilder;
-        DIVariable(std::string name, Function* parent, Value* value, DIType* type, int line, int col);
+    public:
+        void addValue(Value* value, QueryAddress* start, QueryAddress* end);
+
+    private:
+        DIVariable(std::string name, Function* parent, DIType* type, int line, int col);
+
 
         std::string mName;
         Function* mParent;
-        Value* mValue;
+        std::vector<ScopedValue> mValues;
         DIType* mType;
         int mLine;
         int mCol;

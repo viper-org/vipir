@@ -49,6 +49,7 @@ set(SOURCES
     "src/vipir/IR/Instruction/PhiInst.cpp"
 
     "src/vipir/IR/Debug/EmitDebugInfo.cpp"
+    "src/vipir/IR/Debug/QueryAddress.cpp"
 
     "src/vipir/Type/Type.cpp"
     "src/vipir/Type/IntegerType.cpp"
@@ -133,6 +134,7 @@ set(HEADERS
     "include/vipir/IR/Instruction/PhiInst.h"
 
     "include/vipir/IR/Debug/EmitDebugInfo.h"
+    "include/vipir/IR/Debug/QueryAddress.h"
 
     "include/vipir/Type/Type.h"
     "include/vipir/Type/IntegerType.h"

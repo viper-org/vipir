@@ -36,6 +36,7 @@ namespace vipir
     class PhiInst;
 
     class EmitDebugInfo;
+    class QueryAddress;
 
     class ConstantBool;
 
@@ -109,6 +110,7 @@ namespace vipir
 
 
         EmitDebugInfo* CreateDebugInfo(int line, int col);
+        QueryAddress*  CreateQueryAddress();
 
     private:
         BasicBlock* mInsertPoint;

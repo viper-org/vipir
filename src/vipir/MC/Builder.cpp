@@ -24,6 +24,21 @@ namespace vipir
             stream << std::format(".srcloc {}:{}", mLine, mCol);
         }
 
+        QueryAddress::QueryAddress(uint64_t* location)
+            : mLocation(location)
+        {
+        }
+
+        void QueryAddress::emit(codegen::OpcodeBuilder& builder, codegen::Section section)
+        {
+            *mLocation = builder.getPosition(section);
+        }
+
+        void QueryAddress::print(std::ostream& stream)
+        {
+            stream << ".queryaddr";
+        }
+
         
         Builder::Builder() {}
 

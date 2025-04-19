@@ -33,6 +33,8 @@
 
 #include "vipir/ABI/SysV.h"
 
+#include "vipir/DI/DIVariable.h"
+
 #include <dwarf.h>
 #include <iostream>
 #include <fstream>
@@ -115,16 +117,22 @@ int main()
 
     builder.setInsertPoint(entrybb);
 
+    auto q1 = builder.CreateQueryAddress();
     builder.CreateDebugInfo(2, 5);
     auto alloca = builder.CreateAlloca(i32Type);
     auto val = vipir::ConstantInt::Get(mod, 5, i32Type);
     builder.CreateStore(alloca, val);
     //auto addr = builder.CreateAddrOf(alloca);
 
+    auto q2 = builder.CreateQueryAddress();
+    builder.CreateDebugInfo(4, 5);
+    auto val2 = vipir::ConstantInt::Get(mod, 12, i32Type);
+
     //auto call = builder.CreateCall(func2, { vipir::ConstantInt::Get(mod, 1, i32Type), vipir::ConstantInt::Get(mod, 2, i32Type), vipir::ConstantInt::Get(mod, 3, i32Type), vipir::ConstantInt::Get(mod, 4, i32Type), vipir::ConstantInt::Get(mod, 5, i32Type), vipir::ConstantInt::Get(mod, 6, i32Type), vipir::ConstantInt::Get(mod, 7, i32Type), vipir::ConstantInt::Get(mod, 8, i32Type) });
 
     builder.CreateDebugInfo(5, 5);
-    auto ret = builder.CreateRet(builder.CreateLoad(alloca));
+    auto ret = builder.CreateRet(val2);
+    auto q3 = builder.CreateQueryAddress();
 
     //builder.setInsertPoint(entrybb2);
     //auto ret2 = builder.CreateRet(nullptr);
@@ -136,7 +144,9 @@ int main()
 
     diBuilder.setSourceInfo(func1, 1, 3, 6, 1);
 
-    diBuilder.createDebugVariable("x", func1, alloca, intDbgType, 4, 8);
+    auto dbgVar = diBuilder.createDebugVariable("x", func1, intDbgType, 4, 8);
+    dbgVar->addValue(alloca, q1, q2);
+    dbgVar->addValue(val2, q2, q3);
 
     mod.setOutputFormat(vipir::OutputFormat::ELF);
 

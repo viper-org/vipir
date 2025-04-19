@@ -108,7 +108,7 @@ namespace vipir
         void setDebugType(Value* value, DIType* type);
 
         DIType* createDebugType(std::string name, Type* type, uint8_t encoding);
-        DIVariable* createDebugVariable(std::string name, Function* parent, Value* value, DIType* type, int line, int col);
+        DIVariable* createDebugVariable(std::string name, Function* parent, DIType* type, int line, int col);
 
     private:
         std::string mProducer;
@@ -122,6 +122,7 @@ namespace vipir
 
         std::unordered_map<std::string, std::uint32_t> mStrings;
         std::unordered_map<std::string, std::uint32_t> mLineStrings;
+        
 
         Module& mModule;
         codegen::OpcodeBuilder* mOpcodeBuilder;
@@ -145,6 +146,8 @@ namespace vipir
         void createDebugLine(std::vector<MC::EmitSourceInfo*>& sourceInfo);
 
         void createDebugArranges();
+        void createDebugAddr();
+        void createDebugLoclists();
 
         void generateDwarf(MC::Builder& mcBuilder, codegen::OpcodeBuilder& opcodeBuilder);
 

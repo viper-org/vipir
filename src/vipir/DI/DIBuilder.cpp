@@ -4,6 +4,7 @@
 #include "vipir/DI/DIBuilder.h"
 
 #include "vipir/IR/Function.h"
+#include "vipir/IR/Debug/QueryAddress.h"
 #include "vipir/Module.h"
 
 #include <vasm/codegen/builder/OpcodeBuilder.h>
@@ -67,9 +68,9 @@ namespace vipir
         return ptr;
     }
 
-    DIVariable* DIBuilder::createDebugVariable(std::string name, Function* parent, Value* value, DIType* type, int line, int col)
+    DIVariable* DIBuilder::createDebugVariable(std::string name, Function* parent, DIType* type, int line, int col)
     {
-        auto ptr = new DIVariable(std::move(name), parent, value, type, line, col);
+        auto ptr = new DIVariable(std::move(name), parent, type, line, col);
         parent->mDebugVariables.emplace_back(ptr);
         return ptr;
     }
@@ -521,6 +522,51 @@ namespace vipir
             .immediate((uint32_t)mOpcodeBuilder->getPosition(".debug_arranges"))
             .emit(0);
     }
+    
+    void DIBuilder::createDebugAddr()
+    {
+        mOpcodeBuilder->createInstruction(".debug_addr")
+            .immediate((uint16_t)5)
+            .emit();
+
+        mOpcodeBuilder->createInstruction(".debug_addr")
+            .immediate((uint8_t)0x8)
+            .emit();
+        
+        mOpcodeBuilder->createInstruction(".debug_addr")
+            .immediate((uint8_t)0x0)
+            .emit();
+
+
+        mOpcodeBuilder->relocLabel(".text", "dwarf", ".debug_addr", 4, -4);
+        mOpcodeBuilder->createInstruction(".debug_addr")
+            .immediate((uint64_t)0x0)
+            .emit();
+
+        
+        mOpcodeBuilder->createInstruction(".debug_addr")
+            .immediate((uint32_t)0)
+            .emit(0);
+    }
+
+    void DIBuilder::createDebugLoclists()
+    {
+        mOpcodeBuilder->createInstruction(".debug_loclists")
+            .immediate((uint16_t)5)
+            .emit();
+
+        mOpcodeBuilder->createInstruction(".debug_loclists")
+            .immediate((uint8_t)0x8)
+            .emit();
+        
+        mOpcodeBuilder->createInstruction(".debug_loclists")
+            .immediate((uint8_t)0x0)
+            .emit();
+        
+        mOpcodeBuilder->createInstruction(".debug_loclists")
+            .immediate((uint16_t)0x0)
+            .emit();
+    }
 
     void DIBuilder::generateDwarf(MC::Builder& mcBuilder, codegen::OpcodeBuilder& opcodeBuilder)
     {
@@ -578,7 +624,7 @@ namespace vipir
             createInfoEntry(typeInfo);
         }
 
-        DebugAbbrevEntry variableAbbrev = { getNextAbbrevId(), DW_TAG_variable, false, {
+        DebugAbbrevEntry singleValueVariableAbbrev = { getNextAbbrevId(), DW_TAG_variable, false, {
             { DW_AT_name, DW_FORM_strp },
             { DW_AT_decl_file, DW_FORM_strp },
             { DW_AT_decl_line, DW_FORM_data2 },
@@ -586,7 +632,16 @@ namespace vipir
             { DW_AT_type, DW_FORM_ref4 },
             { DW_AT_location, DW_FORM_exprloc },
         }};
-        createAbbrevEntry(variableAbbrev);
+        createAbbrevEntry(singleValueVariableAbbrev);
+        DebugAbbrevEntry multiValueVariableAbbrev = { getNextAbbrevId(), DW_TAG_variable, false, {
+            { DW_AT_name, DW_FORM_strp },
+            { DW_AT_decl_file, DW_FORM_strp },
+            { DW_AT_decl_line, DW_FORM_data2 },
+            { DW_AT_decl_column, DW_FORM_data2 },
+            { DW_AT_type, DW_FORM_ref4 },
+            { DW_AT_location, DW_FORM_sec_offset },
+        }};
+        createAbbrevEntry(multiValueVariableAbbrev);
         
         int idx = 2;
         for (auto& global : mModule.getGlobals())
@@ -636,40 +691,114 @@ namespace vipir
                 }};
                 createInfoEntry(subprogramInfoStart);
 
-                for (auto& debugVariable : func->mDebugVariables)
-                {
-                    DebugInfoEntry variableInfo = { &variableAbbrev, {
-                        getStringPosition(debugVariable->mName),
-                        getStringPosition(mFilename),
-                        (uint16_t)debugVariable->mLine,
-                        (uint16_t)debugVariable->mCol,
-                        (uint32_t)debugVariable->mType->mOffset,
-                    }};
-                    auto value = debugVariable->mValue->getEmittedValue();
+                auto encodeValue = [this](lir::OperandPtr& value, std::string section){
                     if (auto imm = dynamic_cast<lir::Immediate*>(value.get()))
                     {
-                        variableInfo.info.push_back(ULEB128(10));
-                        variableInfo.info.push_back((uint8_t)DW_OP_implicit_value);
-                        variableInfo.info.push_back(ULEB128(8));
-                        variableInfo.info.push_back((uint64_t)imm->value());
+                        writeULEB128(10, section);
+                        mOpcodeBuilder->createInstruction(section)
+                            .immediate((uint8_t)DW_OP_implicit_value)
+                            .emit();
+                        writeULEB128(8, section);
+                        mOpcodeBuilder->createInstruction(section)
+                            .immediate((uint64_t)imm->value())
+                            .emit();
+                        //variableInfo.info.push_back(ULEB128(10));
+                        //variableInfo.info.push_back((uint8_t)DW_OP_implicit_value);
+                        //variableInfo.info.push_back(ULEB128(8));
+                        //variableInfo.info.push_back((uint64_t)imm->value());
                     }
                     if (auto vreg = dynamic_cast<lir::VirtualReg*>(value.get()))
                     {
                         if (vreg->mVreg->onStack())
                         {
-                            variableInfo.info.push_back(ULEB128(2));
-                            variableInfo.info.push_back((uint8_t)DW_OP_fbreg);
-                            variableInfo.info.push_back(SLEB128(-vreg->mVreg->getStackOffset() - 16));
+                            writeULEB128(2, section);
+                            mOpcodeBuilder->createInstruction(section)
+                                .immediate((uint8_t)DW_OP_fbreg)
+                                .emit();
+                            writeSLEB128(-vreg->mVreg->getStackOffset() - 16, section);
+                            //variableInfo.info.push_back(ULEB128(2));
+                            //variableInfo.info.push_back((uint8_t)DW_OP_fbreg);
+                            //variableInfo.info.push_back(SLEB128(-vreg->mVreg->getStackOffset() - 16));
                         }
                         else
                         {
-                            variableInfo.info.push_back(ULEB128(2));
-                            variableInfo.info.push_back((uint8_t)DW_OP_regx);
-                            variableInfo.info.push_back(ULEB128(PhysicalToDwarfRegister(vreg->mVreg->getPhysicalRegister())));
+                            writeULEB128(2, section);
+                            mOpcodeBuilder->createInstruction(section)
+                                .immediate((uint8_t)DW_OP_regx)
+                                .emit();
+                            writeSLEB128(PhysicalToDwarfRegister(vreg->mVreg->getPhysicalRegister()), section);
+                            //variableInfo.info.push_back(ULEB128(2));
+                            //variableInfo.info.push_back((uint8_t)DW_OP_regx);
+                            //variableInfo.info.push_back(ULEB128(PhysicalToDwarfRegister(vreg->mVreg->getPhysicalRegister())));
                         }
                     }
-                    // TODO: Potential other locations here
-                    createInfoEntry(variableInfo);
+                };
+
+                for (auto& debugVariable : func->mDebugVariables)
+                {
+                    auto values = debugVariable->mValues;
+                    if (values.size() == 1)
+                    {
+                        DebugInfoEntry variableInfo = { &singleValueVariableAbbrev, {
+                            getStringPosition(debugVariable->mName),
+                            getStringPosition(mFilename),
+                            (uint16_t)debugVariable->mLine,
+                            (uint16_t)debugVariable->mCol,
+                            (uint32_t)debugVariable->mType->mOffset,
+                        }};
+                        auto value = values[0].value->getEmittedValue();
+                        //if (auto imm = dynamic_cast<lir::Immediate*>(value.get()))
+                        //{
+                        //    variableInfo.info.push_back(ULEB128(10));
+                        //    variableInfo.info.push_back((uint8_t)DW_OP_implicit_value);
+                        //    variableInfo.info.push_back(ULEB128(8));
+                        //    variableInfo.info.push_back((uint64_t)imm->value());
+                        //}
+                        //if (auto vreg = dynamic_cast<lir::VirtualReg*>(value.get()))
+                        //{
+                        //    if (vreg->mVreg->onStack())
+                        //    {
+                        //        variableInfo.info.push_back(ULEB128(2));
+                        //        variableInfo.info.push_back((uint8_t)DW_OP_fbreg);
+                        //        variableInfo.info.push_back(SLEB128(-vreg->mVreg->getStackOffset() - 16));
+                        //    }
+                        //    else
+                        //    {
+                        //        variableInfo.info.push_back(ULEB128(2));
+                        //        variableInfo.info.push_back((uint8_t)DW_OP_regx);
+                        //        variableInfo.info.push_back(ULEB128(PhysicalToDwarfRegister(vreg->mVreg->getPhysicalRegister())));
+                        //    }
+                        //}
+                        // TODO: Potential other locations here
+                        createInfoEntry(variableInfo);
+                        encodeValue(value, ".debug_info");
+                    }
+                    else
+                    {
+                        DebugInfoEntry variableInfo = { &multiValueVariableAbbrev, {
+                            getStringPosition(debugVariable->mName),
+                            getStringPosition(mFilename),
+                            (uint16_t)debugVariable->mLine,
+                            (uint16_t)debugVariable->mCol,
+                            (uint32_t)debugVariable->mType->mOffset,
+                            (uint32_t)mOpcodeBuilder->getPosition(".debug_loclists")+4
+                        }};
+                        createInfoEntry(variableInfo);
+
+                        for (auto& value : debugVariable->mValues)
+                        {
+                            opcodeBuilder.createInstruction(".debug_loclists")
+                                .immediate((uint8_t)DW_LLE_offset_pair)
+                                .emit();
+                            writeULEB128(value.startAddress->getAddress(), ".debug_loclists");
+                            writeULEB128(value.endAddress->getAddress(), ".debug_loclists");
+                            auto emittedValue = value.value->getEmittedValue();
+                            encodeValue(emittedValue, ".debug_loclists");
+                        }
+                        opcodeBuilder.createInstruction(".debug_loclists")
+                            .immediate((uint8_t)DW_LLE_end_of_list)
+                            .emit();
+                    }
                 }
 
                 // Emit a null byte to signify this is the end of this entry's children
@@ -693,12 +822,17 @@ namespace vipir
             .emit();
 
         createDebugLine(mcBuilder.getSourceInfo());
+        createDebugAddr();
         //createDebugArranges();
         
-        // unit length
+        // unit lengths
         opcodeBuilder.createInstruction(".debug_info")
             .immediate((uint32_t)opcodeBuilder.getPosition(".debug_info"))
             .emit(0);
+        opcodeBuilder.createInstruction(".debug_loclists")
+            .immediate((uint32_t)opcodeBuilder.getPosition(".debug_loclists"))
+            .emit(0);
+
         mFinalized = true;
     }
 }

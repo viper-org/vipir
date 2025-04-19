@@ -29,6 +29,19 @@ namespace vipir
             int mAddress{ -1 };
         };
 
+        class QueryAddress : public instruction::Value
+        {
+        public:
+            QueryAddress(uint64_t* location);
+
+            virtual void emit(codegen::OpcodeBuilder& builder, codegen::Section section) override;
+            virtual void print(std::ostream& stream) override;
+
+        private:
+            uint64_t* mLocation;
+        };
+
+
         class Builder
         {
         public:
