@@ -13,6 +13,15 @@ namespace vipir
         , mType(type)
         , mLine(line)
         , mCol(col)
+        , mParameter(false)
+    {
+    }
+
+    DIVariable::DIVariable(std::string name, Function* parent, DIType* type)
+        : mName(std::move(name))
+        , mParent(parent)
+        , mType(type)
+        , mParameter(true)
     {
     }
 

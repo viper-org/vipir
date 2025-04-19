@@ -145,11 +145,14 @@ int main()
 
     diBuilder.setSourceInfo(func1, 1, 3, 6, 1);
 
-    auto dbgVarX = diBuilder.createDebugVariable("x", func1, intDbgType, 2, 5);
+    auto dbgVarX = diBuilder.createLocalVariable("x", func1, intDbgType, 2, 5);
     dbgVarX->addValue(alloca, nullptr, nullptr);
 
-    auto dbgVarY = diBuilder.createDebugVariable("y", func1, intPtr, 3, 5);
+    auto dbgVarY = diBuilder.createLocalVariable("y", func1, intPtr, 3, 5);
     dbgVarY->addPointer(dbgVarX, nullptr, nullptr);
+
+    auto dbgVarArgc = diBuilder.createParameterVariable("argc", func1, intDbgType);
+    dbgVarArgc->addValue(func1->getArgument(0), nullptr, nullptr);
 
     mod.setOutputFormat(vipir::OutputFormat::ELF);
 

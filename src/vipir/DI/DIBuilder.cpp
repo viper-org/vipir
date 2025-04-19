@@ -72,10 +72,21 @@ namespace vipir
         return ptr;
     }
 
-    DIVariable* DIBuilder::createDebugVariable(std::string name, Function* parent, DIType* type, int line, int col)
+    DIVariable* DIBuilder::createLocalVariable(std::string name, Function* parent, DIType* type, int line, int col)
     {
         auto ptr = new DIVariable(std::move(name), parent, type, line, col);
+
         parent->mDebugVariables.emplace_back(ptr);
+
+        return ptr;
+    }
+
+    DIVariable* DIBuilder::createParameterVariable(std::string name, Function* parent, DIType* type)
+    {
+        auto ptr = new DIVariable(std::move(name), parent, type);
+
+        parent->mDebugVariables.emplace_back(ptr);
+
         return ptr;
     }
 
@@ -653,7 +664,14 @@ namespace vipir
             { DW_AT_type, DW_FORM_ref4 },
             { DW_AT_location, DW_FORM_exprloc },
         }};
+        DebugAbbrevEntry singleValueParameterAbbrev = singleValueVariableAbbrev;
+        singleValueParameterAbbrev.type = DW_TAG_formal_parameter;
+        singleValueParameterAbbrev.id = getNextAbbrevId();
+
         createAbbrevEntry(singleValueVariableAbbrev);
+        createAbbrevEntry(singleValueParameterAbbrev);
+
+
         DebugAbbrevEntry multiValueVariableAbbrev = { getNextAbbrevId(), DW_TAG_variable, false, {
             { DW_AT_name, DW_FORM_strp },
             { DW_AT_decl_file, DW_FORM_strp },
@@ -662,7 +680,12 @@ namespace vipir
             { DW_AT_type, DW_FORM_ref4 },
             { DW_AT_location, DW_FORM_sec_offset },
         }};
+        DebugAbbrevEntry multiValueParameterAbbrev = multiValueVariableAbbrev;
+        multiValueParameterAbbrev.type = DW_TAG_formal_parameter;
+        multiValueParameterAbbrev.id = getNextAbbrevId();
+
         createAbbrevEntry(multiValueVariableAbbrev);
+        createAbbrevEntry(multiValueParameterAbbrev);
         
         int idx = 2;
         for (auto& global : mModule.getGlobals())
@@ -752,7 +775,9 @@ namespace vipir
                     auto values = debugVariable->mValues;
                     if (values.size() == 1)
                     {
-                        DebugInfoEntry variableInfo = { &singleValueVariableAbbrev, {
+                        DebugAbbrevEntry* abbrev = debugVariable->mParameter ? &singleValueParameterAbbrev : &singleValueVariableAbbrev;
+
+                        DebugInfoEntry variableInfo = { abbrev, {
                             getStringPosition(debugVariable->mName),
                             getStringPosition(mFilename),
                             (uint16_t)debugVariable->mLine,
@@ -771,7 +796,7 @@ namespace vipir
                                 .immediate((uint32_t)values[0].pointee->mOffset)
                                 .emit();
                                 
-                            writeSLEB128(0, ".debug_loclists");
+                            writeSLEB128(0, ".debug_info");
                         }
                         else
                         {
@@ -781,7 +806,9 @@ namespace vipir
                     }
                     else
                     {
-                        DebugInfoEntry variableInfo = { &multiValueVariableAbbrev, {
+                        DebugAbbrevEntry* abbrev = debugVariable->mParameter ? &multiValueParameterAbbrev : &multiValueVariableAbbrev;
+
+                        DebugInfoEntry variableInfo = { abbrev, {
                             getStringPosition(debugVariable->mName),
                             getStringPosition(mFilename),
                             (uint16_t)debugVariable->mLine,

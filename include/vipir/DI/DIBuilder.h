@@ -96,7 +96,8 @@ namespace vipir
 
         DIType* createBasicType(std::string name, Type* type, uint8_t encoding);
         DIType* createPointerType(DIType* base);
-        DIVariable* createDebugVariable(std::string name, Function* parent, DIType* type, int line, int col);
+        DIVariable* createLocalVariable(std::string name, Function* parent, DIType* type, int line, int col);
+        DIVariable* createParameterVariable(std::string name, Function* parent, DIType* type);
 
     private:
         std::string mProducer;

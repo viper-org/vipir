@@ -1,4 +1,4 @@
-f main() {
+f main(argc) {
     x = 5
     y = &x
     x = 12

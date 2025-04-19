@@ -33,6 +33,7 @@ namespace vipir
 
     private:
         DIVariable(std::string name, Function* parent, DIType* type, int line, int col);
+        DIVariable(std::string name, Function* parent, DIType* type); // For parameters
 
 
         std::string mName;
@@ -41,6 +42,7 @@ namespace vipir
         DIType* mType;
         int mLine;
         int mCol;
+        bool mParameter;
 
 
         int mOffset{ -1 };
