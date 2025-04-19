@@ -228,6 +228,17 @@ namespace vipir
             .emit();
     }
 
+    void DIBuilder::writeTypeOffset(DIType* type, std::string section)
+    {
+        if (type->mOffset == -1)
+        {
+            type->mWriteTo.push_back(mOpcodeBuilder->getPosition(section));
+        }
+        mOpcodeBuilder->createInstruction(section)
+            .immediate((uint32_t)type->mOffset)
+            .emit();
+    }
+
     void DIBuilder::createDwarfHeader()
     {
         // format
@@ -300,6 +311,9 @@ namespace vipir
                     mOpcodeBuilder->createInstruction(".debug_info")
                         .immediate(mOpcodeBuilder->getLabel(arg.symbol).first)
                         .emit();
+                },
+                [this](TypeOffset arg) {
+                    writeTypeOffset(arg.mType, ".debug_info");
                 },
                 [this](auto arg) { 
                     mOpcodeBuilder->createInstruction(".debug_info")
@@ -683,7 +697,7 @@ namespace vipir
             {
                 DebugInfoEntry typeInfo = { &pointerTypeAbbrev, {
                     (uint8_t)0x8,
-                    (uint32_t)pointerType->mBaseType->mOffset
+                    TypeOffset(pointerType->mBaseType)
                 }};
                 createInfoEntry(typeInfo);
             }
@@ -707,7 +721,7 @@ namespace vipir
                         getStringPosition(mFilename),
                         (uint8_t)structureType->mLine,
                         (uint8_t)structureType->mCol,
-                        (uint32_t)member.type->mOffset,
+                        TypeOffset(member.type),
                         (uint16_t)offset
                     }};
                     offset += AlignUp(structureType->mStructType->getField(idx)->getSizeInBits()/8, structureType->mStructType->getAlignment()/8);
@@ -717,6 +731,16 @@ namespace vipir
                 opcodeBuilder.createInstruction(".debug_info")
                     .immediate((uint8_t)0)
                     .emit();
+            }
+        }
+
+        for (auto& type : mDebugTypes)
+        {
+            for (auto writeTo : type->mWriteTo)
+            {
+                opcodeBuilder.createInstruction(".debug_info")
+                    .immediate((uint32_t)type->mOffset)
+                    .emit(writeTo, true);
             }
         }
 

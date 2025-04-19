@@ -42,6 +42,13 @@ namespace vipir
         int64_t mValue;
     };
 
+    struct TypeOffset
+    {
+        explicit TypeOffset(DIType* type) : mType(type) {}
+
+        DIType* mType;
+    };
+
     struct Relocation
     {
         Relocation(std::string symbol, std::string location, std::string section, int offset, int addend)
@@ -77,7 +84,7 @@ namespace vipir
     struct DebugInfoEntry
     {
         DebugAbbrevEntry* abbrev;
-        std::vector<std::variant<uint8_t, uint16_t, uint32_t, uint64_t, ULEB128, SLEB128, Relocation> > info;
+        std::vector<std::variant<uint8_t, uint16_t, uint32_t, uint64_t, ULEB128, SLEB128, Relocation, TypeOffset> > info;
     };
 
     class DIBuilder
@@ -126,6 +133,7 @@ namespace vipir
 
         void writeULEB128(uint64_t value, std::string section);
         void writeSLEB128(int64_t value,  std::string section);
+        void writeTypeOffset(DIType* type, std::string section);
 
         void createDwarfHeader();
         void createAbbrevEntry(DebugAbbrevEntry entry);

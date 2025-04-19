@@ -40,6 +40,9 @@ namespace vipir
 
     class ConstantBool;
 
+
+    class DIVariable;
+
     class IRBuilder
     {
     public:
@@ -60,7 +63,7 @@ namespace vipir
 
         StoreInst* CreateStore(Value* ptr, Value* value);
         LoadInst* CreateLoad(Value* ptr);
-        AddrInst* CreateAddrOf(Value* ptr);
+        AddrInst* CreateAddrOf(Value* ptr, DIVariable* debugVar = nullptr);
         GEPInst* CreateGEP(Value* ptr, Value* offset);
         GEPInst* CreateStructGEP(Value* ptr, int index);
 

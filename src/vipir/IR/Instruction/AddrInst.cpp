@@ -31,6 +31,11 @@ namespace vipir
         return mPtr;
     }
 
+    DIVariable* AddrInst::getDebugVariable()
+    {
+        return mDebugVar;
+    }
+
     std::string AddrInst::ident() const
     {
         return std::format("%{}", getName(mValueId));
@@ -73,10 +78,11 @@ namespace vipir
         mEmittedValue = std::move(vreg);
     }
 
-    AddrInst::AddrInst(BasicBlock* parent, Value* ptr)
+    AddrInst::AddrInst(BasicBlock* parent, Value* ptr, DIVariable* debugVar)
         : Instruction(parent->getModule(), parent)
         , mPtr(ptr)
         , mValueId(mModule.getNextValueId())
+        , mDebugVar(debugVar)
     {
         mType = mPtr->getType();
 

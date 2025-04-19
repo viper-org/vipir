@@ -23,6 +23,10 @@ namespace vipir
 
         int mAlign;
         int mOffset{ -1 };
+        // In case of forward references, once we emit debug
+        // info for this type, write it's offset to all
+        // of the locations in this vector
+        std::vector<uint64_t> mWriteTo;
     };
 
     class DIBasicType : public DIType

@@ -91,9 +91,9 @@ namespace vipir
         return load;
     }
 
-    AddrInst* IRBuilder::CreateAddrOf(Value* ptr)
+    AddrInst* IRBuilder::CreateAddrOf(Value* ptr, DIVariable* debugVar)
     {
-        AddrInst* addr = new AddrInst(mInsertPoint, ptr);
+        AddrInst* addr = new AddrInst(mInsertPoint, ptr, debugVar);
 
         mInsertPoint->insertValue(mInsertAfter, addr);
 
