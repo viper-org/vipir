@@ -14,11 +14,13 @@ namespace vipir
     class QueryAddress;
     class DIBuilder;
     class DIType;
+    class DIVariable;
 
     struct ScopedValue
     {
         QueryAddress* startAddress;
         Value* value;
+        DIVariable* pointee;
         QueryAddress* endAddress;
     };
 
@@ -27,6 +29,7 @@ namespace vipir
     friend class DIBuilder;
     public:
         void addValue(Value* value, QueryAddress* start, QueryAddress* end);
+        void addPointer(DIVariable* pointee, QueryAddress* start, QueryAddress* end);
 
     private:
         DIVariable(std::string name, Function* parent, DIType* type, int line, int col);
@@ -38,6 +41,9 @@ namespace vipir
         DIType* mType;
         int mLine;
         int mCol;
+
+
+        int mOffset{ -1 };
     };
 }
 

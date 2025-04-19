@@ -5,6 +5,7 @@
 #define VIPIR_DI_DI_BUILDER_H 1
 
 #include "vipir/DI/DIVariable.h"
+#include "vipir/DI/DIType.h"
 
 #include "vipir/MC/Builder.h"
 
@@ -29,7 +30,6 @@ namespace vipir
     struct ULEB128
     {
         explicit ULEB128(uint64_t val) : mValue(val) {}
-
 
         uint64_t mValue;
     };
@@ -80,19 +80,6 @@ namespace vipir
         std::vector<std::variant<uint8_t, uint16_t, uint32_t, uint64_t, ULEB128, SLEB128, Relocation> > info;
     };
 
-    class DIType
-    {
-    friend class DIBuilder;
-
-        DIType(std::string name, Type* type, uint8_t encoding);
-
-        std::string mName;
-        Type* mType;
-        uint8_t mEncoding;
-
-        int mOffset{ -1 };
-    };
-
     class DIBuilder
     {
     friend class Module;
@@ -107,7 +94,8 @@ namespace vipir
         void setSourceInfo(Function* func, int line, int col, int endLine, int endCol);
         void setDebugType(Value* value, DIType* type);
 
-        DIType* createDebugType(std::string name, Type* type, uint8_t encoding);
+        DIType* createBasicType(std::string name, Type* type, uint8_t encoding);
+        DIType* createPointerType(DIType* base);
         DIVariable* createDebugVariable(std::string name, Function* parent, DIType* type, int line, int col);
 
     private:

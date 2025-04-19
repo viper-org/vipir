@@ -90,6 +90,7 @@ set(SOURCES
 
     "src/vipir/DI/DIBuilder.cpp"
     "src/vipir/DI/DIVariable.cpp"
+    "src/vipir/DI/DIType.cpp"
 )
 
 set(HEADERS
@@ -178,6 +179,7 @@ set(HEADERS
 
     "include/vipir/DI/DIBuilder.h"
     "include/vipir/DI/DIVariable.h"
+    "include/vipir/DI/DIType.h"
 )
 
 add_library(vipir ${SOURCES} ${HEADERS})

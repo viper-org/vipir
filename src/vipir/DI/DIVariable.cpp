@@ -18,6 +18,11 @@ namespace vipir
 
     void DIVariable::addValue(Value* value, QueryAddress* start, QueryAddress* end)
     {
-        mValues.push_back({start, value, end});
+        mValues.push_back({start, value, nullptr, end});
+    }
+
+    void DIVariable::addPointer(DIVariable* pointee, QueryAddress* start, QueryAddress* end)
+    {
+        mValues.push_back({start, nullptr, pointee, end});
     }
 }

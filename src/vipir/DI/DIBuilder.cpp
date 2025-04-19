@@ -14,13 +14,6 @@
 
 namespace vipir
 {
-    DIType::DIType(std::string name, Type* type, uint8_t encoding)
-        : mName(std::move(name))
-        , mType(type)
-        , mEncoding(encoding)
-    {
-    }
-
     DIBuilder::DIBuilder(Module& module)
         : mModule(module)
         , mFinalized(false)
@@ -61,10 +54,21 @@ namespace vipir
         value->mDebugType = type;
     }
 
-    DIType* DIBuilder::createDebugType(std::string name, Type* type, uint8_t encoding)
+    DIType* DIBuilder::createBasicType(std::string name, Type* type, uint8_t encoding)
     {
-        auto ptr = new DIType(std::move(name), type, encoding);
+        auto ptr = new DIBasicType(std::move(name), type, encoding);
+
         mDebugTypes.push_back(std::unique_ptr<DIType>(ptr));
+
+        return ptr;
+    }
+
+    DIType* DIBuilder::createPointerType(DIType* base)
+    {
+        auto ptr = new DIPointerType(base);
+
+        mDebugTypes.push_back(std::unique_ptr<DIType>(ptr));
+
         return ptr;
     }
 
@@ -606,22 +610,39 @@ namespace vipir
         }};
         createInfoEntry(compileUnitInfo);
 
-        DebugAbbrevEntry typeAbbrev = { getNextAbbrevId(), DW_TAG_base_type, false, {
+        DebugAbbrevEntry basicTypeAbbrev = { getNextAbbrevId(), DW_TAG_base_type, false, {
             { DW_AT_byte_size, DW_FORM_data1 },
             { DW_AT_encoding, DW_FORM_data1 },
             { DW_AT_name, DW_FORM_strp },
         }};
-        createAbbrevEntry(typeAbbrev);
+        createAbbrevEntry(basicTypeAbbrev);
+
+        DebugAbbrevEntry pointerTypeAbbrev = { getNextAbbrevId(), DW_TAG_pointer_type, false, {
+            { DW_AT_byte_size, DW_FORM_data1 },
+            { DW_AT_type, DW_FORM_ref4 }
+        }};
+        createAbbrevEntry(pointerTypeAbbrev);
 
         for (auto& type : mDebugTypes)
         {
             type->mOffset = getDebugInfoSize();
-            DebugInfoEntry typeInfo = { &typeAbbrev, {
-                (uint8_t)(type->mType->getSizeInBits() / 8),
-                (uint8_t)type->mEncoding,
-                getStringPosition(type->mName)
-            }};
-            createInfoEntry(typeInfo);
+            if (auto basicType = dynamic_cast<DIBasicType*>(type.get()))
+            {
+                DebugInfoEntry typeInfo = { &basicTypeAbbrev, {
+                    (uint8_t)(basicType->mType->getSizeInBits() / 8),
+                    (uint8_t)basicType->mEncoding,
+                    getStringPosition(basicType->mName)
+                }};
+                createInfoEntry(typeInfo);
+            }
+            else if (auto pointerType = dynamic_cast<DIPointerType*>(type.get()))
+            {
+                DebugInfoEntry typeInfo = { &pointerTypeAbbrev, {
+                    (uint8_t)0x8,
+                    (uint32_t)pointerType->mBaseType->mOffset
+                }};
+                createInfoEntry(typeInfo);
+            }
         }
 
         DebugAbbrevEntry singleValueVariableAbbrev = { getNextAbbrevId(), DW_TAG_variable, false, {
@@ -702,10 +723,6 @@ namespace vipir
                         mOpcodeBuilder->createInstruction(section)
                             .immediate((uint64_t)imm->value())
                             .emit();
-                        //variableInfo.info.push_back(ULEB128(10));
-                        //variableInfo.info.push_back((uint8_t)DW_OP_implicit_value);
-                        //variableInfo.info.push_back(ULEB128(8));
-                        //variableInfo.info.push_back((uint64_t)imm->value());
                     }
                     if (auto vreg = dynamic_cast<lir::VirtualReg*>(value.get()))
                     {
@@ -716,9 +733,6 @@ namespace vipir
                                 .immediate((uint8_t)DW_OP_fbreg)
                                 .emit();
                             writeSLEB128(-vreg->mVreg->getStackOffset() - 16, section);
-                            //variableInfo.info.push_back(ULEB128(2));
-                            //variableInfo.info.push_back((uint8_t)DW_OP_fbreg);
-                            //variableInfo.info.push_back(SLEB128(-vreg->mVreg->getStackOffset() - 16));
                         }
                         else
                         {
@@ -727,15 +741,14 @@ namespace vipir
                                 .immediate((uint8_t)DW_OP_regx)
                                 .emit();
                             writeSLEB128(PhysicalToDwarfRegister(vreg->mVreg->getPhysicalRegister()), section);
-                            //variableInfo.info.push_back(ULEB128(2));
-                            //variableInfo.info.push_back((uint8_t)DW_OP_regx);
-                            //variableInfo.info.push_back(ULEB128(PhysicalToDwarfRegister(vreg->mVreg->getPhysicalRegister())));
                         }
                     }
                 };
 
                 for (auto& debugVariable : func->mDebugVariables)
                 {
+                    debugVariable->mOffset = getDebugInfoSize();
+
                     auto values = debugVariable->mValues;
                     if (values.size() == 1)
                     {
@@ -746,32 +759,25 @@ namespace vipir
                             (uint16_t)debugVariable->mCol,
                             (uint32_t)debugVariable->mType->mOffset,
                         }};
-                        auto value = values[0].value->getEmittedValue();
-                        //if (auto imm = dynamic_cast<lir::Immediate*>(value.get()))
-                        //{
-                        //    variableInfo.info.push_back(ULEB128(10));
-                        //    variableInfo.info.push_back((uint8_t)DW_OP_implicit_value);
-                        //    variableInfo.info.push_back(ULEB128(8));
-                        //    variableInfo.info.push_back((uint64_t)imm->value());
-                        //}
-                        //if (auto vreg = dynamic_cast<lir::VirtualReg*>(value.get()))
-                        //{
-                        //    if (vreg->mVreg->onStack())
-                        //    {
-                        //        variableInfo.info.push_back(ULEB128(2));
-                        //        variableInfo.info.push_back((uint8_t)DW_OP_fbreg);
-                        //        variableInfo.info.push_back(SLEB128(-vreg->mVreg->getStackOffset() - 16));
-                        //    }
-                        //    else
-                        //    {
-                        //        variableInfo.info.push_back(ULEB128(2));
-                        //        variableInfo.info.push_back((uint8_t)DW_OP_regx);
-                        //        variableInfo.info.push_back(ULEB128(PhysicalToDwarfRegister(vreg->mVreg->getPhysicalRegister())));
-                        //    }
-                        //}
-                        // TODO: Potential other locations here
                         createInfoEntry(variableInfo);
-                        encodeValue(value, ".debug_info");
+                        if (values[0].pointee)
+                        {
+                            writeULEB128(6, ".debug_info");
+                            opcodeBuilder.createInstruction(".debug_info")
+                                .immediate((uint8_t)DW_OP_implicit_pointer)
+                                .emit();
+                            
+                            opcodeBuilder.createInstruction(".debug_info")
+                                .immediate((uint32_t)values[0].pointee->mOffset)
+                                .emit();
+                                
+                            writeSLEB128(0, ".debug_loclists");
+                        }
+                        else
+                        {
+                            auto value = values[0].value->getEmittedValue();
+                            encodeValue(value, ".debug_info");
+                        }
                     }
                     else
                     {
@@ -798,8 +804,24 @@ namespace vipir
                                 .emit();
                             writeULEB128(value.startAddress->getAddress(), ".debug_loclists");
                             writeULEB128(endAddress, ".debug_loclists");
-                            auto emittedValue = value.value->getEmittedValue();
-                            encodeValue(emittedValue, ".debug_loclists");
+                            if (values[0].pointee)
+                            {
+                                writeULEB128(6, ".debug_loclists");
+                                opcodeBuilder.createInstruction(".debug_loclists")
+                                    .immediate((uint8_t)DW_OP_implicit_pointer)
+                                    .emit();
+                                
+                                opcodeBuilder.createInstruction(".debug_loclists")
+                                    .immediate((uint32_t)values[0].pointee->mOffset)
+                                    .emit();
+                                
+                                writeSLEB128(0, ".debug_loclists");
+                            }
+                            else
+                            {
+                                auto emittedValue = value.value->getEmittedValue();
+                                encodeValue(emittedValue, ".debug_loclists");
+                            }
                         }
                         opcodeBuilder.createInstruction(".debug_loclists")
                             .immediate((uint8_t)DW_LLE_end_of_list)

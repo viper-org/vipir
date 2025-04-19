@@ -122,7 +122,7 @@ int main()
     auto alloca = builder.CreateAlloca(i32Type);
     auto val = vipir::ConstantInt::Get(mod, 5, i32Type);
     builder.CreateStore(alloca, val);
-    //auto addr = builder.CreateAddrOf(alloca);
+    auto addr = builder.CreateAddrOf(alloca);
 
     auto q2 = builder.CreateQueryAddress();
     builder.CreateDebugInfo(4, 5);
@@ -130,23 +130,26 @@ int main()
 
     //auto call = builder.CreateCall(func2, { vipir::ConstantInt::Get(mod, 1, i32Type), vipir::ConstantInt::Get(mod, 2, i32Type), vipir::ConstantInt::Get(mod, 3, i32Type), vipir::ConstantInt::Get(mod, 4, i32Type), vipir::ConstantInt::Get(mod, 5, i32Type), vipir::ConstantInt::Get(mod, 6, i32Type), vipir::ConstantInt::Get(mod, 7, i32Type), vipir::ConstantInt::Get(mod, 8, i32Type) });
 
-    builder.CreateDebugInfo(5, 5);
+    builder.CreateDebugInfo(6, 5);
     auto ret = builder.CreateRet(val2);
     auto q3 = builder.CreateQueryAddress();
 
     //builder.setInsertPoint(entrybb2);
     //auto ret2 = builder.CreateRet(nullptr);
     
-    auto intDbgType = diBuilder.createDebugType("int", vipir::Type::GetIntegerType(32), DW_ATE_signed);
+    auto intDbgType = diBuilder.createBasicType("int", vipir::Type::GetIntegerType(32), DW_ATE_signed);
+    auto intPtr = diBuilder.createPointerType(intDbgType);
     //auto voidDbgType = diBuilder.createDebugType("void", vipir::Type::GetVoidType(), DW_ATE_void);
 
     diBuilder.setDebugType(func1, intDbgType);
 
     diBuilder.setSourceInfo(func1, 1, 3, 6, 1);
 
-    auto dbgVar = diBuilder.createDebugVariable("x", func1, intDbgType, 4, 8);
-    dbgVar->addValue(alloca, q1, q2);
-    dbgVar->addValue(val2, q2, q3);
+    auto dbgVarX = diBuilder.createDebugVariable("x", func1, intDbgType, 2, 5);
+    dbgVarX->addValue(alloca, nullptr, nullptr);
+
+    auto dbgVarY = diBuilder.createDebugVariable("y", func1, intPtr, 3, 5);
+    dbgVarY->addPointer(dbgVarX, nullptr, nullptr);
 
     mod.setOutputFormat(vipir::OutputFormat::ELF);
 
