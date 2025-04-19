@@ -665,6 +665,7 @@ namespace vipir
             { DW_AT_type, DW_FORM_ref4 },
             { DW_AT_data_member_location, DW_FORM_data2 },
         }};
+        createAbbrevEntry(memberAbbrev);
 
         for (auto& type : mDebugTypes)
         {
@@ -697,17 +698,19 @@ namespace vipir
                 }};
                 createInfoEntry(typeInfo);
                 int idx = 0;
+                int offset = 0;
                 for (auto& member : structureType->mMembers)
                 {
                     DebugInfoEntry memberInfo = { &memberAbbrev, {
                         getStringPosition(member.name),
-                        structureType->mStructType->getField(idx)->getSizeInBits(),
+                        (uint16_t)(structureType->mStructType->getField(idx)->getSizeInBits()/8),
                         getStringPosition(mFilename),
                         (uint8_t)structureType->mLine,
                         (uint8_t)structureType->mCol,
                         (uint32_t)member.type->mOffset,
-                        (uint16_t)AlignUp(idx, structureType->mStructType->getAlignment())
+                        (uint16_t)offset
                     }};
+                    offset += AlignUp(structureType->mStructType->getField(idx)->getSizeInBits()/8, structureType->mStructType->getAlignment()/8);
                     createInfoEntry(memberInfo);
                     ++idx;
                 }
