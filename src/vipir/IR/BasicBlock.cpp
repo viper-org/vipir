@@ -148,11 +148,6 @@ namespace vipir
                 else
                     phi->setEmittedValue();
             }
-            for (auto& value : mValueList)
-            {
-                if (dynamic_cast<PhiInst*>(value.get()))
-                    value->emit(builder);
-            }
         }
     }
 

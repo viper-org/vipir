@@ -16,6 +16,7 @@ namespace vipir
     {
     friend class IRBuilder;
     friend class BasicBlock;
+    friend class Function;
     friend class opt::RegAlloc;
     friend class opt::Mem2Reg;
     public:

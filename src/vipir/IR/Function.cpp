@@ -1,9 +1,11 @@
 // Copyright 2024 solar-mist
 
 #include "vipir/IR/Function.h"
-#include "vipir/IR/Instruction/AllocaInst.h"
 
 #include "vipir/Module.h"
+
+#include "vipir/IR/Instruction/PhiInst.h"
+#include "vipir/IR/Instruction/AllocaInst.h"
 
 #include "vipir/LIR/Label.h"
 #include "vipir/LIR/Instruction/EnterFunc.h"
@@ -188,6 +190,13 @@ namespace vipir
         for (auto& basicBlock: mBasicBlockList)
         {
             basicBlock->emit(newBuilder);
+        }
+        for (auto& basicBlock: mBasicBlockList)
+        {
+            for (auto phi : basicBlock->getPhis())
+            {
+                phi->emit(newBuilder);
+            }
         }
 
 
