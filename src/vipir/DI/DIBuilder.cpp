@@ -232,7 +232,7 @@ namespace vipir
     {
         if (type->mOffset == -1)
         {
-            type->mWriteTo.push_back(mOpcodeBuilder->getPosition(section));
+            type->mWriteTo.push_back({mOpcodeBuilder->getPosition(section), section});
         }
         mOpcodeBuilder->createInstruction(section)
             .immediate((uint32_t)type->mOffset)
@@ -623,6 +623,7 @@ namespace vipir
         uint32_t producerPosition = getStringPosition(mProducer);
 
         createDwarfHeader();
+        createDebugLoclists();
         
         /*
          * Compile Unit
@@ -738,9 +739,9 @@ namespace vipir
         {
             for (auto writeTo : type->mWriteTo)
             {
-                opcodeBuilder.createInstruction(".debug_info")
+                opcodeBuilder.createInstruction(writeTo.section)
                     .immediate((uint32_t)type->mOffset)
-                    .emit(writeTo, true);
+                    .emit(writeTo.offset, true);
             }
         }
 

@@ -11,6 +11,12 @@
 
 namespace vipir
 {
+    struct WriteTo
+    {
+        uint64_t offset;
+        std::string section;
+    };
+
     class DIType
     {
     friend class DIBuilder;
@@ -26,7 +32,7 @@ namespace vipir
         // In case of forward references, once we emit debug
         // info for this type, write it's offset to all
         // of the locations in this vector
-        std::vector<uint64_t> mWriteTo;
+        std::vector<WriteTo> mWriteTo;
     };
 
     class DIBasicType : public DIType
