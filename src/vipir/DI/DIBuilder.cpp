@@ -939,6 +939,7 @@ namespace vipir
                                 encodeValue(emittedValue, ".debug_loclists");
                             }
                         }
+                        ++mLoclistsCount;
                         opcodeBuilder.createInstruction(".debug_loclists")
                             .immediate((uint8_t)DW_LLE_end_of_list)
                             .emit();
@@ -973,6 +974,10 @@ namespace vipir
         opcodeBuilder.createInstruction(".debug_info")
             .immediate((uint32_t)opcodeBuilder.getPosition(".debug_info"))
             .emit(0);
+
+        opcodeBuilder.createInstruction(".debug_loclists")
+            .immediate((uint32_t)mLoclistsCount)
+            .emit(4, true);
         opcodeBuilder.createInstruction(".debug_loclists")
             .immediate((uint32_t)opcodeBuilder.getPosition(".debug_loclists"))
             .emit(0);
