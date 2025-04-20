@@ -116,11 +116,11 @@ namespace vipir
         std::vector<std::unique_ptr<DIType> > mDebugTypes;
         
         int mAbbrevCount;
-        int mLoclistsCount{ 0 };
         bool mFinalized;
 
         std::unordered_map<std::string, std::uint32_t> mStrings;
         std::unordered_map<std::string, std::uint32_t> mLineStrings;
+        
 
         Module& mModule;
         codegen::OpcodeBuilder* mOpcodeBuilder;
