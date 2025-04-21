@@ -253,8 +253,9 @@ namespace vipir
         mOpcodeBuilder->createInstruction(".debug_info")
             .immediate((uint8_t)0x8)
             .emit();
-
+        
         // offset into .debug_abbrev
+        mOpcodeBuilder->relocLabel(".debug_abbrev", "dwarf32", ".debug_info");
         mOpcodeBuilder->createInstruction(".debug_info")
             .immediate((uint32_t)0)
             .emit();
@@ -305,9 +306,14 @@ namespace vipir
                 },
                 [this](Relocation arg) {
                     mOpcodeBuilder->relocLabel(arg.symbol, arg.location, arg.section, arg.offset, arg.addend);
-                    mOpcodeBuilder->createInstruction(".debug_info")
-                        .immediate(mOpcodeBuilder->getLabel(arg.symbol).first)
-                        .emit();
+                    if (arg.size == 32)
+                        mOpcodeBuilder->createInstruction(".debug_info")
+                            .immediate((uint32_t)mOpcodeBuilder->getLabel(arg.symbol).first)
+                            .emit();
+                    else if (arg.size == 64)
+                        mOpcodeBuilder->createInstruction(".debug_info")
+                            .immediate(mOpcodeBuilder->getLabel(arg.symbol).first)
+                            .emit();
                 },
                 [this](TypeOffset arg) {
                     writeTypeOffset(arg.mType, ".debug_info");
@@ -655,9 +661,9 @@ namespace vipir
             (uint8_t)DW_LANG_C11,
             filenamePosition,
             directoryPosition,
-            Relocation(".text", "dwarf", ".debug_info", 0, 0),
+            Relocation(".text", "dwarf", ".debug_info", 0, 0, 64),
             opcodeBuilder.getPosition(".text"),
-            (uint32_t)0
+            Relocation(".debug_line", "dwarf32", ".debug_info", 0, 0, 32),
         }};
         createInfoEntry(compileUnitInfo);
 
@@ -828,7 +834,7 @@ namespace vipir
                     (uint8_t)global->mLine,
                     (uint8_t)global->mCol,
                     typeOffset,
-                    Relocation(".text", "dwarf", ".debug_info", 0, start),
+                    Relocation(".text", "dwarf", ".debug_info", 0, start, 64),
                     end - start,
                     ULEB128(1),
                     (uint8_t)DW_OP_call_frame_cfa

@@ -51,12 +51,13 @@ namespace vipir
 
     struct Relocation
     {
-        Relocation(std::string symbol, std::string location, std::string section, int offset, int addend)
+        Relocation(std::string symbol, std::string location, std::string section, int offset, int addend, int size)
             : symbol(std::move(symbol))
             , location(std::move(location))
             , section(std::move(section))
             , offset(offset)
             , addend(addend)
+            , size(size)
         {
         }
 
@@ -65,6 +66,7 @@ namespace vipir
         std::string section;
         int offset;
         int addend;
+        int size;
     };
 
     struct DebugAbbrevItem
