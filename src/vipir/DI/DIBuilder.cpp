@@ -367,6 +367,11 @@ namespace vipir
     void DIBuilder::createDebugLine(std::vector<MC::EmitSourceInfo*>& sourceInfo)
     {
         mOpcodeBuilder->setSection(".debug_line");
+        // unit length(will be overwritten)
+        mOpcodeBuilder->createInstruction(".debug_line")
+            .immediate((uint32_t)0)
+            .emit();
+
         // version
         mOpcodeBuilder->createInstruction(".debug_line")
             .immediate((uint16_t)0x5)
@@ -459,7 +464,7 @@ namespace vipir
         
         // header length
         mOpcodeBuilder->createInstruction(".debug_line")
-            .immediate((uint32_t)mOpcodeBuilder->getPosition(".debug_line")-4)
+            .immediate((uint32_t)mOpcodeBuilder->getPosition(".debug_line")-8)
             .emit(headerLengthPos);
 
         // TODO: Generate line number program
@@ -478,7 +483,7 @@ namespace vipir
         mOpcodeBuilder->createInstruction(".debug_line")
             .immediate((uint8_t)DW_LNE_set_address)
             .emit();
-        mOpcodeBuilder->relocLabel(".text", "dwarf", ".debug_line", 4, -4 );
+        mOpcodeBuilder->relocLabel(".text", "dwarf", ".debug_line");
         mOpcodeBuilder->createInstruction(".debug_line")
             .immediate((uint64_t)mOpcodeBuilder->getLabel(".text").first)
             .emit();
@@ -508,8 +513,8 @@ namespace vipir
 
         // unit length
         mOpcodeBuilder->createInstruction(".debug_line")
-            .immediate((uint32_t)mOpcodeBuilder->getPosition(".debug_line"))
-            .emit(0);
+            .immediate((uint32_t)mOpcodeBuilder->getPosition(".debug_line")-4)
+            .emit(0, true);
     }
 
     void DIBuilder::createDebugArranges()
@@ -535,7 +540,7 @@ namespace vipir
             .emit();
         
         // .text
-        mOpcodeBuilder->relocLabel(".text", "dwarf", ".debug_arranges", 4, -4);
+        mOpcodeBuilder->relocLabel(".text", "dwarf", ".debug_arranges");
         mOpcodeBuilder->createInstruction(".debug_arranges")
             .immediate((uint64_t)0)
             .emit();
@@ -561,6 +566,10 @@ namespace vipir
     void DIBuilder::createDebugAddr()
     {
         mOpcodeBuilder->createInstruction(".debug_addr")
+            .immediate((uint32_t)0)
+            .emit();
+
+        mOpcodeBuilder->createInstruction(".debug_addr")
             .immediate((uint16_t)5)
             .emit();
 
@@ -573,15 +582,15 @@ namespace vipir
             .emit();
 
 
-        mOpcodeBuilder->relocLabel(".text", "dwarf", ".debug_addr", 4, -4);
+        mOpcodeBuilder->relocLabel(".text", "dwarf", ".debug_addr");
         mOpcodeBuilder->createInstruction(".debug_addr")
             .immediate((uint64_t)0x0)
             .emit();
-
         
+
         mOpcodeBuilder->createInstruction(".debug_addr")
-            .immediate((uint32_t)0)
-            .emit(0);
+        .immediate((uint32_t)mOpcodeBuilder->getPosition(".debug_addr")-4)
+        .emit(0, true);
     }
 
     void DIBuilder::createDebugLoclists()
@@ -646,7 +655,7 @@ namespace vipir
             (uint8_t)DW_LANG_C11,
             filenamePosition,
             directoryPosition,
-            Relocation(".text", "dwarf", ".debug_info", 4, -4),
+            Relocation(".text", "dwarf", ".debug_info", 0, 0),
             opcodeBuilder.getPosition(".text"),
             (uint32_t)0
         }};
@@ -819,7 +828,7 @@ namespace vipir
                     (uint8_t)global->mLine,
                     (uint8_t)global->mCol,
                     typeOffset,
-                    Relocation(".text", "dwarf", ".debug_info", 4, start - 4),
+                    Relocation(".text", "dwarf", ".debug_info", 0, start),
                     end - start,
                     ULEB128(1),
                     (uint8_t)DW_OP_call_frame_cfa
