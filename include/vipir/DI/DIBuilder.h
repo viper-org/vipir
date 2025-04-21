@@ -116,7 +116,6 @@ namespace vipir
         std::vector<std::unique_ptr<DIType> > mDebugTypes;
         
         int mAbbrevCount;
-        bool mFinalized;
 
         std::unordered_map<std::string, std::uint32_t> mStrings;
         std::unordered_map<std::string, std::uint32_t> mLineStrings;
@@ -128,7 +127,6 @@ namespace vipir
         std::uint32_t getStringPosition(std::string str);
         std::uint32_t getLineStringPosition(std::string str);
         void initializeStringTable();
-        uint32_t getDebugInfoSize();
         int getNextAbbrevId();
 
         void writeULEB128(uint64_t value, std::string section);

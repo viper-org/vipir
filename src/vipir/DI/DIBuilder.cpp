@@ -16,7 +16,6 @@ namespace vipir
 {
     DIBuilder::DIBuilder(Module& module)
         : mModule(module)
-        , mFinalized(false)
         , mAbbrevCount(1)
     {
     }
@@ -196,13 +195,6 @@ namespace vipir
     {
     }
 
-    uint32_t DIBuilder::getDebugInfoSize()
-    {
-        // Any references into .debug_info will be 4 bytes off before the length field is emitted,
-        // so that is checked here
-        return mOpcodeBuilder->getPosition(".debug_info") + (mFinalized ? 0 : 4);
-    }
-
     int DIBuilder::getNextAbbrevId()
     {
         return mAbbrevCount++;
@@ -241,6 +233,11 @@ namespace vipir
 
     void DIBuilder::createDwarfHeader()
     {
+        // unit length
+        mOpcodeBuilder->createInstruction(".debug_info")
+            .immediate((uint32_t)0)
+            .emit();
+
         // format
         mOpcodeBuilder->createInstruction(".debug_info")
             .immediate((uint16_t)0x5)
@@ -589,6 +586,11 @@ namespace vipir
 
     void DIBuilder::createDebugLoclists()
     {
+        // unit length(will be overwritten)
+        mOpcodeBuilder->createInstruction(".debug_loclists")
+            .immediate((uint32_t)0x0)
+            .emit();
+
         mOpcodeBuilder->createInstruction(".debug_loclists")
             .immediate((uint16_t)5)
             .emit();
@@ -602,7 +604,7 @@ namespace vipir
             .emit();
         
         mOpcodeBuilder->createInstruction(".debug_loclists")
-            .immediate((uint16_t)0x0)
+            .immediate((uint32_t)0x0)
             .emit();
     }
 
@@ -684,7 +686,7 @@ namespace vipir
 
         for (auto& type : mDebugTypes)
         {
-            type->mOffset = getDebugInfoSize();
+            type->mOffset = opcodeBuilder.getPosition(".debug_info");
             if (auto basicType = dynamic_cast<DIBasicType*>(type.get()))
             {
                 DebugInfoEntry typeInfo = { &basicTypeAbbrev, {
@@ -859,7 +861,7 @@ namespace vipir
 
                 for (auto& debugVariable : func->mDebugVariables)
                 {
-                    debugVariable->mOffset = getDebugInfoSize();
+                    debugVariable->mOffset = opcodeBuilder.getPosition(".debug_info");
 
                     auto values = debugVariable->mValues;
                     if (values.size() == 1)
@@ -903,7 +905,7 @@ namespace vipir
                             (uint16_t)debugVariable->mLine,
                             (uint16_t)debugVariable->mCol,
                             (uint32_t)debugVariable->mType->mOffset,
-                            (uint32_t)mOpcodeBuilder->getPosition(".debug_loclists")+4
+                            (uint32_t)mOpcodeBuilder->getPosition(".debug_loclists")
                         }};
                         createInfoEntry(variableInfo);
 
@@ -971,12 +973,10 @@ namespace vipir
         
         // unit lengths
         opcodeBuilder.createInstruction(".debug_info")
-            .immediate((uint32_t)opcodeBuilder.getPosition(".debug_info"))
-            .emit(0);
+            .immediate((uint32_t)opcodeBuilder.getPosition(".debug_info")-4)
+            .emit(0, true);
         opcodeBuilder.createInstruction(".debug_loclists")
-            .immediate((uint32_t)opcodeBuilder.getPosition(".debug_loclists"))
-            .emit(0);
-
-        mFinalized = true;
+            .immediate((uint32_t)opcodeBuilder.getPosition(".debug_loclists")-4)
+            .emit(0, true);
     }
 }
