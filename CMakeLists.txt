@@ -14,6 +14,7 @@ set(SOURCES
 
     "src/vipir/Pass/Pass.cpp"
     "src/vipir/Pass/DefaultPass.cpp"
+    "src/vipir/Pass/IRInfoPass.cpp"
 
     "src/vipir/IR/Function.cpp"
     "src/vipir/IR/Argument.cpp"
@@ -98,6 +99,7 @@ set(HEADERS
 
     "include/vipir/Pass/Pass.h"
     "include/vipir/Pass/DefaultPass.h"
+    "include/vipir/Pass/IRInfoPass.h"
 
     "include/vipir/IR/Value.h"
     "include/vipir/IR/Global.h"

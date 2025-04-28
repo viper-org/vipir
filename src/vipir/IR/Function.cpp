@@ -24,6 +24,7 @@
 #include <algorithm>
 #include <deque>
 #include <format>
+#include <stack>
 
 namespace vipir
 {
@@ -98,6 +99,11 @@ namespace vipir
     int Function::getNumBasicBlocks()
     {
         return mBasicBlockList.size();
+    }
+
+    std::vector<std::unique_ptr<BasicBlock> >& Function::getBasicBlocks()
+    {
+        return mBasicBlockList;
     }
 
     void Function::print(std::ostream& stream)
@@ -216,6 +222,36 @@ namespace vipir
         if (mEndLine)
         {
             builder.addValue(std::make_unique<lir::EmitSourceInfo>(mEndLine, mEndCol));
+        }
+    }
+
+    static void postorder(BasicBlock* head, std::vector<BasicBlock*>& visited, std::stack<BasicBlock*>& stack)
+    {
+        if (std::find(visited.begin(), visited.end(), head) != visited.end()) return;
+        visited.push_back(head);
+        for (auto succ : head->successors())
+        {
+            postorder(succ, visited, stack);
+        }
+        stack.push(head);
+    }
+
+    void Function::orderBasicBlocks()
+    {
+        if (mBasicBlockList.empty()) return;
+        std::vector<BasicBlock*> visited;
+        std::stack<BasicBlock*> stack;
+        postorder(mBasicBlockList[0].get(), visited, stack);
+        for (auto& bb : mBasicBlockList)
+        {
+            std::ignore = bb.release();
+        }
+        mBasicBlockList.clear();
+        while (!stack.empty())
+        {
+            auto bb = stack.top();
+            stack.pop();
+            mBasicBlockList.push_back(BasicBlockPtr(bb));
         }
     }
 

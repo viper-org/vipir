@@ -143,6 +143,14 @@ namespace vipir
 
     void Module::lirEmission()
     {
+        for (const GlobalPtr& global : mGlobals)
+        {
+            if (auto func = dynamic_cast<Function*>(global.get()))
+            {
+                func->orderBasicBlocks();
+            }
+        }
+
         opt::RegAlloc regalloc;
         for (const GlobalPtr& global : mGlobals)
         {

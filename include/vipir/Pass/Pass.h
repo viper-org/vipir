@@ -26,7 +26,9 @@ namespace vipir
         PeepholeOptimization,
         ConstantFolding,
         AliasAnalysis,
-        Mem2Reg
+        Mem2Reg,
+
+        CFGEmission
     };
 
     class Pass

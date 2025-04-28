@@ -50,6 +50,7 @@ namespace vipir
 
         void insertBasicBlock(BasicBlock* basicBlock);
         int getNumBasicBlocks();
+        std::vector<BasicBlockPtr>& getBasicBlocks();
         void setEmittedValue();
         bool isPure() const;
 
@@ -62,6 +63,8 @@ namespace vipir
 
     protected:
         void emit(lir::Builder& builder) override;
+
+        void orderBasicBlocks();
 
         std::vector<AllocaInst*> getAllocaList();
 

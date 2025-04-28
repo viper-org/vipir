@@ -191,7 +191,7 @@ namespace vipir
                 for (auto& value: basicBlock->mValueList)
                 {
                     value->mInterval.first = index;
-                    value->mInterval.second = index+1;
+                    //value->mInterval.second = index+1;
                     value->mId = index;
                     index++;
                 }
