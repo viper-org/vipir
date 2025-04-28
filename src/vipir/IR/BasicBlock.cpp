@@ -3,7 +3,9 @@
 #include "vipir/IR/BasicBlock.h"
 #include "vipir/IR/Function.h"
 
+#include "vipir/IR/Instruction/BranchInst.h"
 #include "vipir/IR/Instruction/PhiInst.h"
+#include "vipir/IR/Instruction/RetInst.h"
 
 #include "vipir/Module.h"
 
@@ -61,6 +63,13 @@ namespace vipir
     {
         std::erase_if(mValueList, [value](ValuePtr& valuePtr) {
             return valuePtr.get() == value;
+        });
+    }
+
+    bool BasicBlock::hasTerminator() const
+    {
+        return std::any_of(mValueList.rbegin(), mValueList.rend(), [](const auto& value) {
+            return dynamic_cast<BranchInst*>(value.get()) || dynamic_cast<RetInst*>(value.get());
         });
     }
 

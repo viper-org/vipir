@@ -37,6 +37,8 @@ namespace vipir
         void insertValue(Value* insertAfter, Value* value);
         void eraseValue(Value* value);
 
+        bool hasTerminator() const;
+
         std::vector<Value*>& liveIn();
         std::vector<BasicBlock*>& successors();
         std::vector<BasicBlock*>& predecessors();
@@ -79,7 +81,7 @@ namespace vipir
 
         bool mExists;
 
-        lir::Value* mEndNode; // for phi nodes
+        lir::Value* mEndNode{ nullptr }; // for phi nodes
     };
 }
 

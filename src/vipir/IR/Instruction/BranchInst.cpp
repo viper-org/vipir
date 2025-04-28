@@ -71,6 +71,7 @@ namespace vipir
 
     void BranchInst::emit(lir::Builder& builder)
     {
+        assert(!mParent->endNode());
         mParent->endNode() = builder.getLastNode();
 
         if (mIsConstantFolded && !mTrueBranch)
