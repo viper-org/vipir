@@ -230,7 +230,6 @@ namespace vipir
                 for (auto valueIt = bb->mValueList.rbegin(); valueIt != bb->mValueList.rend(); ++valueIt)
                 {
                     auto& value = *valueIt;
-                    if (dynamic_cast<PhiInst*>(value.get())) continue;
 
                     for (auto operandR: value->getOperands())
                     {

@@ -242,15 +242,24 @@ namespace vipir
         std::vector<BasicBlock*> visited;
         std::stack<BasicBlock*> stack;
         postorder(mBasicBlockList[0].get(), visited, stack);
+
+        std::vector<BasicBlock*> blocks;
         for (auto& bb : mBasicBlockList)
         {
-            std::ignore = bb.release();
+            blocks.push_back(bb.release());
         }
         mBasicBlockList.clear();
         while (!stack.empty())
         {
             auto bb = stack.top();
             stack.pop();
+            mBasicBlockList.push_back(BasicBlockPtr(bb));
+            std::erase(blocks, bb);
+        }
+        // The basicblocks need to still exist, just not be in the function anymore 
+        for (auto bb : blocks)
+        {
+            bb->mExists = false;
             mBasicBlockList.push_back(BasicBlockPtr(bb));
         }
     }

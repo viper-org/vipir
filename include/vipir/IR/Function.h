@@ -38,7 +38,7 @@ namespace vipir
     using BasicBlockPtr = std::unique_ptr<BasicBlock>;
     public:
         static Function* Create(FunctionType* type, Module& module, std::string_view name, bool pure, const abi::CallingConvention* callingConvention);
-        static Function* Create(FunctionType* type, Module& module, std::string_view name, bool pure); // can't use another parameter in a default parameter
+        static Function* Create(FunctionType* type, Module& module, std::string_view name, bool pure);
         
         void replaceAllUsesWith(Value* old, Value* newValue);
 

@@ -111,6 +111,14 @@ namespace vipir
 
     void Module::print(std::ostream& stream) const
     {
+        for (const GlobalPtr& global : mGlobals)
+        {
+            if (auto func = dynamic_cast<Function*>(global.get()))
+            {
+                func->orderBasicBlocks();
+            }
+        }
+
         stream << std::format("file \"{}\"", mName);
 
         for (const GlobalPtr& global : mGlobals)
