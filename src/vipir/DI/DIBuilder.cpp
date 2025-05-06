@@ -481,9 +481,8 @@ enum DwarfLocationListEntry {
 
 namespace vipir
 {
-    DIBuilder::DIBuilder(Module& module)
-        : mModule(module)
-        , mAbbrevCount(1)
+    DIBuilder::DIBuilder()
+        : mAbbrevCount(1)
     {
     }
 
@@ -545,6 +544,19 @@ namespace vipir
         mDebugTypes.push_back(std::unique_ptr<DIType>(ptr));
 
         return ptr;
+    }
+
+    void DIBuilder::borrowDebugType(DIType* type)
+    {
+        mBorrowedDebugTypes.push_back(type);
+    }
+
+    void DIBuilder::borrowTypes(DIBuilder* from)
+    {
+        for (auto& debugType : from->mDebugTypes)
+        {
+            mBorrowedDebugTypes.push_back(debugType.get());
+        }
     }
 
     DIVariable* DIBuilder::createLocalVariable(std::string name, Function* parent, DIType* type, int line, int col)
@@ -1095,7 +1107,7 @@ namespace vipir
         return (value + align - 1) & ~(align - 1);
     }
 
-    void DIBuilder::generateDwarf(MC::Builder& mcBuilder, codegen::OpcodeBuilder& opcodeBuilder)
+    void DIBuilder::generateDwarf(Module& module, MC::Builder& mcBuilder, codegen::OpcodeBuilder& opcodeBuilder)
     {
         mOpcodeBuilder = &opcodeBuilder;
         mOpcodeBuilder->addLabel(".LEtext", ".text", false);
@@ -1165,11 +1177,15 @@ namespace vipir
             { DW_AT_data_member_location, DW_FORM_data2 },
         }};
         createAbbrevEntry(memberAbbrev);
+        
+        std::vector<DIType*> types;
+        for (auto& debugType : mDebugTypes) types.push_back(debugType.get());
+        std::copy(mBorrowedDebugTypes.begin(), mBorrowedDebugTypes.end(), std::back_inserter(types));
 
-        for (auto& type : mDebugTypes)
+        for (auto& type : types)
         {
             type->mOffset = opcodeBuilder.getPosition(".debug_info");
-            if (auto basicType = dynamic_cast<DIBasicType*>(type.get()))
+            if (auto basicType = dynamic_cast<DIBasicType*>(type))
             {
                 DebugInfoEntry typeInfo = { &basicTypeAbbrev, {
                     (uint8_t)(basicType->mType->getSizeInBits() / 8),
@@ -1178,7 +1194,7 @@ namespace vipir
                 }};
                 createInfoEntry(typeInfo);
             }
-            else if (auto pointerType = dynamic_cast<DIPointerType*>(type.get()))
+            else if (auto pointerType = dynamic_cast<DIPointerType*>(type))
             {
                 DebugInfoEntry typeInfo = { &pointerTypeAbbrev, {
                     (uint8_t)0x8,
@@ -1186,7 +1202,7 @@ namespace vipir
                 }};
                 createInfoEntry(typeInfo);
             }
-            else if (auto structureType = dynamic_cast<DIStructureType*>(type.get()))
+            else if (auto structureType = dynamic_cast<DIStructureType*>(type))
             {
                 DebugInfoEntry typeInfo = { &structTypeAbbrev, {
                     getStringPosition(structureType->mName),
@@ -1219,7 +1235,7 @@ namespace vipir
             }
         }
 
-        for (auto& type : mDebugTypes)
+        for (auto& type : types)
         {
             for (auto writeTo : type->mWriteTo)
             {
@@ -1261,7 +1277,7 @@ namespace vipir
         createAbbrevEntry(multiValueParameterAbbrev);
         
         int idx = 2;
-        for (auto& global : mModule.getGlobals())
+        for (auto& global : module.getGlobals())
         {
             if (auto func = dynamic_cast<Function*>(global.get()))
             {

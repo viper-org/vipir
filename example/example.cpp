@@ -94,7 +94,7 @@ int main()
     vipir::Module mod("test.tst");
     mod.setABI<vipir::abi::SysV>();
     
-    vipir::DIBuilder diBuilder(mod);
+    vipir::DIBuilder diBuilder;
     diBuilder.setFilename("test.tst");
     diBuilder.setDirectory(std::filesystem::current_path().string());
     diBuilder.setProducer("Example vipIR project");

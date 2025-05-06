@@ -93,7 +93,7 @@ namespace vipir
     {
     friend class Module;
     public:
-        DIBuilder(Module& module);
+        DIBuilder();
 
         void setProducer(std::string_view producer);
         void setFilename(std::string_view filename);
@@ -107,6 +107,9 @@ namespace vipir
         DIType* createPointerType(DIType* base);
         DIType* createStructureType(std::string name, StructType* structType, int line, int col);
 
+        void borrowDebugType(DIType* type);
+        void borrowTypes(DIBuilder* from);
+
         DIVariable* createLocalVariable(std::string name, Function* parent, DIType* type, int line, int col);
         DIVariable* createParameterVariable(std::string name, Function* parent, DIType* type);
 
@@ -116,6 +119,7 @@ namespace vipir
         std::string mDirectory;
 
         std::vector<std::unique_ptr<DIType> > mDebugTypes;
+        std::vector<DIType*> mBorrowedDebugTypes;
         
         int mAbbrevCount;
 
@@ -123,7 +127,6 @@ namespace vipir
         std::unordered_map<std::string, std::uint32_t> mLineStrings;
         
 
-        Module& mModule;
         codegen::OpcodeBuilder* mOpcodeBuilder;
 
         std::uint32_t getStringPosition(std::string str);
@@ -148,7 +151,7 @@ namespace vipir
         void createDebugAddr();
         void createDebugLoclists();
 
-        void generateDwarf(MC::Builder& mcBuilder, codegen::OpcodeBuilder& opcodeBuilder);
+        void generateDwarf(Module& module, MC::Builder& mcBuilder, codegen::OpcodeBuilder& opcodeBuilder);
 
     };
 }

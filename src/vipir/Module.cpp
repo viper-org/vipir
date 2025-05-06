@@ -214,7 +214,7 @@ namespace vipir
 
     void Module::generateDebugInfo(DIBuilder* builder)
     {
-        builder->generateDwarf(mInstructionBuilder, mOpcodeBuilder);
+        builder->generateDwarf(*this, mInstructionBuilder, mOpcodeBuilder);
     }
 
     void Module::emit(std::ostream& stream)
