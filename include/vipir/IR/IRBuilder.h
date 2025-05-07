@@ -39,6 +39,7 @@ namespace vipir
     class QueryAddress;
 
     class ConstantBool;
+    class ConstantStruct;
 
 
     class DIVariable;
@@ -110,6 +111,7 @@ namespace vipir
 
 
         ConstantBool* CreateConstantBool(bool value);
+        ConstantStruct* CreateConstantStruct(Type* type, std::vector<Value*> values);
 
 
         EmitDebugInfo* CreateDebugInfo(int line, int col);

@@ -43,6 +43,15 @@ namespace vipir
             builder.addValue(std::make_unique<lir::Move>(mEmittedValue->clone(), std::move(source)));
         }
         else
-            mEmittedValue = std::make_unique<lir::VirtualReg>(mVReg, mType->getOperandSize());
+        {
+            if (mVReg->onStack())
+            {
+                mEmittedValue = std::make_unique<lir::Memory>(mType->getOperandSize(), std::make_unique<lir::VirtualReg>(mVReg, mType->getOperandSize()), std::nullopt, nullptr, std::nullopt);
+            }
+            else
+            {
+                mEmittedValue = std::make_unique<lir::VirtualReg>(mVReg, mType->getOperandSize());
+            }
+        }
     }
 }

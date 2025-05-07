@@ -10,6 +10,8 @@
 
 #include "vipir/IR/Instruction/Instruction.h"
 
+#include "vipir/Type/StructType.h"
+
 namespace vipir
 {
     class GEPInst : public Instruction
@@ -32,6 +34,8 @@ namespace vipir
         Value* mPtr;
         Value* mOffset;
         int mAlignment;
+
+        StructType* mStructType{ nullptr };
 
         int mValueId;
     };

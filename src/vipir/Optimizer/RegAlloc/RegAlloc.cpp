@@ -5,6 +5,7 @@
 
 #include "vipir/IR/Instruction/AllocaInst.h"
 #include "vipir/IR/Instruction/PhiInst.h"
+#include "vipir/Type/StructType.h"
 
 #include <algorithm>
 #include <map>
@@ -316,15 +317,40 @@ namespace vipir
 
         std::vector<Argument*> RegAlloc::setArguments(Function* function, abi::ABI* abi, std::vector<Value*>& activeValues, std::map<int, VReg*>& virtualRegs)
         {
-            std::vector<Argument*> todo;
-
-            int argumentIndex = 0;
-
             const abi::CallingConvention* callingConvention = function->getCallingConvention();
 
+            std::vector<Argument*> todo;
+
+            for (auto it = function->mArguments.begin(); it != function->mArguments.end(); ++it)
+            {
+                auto& arg = *it;
+                if (arg->getType()->isStructType())
+                {
+                    auto structType = static_cast<StructType*>(arg->getType());
+                    if (structType->getSizeInBits() <= callingConvention->getMaxStructSize())
+                    {
+
+                    }
+                }
+            }
+
+            int argumentIndex = 0;
+            
+            std::vector<Argument*> memArgs;
+            
             auto iterations = std::min(callingConvention->getParameterRegisterCount(), static_cast<int>(function->mArguments.size()));
             for (int i = 0; i < iterations; ++i)
             {
+                if (function->mArguments[i]->getType()->isStructType())
+                {
+                    auto structType = static_cast<StructType*>(function->mArguments[i]->getType());
+                    if (structType->getSizeInBits() <= callingConvention->getMaxStructSize())
+                    {
+                        memArgs.push_back(function->mArguments[i].get());
+                        continue;
+                    }
+                }
+                
                 auto it = std::find_if(virtualRegs.begin(), virtualRegs.end(), [argumentIndex, function](const auto& vreg) {
                     return vreg.second->mPhysicalRegister == function->getCallingConvention()->getParameterRegister(argumentIndex);
                 });
@@ -339,16 +365,21 @@ namespace vipir
                 virtualRegs.erase(it);
                 activeValues.push_back(function->mArguments[i].get());
             }
-
-            if (function->mArguments.size() > callingConvention->getParameterRegisterCount())
+            
+            for (auto it = function->mArguments.begin() + callingConvention->getParameterRegisterCount(); it < function->mArguments.end(); ++it)
+            {
+                memArgs.push_back(it->get());
+            }
+            
+            if (!memArgs.empty())
             {
                 if (callingConvention->getArgumentPassingOrder() == abi::ArgumentPassingOrder::RightToLeft)
                 {
-                    addStackParams(function->mArguments.rbegin(), function->mArguments.rend() - callingConvention->getParameterRegisterCount(), function, abi, activeValues);
+                    addStackParams(memArgs.rbegin(), memArgs.rend(), function, abi, activeValues);
                 }
                 else if (callingConvention->getArgumentPassingOrder() == abi::ArgumentPassingOrder::LeftToRight)
                 {
-                    addStackParams(function->mArguments.begin() + callingConvention->getParameterRegisterCount(), function->mArguments.end(), function, abi, activeValues);
+                    addStackParams(memArgs.begin(), memArgs.end(), function, abi, activeValues);
                 }
             }
 

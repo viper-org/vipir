@@ -167,6 +167,7 @@ namespace vipir
             codegen::OperandSize size() override;
 
             OperandPtr base();
+            void addDisplacement(int displacement);
 
         private:
             codegen::OperandSize mSize;

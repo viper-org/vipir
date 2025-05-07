@@ -21,6 +21,8 @@ namespace vipir
             std::vector<int> getCallerSavedRegisters() const override;
             std::vector<int> getCalleeSavedRegisters() const override;
 
+            int getMaxStructSize() const override;
+
             ArgumentPassingOrder getArgumentPassingOrder() const override;
             StackCleaner getStackCleaner() const override;
 

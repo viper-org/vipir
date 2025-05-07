@@ -12,6 +12,12 @@
 
 namespace vipir
 {
+    enum class ArgumentClass
+    {
+        Integer,
+        Memory,
+    };
+
     class Argument : public Value
     {
     friend class Function;
@@ -30,6 +36,8 @@ namespace vipir
     private:
         std::string mName;
         int mIdx;
+
+        ArgumentClass mClass;
 
         // In case we cannot use the physical register of this argument
         opt::VReg* mMoveTo;

@@ -2,6 +2,7 @@
 
 #include "vipir/IR/IRBuilder.h"
 #include "vipir/IR/BasicBlock.h"
+#include "vipir/IR/Constant/ConstantStruct.h"
 #include "vipir/IR/Function.h"
 
 #include "vipir/IR/Debug/EmitDebugInfo.h"
@@ -435,6 +436,15 @@ namespace vipir
         mInsertPoint->insertValue(mInsertAfter, constantBool);
 
         return constantBool;
+    }
+    
+    ConstantStruct* IRBuilder::CreateConstantStruct(Type* type, std::vector<Value*> values)
+    {
+        ConstantStruct* constant = new ConstantStruct(mInsertPoint->getModule(), type, std::move(values));
+
+        mInsertPoint->insertValue(mInsertAfter, constant);
+
+        return constant;
     }
 
 

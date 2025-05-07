@@ -63,6 +63,11 @@ public:
         return 3;
     }
 
+    int getMaxStructSize() const override
+    {
+        return 128; // 16 bytes
+    }
+
     std::vector<int> getCallerSavedRegisters() const override
     {
         return { 0, 1, 2, 6, 7, 8, 9, 10, 11 };

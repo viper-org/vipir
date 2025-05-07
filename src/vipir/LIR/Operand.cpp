@@ -14,6 +14,7 @@
 
 #include <cassert>
 #include <format>
+#include <iostream>
 
 namespace vipir
 {
@@ -360,6 +361,18 @@ namespace vipir
         OperandPtr Memory::base()
         {
             return mBase->clone();
+        }
+
+        void Memory::addDisplacement(int displacement)
+        {
+            if (mDisplacement)
+            {
+                *mDisplacement += displacement;
+            }
+            else
+            {
+                mDisplacement = displacement;
+            }
         }
 
 

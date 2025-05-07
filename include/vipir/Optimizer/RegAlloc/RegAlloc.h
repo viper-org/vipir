@@ -39,7 +39,7 @@ namespace vipir
 
                 for (auto it = begin; it < end; ++it)
                 {
-                    ArgumentPtr& argument = *it;
+                    Argument* argument = *it;
 
                     int id = function->mVirtualRegs.size();
                     function->mVirtualRegs.push_back(std::make_unique<VReg>(id, abi->getStackOffsetRegister()));
@@ -51,7 +51,7 @@ namespace vipir
                     stackOffset -= 8;
 
                     argument->mVReg = vreg;
-                    activeValues.push_back(argument.get());
+                    activeValues.push_back(argument);
                 }
             }
 
