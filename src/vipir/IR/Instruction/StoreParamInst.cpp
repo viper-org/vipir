@@ -1,6 +1,7 @@
 // Copyright 2024 solar-mist
 
 #include "vipir/IR/Instruction/StoreParamInst.h"
+#include "vipir/IR/Constant/ConstantStruct.h"
 #include "vipir/IR/Instruction/LoadInst.h"
 #include "vipir/IR/Instruction/AllocaInst.h"
 
@@ -65,7 +66,17 @@ namespace vipir
         if (mValue->getType()->isStructType())
         {
             auto load = dynamic_cast<LoadInst*>(mValue);
-            assert(load != nullptr);
+            if (!load)
+            {
+                auto constant = dynamic_cast<ConstantStruct*>(mValue);
+                assert(constant);
+                auto compound = static_cast<lir::Compound*>(value.get());
+                for (auto it = compound->getValues().rbegin(); it != compound->getValues().rend(); ++it)
+                {
+                    builder.addValue(std::make_unique<lir::Push>((*it)->clone()));
+                }
+                return;
+            }
 
             auto loadPointer = load->getPointer();
             auto ptr = loadPointer->getEmittedValue();
