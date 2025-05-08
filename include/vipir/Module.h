@@ -13,6 +13,8 @@
 
 #include "vipir/ABI/ABI.h"
 
+#include "vipir/DI/DIBuilder.h"
+
 #include <cassert>
 #include <memory>
 #include <string>
@@ -65,6 +67,7 @@ namespace vipir
 
         void lirEmission();
         void lirCodegen();
+        void generateDebugInfo(DIBuilder* builder);
         void emit(std::ostream& stream);
 
     private:
@@ -77,6 +80,8 @@ namespace vipir
         bool mRunPasses;
 
         lir::Builder mBuilder;
+        codegen::OpcodeBuilder mOpcodeBuilder;
+        MC::Builder mInstructionBuilder;
         std::unique_ptr<codegen::IOutputFormat> mOutputFormat;
     };
 

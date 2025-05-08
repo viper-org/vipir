@@ -3,9 +3,11 @@
 #include "vipir/IR/Instruction/PhiInst.h"
 #include "vipir/IR/BasicBlock.h"
 
+#include "vipir/IR/Instruction/AddrInst.h"
 #include "vipir/Module.h"
 
 #include "vipir/LIR/Instruction/Move.h"
+#include "vipir/LIR/Instruction/LoadAddress.h"
 
 #include <algorithm>
 
@@ -30,6 +32,13 @@ namespace vipir
         }
         return operands;
     }
+    
+    void PhiInst::eraseFromParent()
+    {
+        std::erase(mParent->mPhis, this);
+        
+        Instruction::eraseFromParent();
+    }
 
     void PhiInst::addIncoming(Value* value, BasicBlock* basicBlock)
     {
@@ -38,26 +47,31 @@ namespace vipir
 
     void PhiInst::emit(lir::Builder& builder)
     {
-        lir::OperandPtr vreg = std::make_unique<lir::VirtualReg>(mVReg, mType->getOperandSize());
-
         std::vector<BasicBlock*> done;
         for (auto& incoming : mIncoming)
         {
             if (std::find(done.begin(), done.end(), incoming.second) != done.end()) continue;
             if (incoming.second->exists())
             {
+                if (incoming.first == this) continue;
+
                 done.push_back(incoming.second);
-                auto position = incoming.second->endPosition();
-                position += builder.getInsertsBefore(position);
-                builder.insertValue(std::make_unique<lir::Move>(vreg->clone(), incoming.first->getEmittedValue()), position);
+                auto value = std::make_unique<lir::Move>(mEmittedValue->clone(), incoming.first->getEmittedValue());
+                auto ptr = value.get();
+                builder.insertValue(std::move(value), incoming.second->endNode());
+                incoming.second->endNode() = ptr;
             }
         }
-        mEmittedValue = std::move(vreg);
+    }
+
+    void PhiInst::setEmittedValue()
+    {
+        mEmittedValue = std::make_unique<lir::VirtualReg>(mVReg, mType->getOperandSize());
     }
 
     std::string PhiInst::ident() const
     {
-        return getName(mValueId);
+        return "%" + getName(mValueId);
     }
 
     void PhiInst::doConstantFold()

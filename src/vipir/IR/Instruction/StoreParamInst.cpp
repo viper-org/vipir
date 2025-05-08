@@ -1,9 +1,14 @@
 // Copyright 2024 solar-mist
 
 #include "vipir/IR/Instruction/StoreParamInst.h"
+#include "vipir/IR/Constant/ConstantStruct.h"
+#include "vipir/IR/Instruction/LoadInst.h"
+#include "vipir/IR/Instruction/AllocaInst.h"
 
 #include "vipir/IR/BasicBlock.h"
 
+#include "vipir/IR/Instruction/AddrInst.h"
+#include "vipir/LIR/Instruction/LoadAddress.h"
 #include "vipir/Module.h"
 
 #include "vipir/LIR/Instruction/Move.h"
@@ -58,6 +63,41 @@ namespace vipir
             builder.addValue(std::make_unique<lir::BinaryArithmetic>(stack->clone(), lir::BinaryArithmetic::Operator::Sub, std::move(alignment)));
         }
 
+        if (mType->isStructType())
+        {
+            auto constant = dynamic_cast<ConstantStruct*>(mValue);
+            if (constant)
+            {
+                auto compound = static_cast<lir::Compound*>(value.get());
+                for (auto it = compound->getValues().rbegin(); it != compound->getValues().rend(); ++it)
+                {
+                    builder.addValue(std::make_unique<lir::Push>((*it)->clone()));
+                }
+                return;
+            }
+
+            auto ptr = mValue->getEmittedValue();
+            if (dynamic_cast<AllocaInst*>(mValue))
+            {
+                ptr = std::make_unique<lir::Memory>(mType->getOperandSize(), std::move(ptr), std::nullopt, nullptr, std::nullopt);
+            }
+            else
+            {
+                ptr = std::make_unique<lir::Memory>(mType->getOperandSize(), std::move(ptr), std::nullopt, nullptr, std::nullopt);
+            }
+            
+            // Push in reverse order so the struct is laid out correctly for the callee
+            for (int i = mType->getSizeInBits() / 8 - 8; i >= 0; i -= 8)
+            {
+                auto mem = static_cast<lir::Memory*>(ptr.get());
+                auto ptr = mem->clone();
+                mem = static_cast<lir::Memory*>(ptr.get());
+                mem->addDisplacement(i);
+                builder.addValue(std::make_unique<lir::Push>(std::move(ptr)));
+            }
+            return;
+        }
+
         if (regID != -1)
         {
             ptr = std::make_unique<lir::PhysicalReg>(regID, mValue->getType()->getOperandSize());
@@ -77,6 +117,15 @@ namespace vipir
             , mValue(value)
             , mAlignStack(alignStack)
     {
+        if (mValue->getType()->isStructType())
+        {
+            if (auto load = dynamic_cast<LoadInst*>(mValue))
+            {
+                auto ptr = load->getPointer();
+                mValue = ptr;
+            }
+        }
+
         mType = value->getType();
         mValue->setPreferredRegisterID(mCallingConvention->getParameterRegister(mParamIndex));
         mRequiresVReg = false;

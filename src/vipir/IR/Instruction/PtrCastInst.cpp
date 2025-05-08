@@ -15,7 +15,7 @@ namespace vipir
 {
     void PtrCastInst::print(std::ostream& stream)
     {
-        stream << std::format("ptr cast {} -> {} %{}", mPtr->ident(), mType->getName(), getName(mValueId));
+        stream << std::format("%{} = inttoptr {} -> {}", getName(mValueId), mPtr->ident(), mType->getName());
     }
 
     std::string PtrCastInst::ident() const

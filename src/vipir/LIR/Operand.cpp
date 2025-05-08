@@ -14,6 +14,7 @@
 
 #include <cassert>
 #include <format>
+#include <iostream>
 
 namespace vipir
 {
@@ -98,9 +99,10 @@ namespace vipir
         }
 
 
-        VirtualReg::VirtualReg(opt::VReg* vreg, codegen::OperandSize size)
+        VirtualReg::VirtualReg(opt::VReg* vreg, codegen::OperandSize size, bool pointer)
             : mVreg(vreg)
             , mSize(size)
+            , mPointer(pointer)
         {
         }
 
@@ -116,7 +118,7 @@ namespace vipir
 
         OperandPtr VirtualReg::clone()
         {
-            return std::make_unique<VirtualReg>(mVreg, mSize);
+            return std::make_unique<VirtualReg>(mVreg, mSize, mPointer);
         }
         
         bool VirtualReg::operator==(OperandPtr& other)
@@ -140,6 +142,11 @@ namespace vipir
         codegen::OperandSize VirtualReg::size()
         {
             return mSize;
+        }
+
+        bool& VirtualReg::pointer()
+        {
+            return mPointer;
         }
 
 
@@ -175,6 +182,11 @@ namespace vipir
         codegen::OperandSize Lbl::size()
         {
             return codegen::OperandSize::None;
+        }
+
+        std::string Lbl::getName()
+        {
+            return mName;
         }
 
 
@@ -275,6 +287,8 @@ namespace vipir
 
             instruction::RegisterPtr base;
             std::optional<int> displacement = mDisplacement;
+            instruction::RegisterPtr index = nullptr;
+            std::optional<int> scale = mScale;
 
             if (auto reg = dynamic_cast<instruction::Register*>(baseOperand.get()))
             {
@@ -282,9 +296,19 @@ namespace vipir
             }
             else if (auto mem = dynamic_cast<instruction::Memory*>(baseOperand.get()))
             {
-                assert(mem->getIndex() == nullptr);
-                assert(mem->getScale().value_or(0) == 0);
-                base = std::make_unique<instruction::Register>(mem->getBase()->getID(), mem->getBase()->getSize());
+                if (mIndex == nullptr && mScale.value_or(0) == 0)
+                {
+                    if (mem->getIndex())
+                        index = mem->getIndex()->clone(mem->getIndex()->getSize());
+                    scale = mem->getScale();
+                }
+                else
+                {
+                    assert(mem->getIndex() == nullptr);
+                    //assert(mem->getScale().value_or(0) == 0);
+                }
+
+                base = mem->getBase()->clone(mem->getBase()->getSize());
                 if (mem->getDisplacement())
                 {
                     if (displacement) *displacement += *mem->getDisplacement();
@@ -292,7 +316,6 @@ namespace vipir
                 }
             }
 
-            instruction::RegisterPtr index = nullptr;
             if (mIndex)
             {
                 instruction::OperandPtr indexOperand = mIndex->asmOperand();
@@ -307,7 +330,7 @@ namespace vipir
                 }
             }
 
-            return std::make_unique<instruction::Memory>(std::move(base), displacement, std::move(index), mScale);
+            return std::make_unique<instruction::Memory>(std::move(base), displacement, std::move(index), scale);
         }
 
         OperandPtr Memory::clone()
@@ -338,6 +361,18 @@ namespace vipir
         OperandPtr Memory::base()
         {
             return mBase->clone();
+        }
+
+        void Memory::addDisplacement(int displacement)
+        {
+            if (mDisplacement)
+            {
+                *mDisplacement += displacement;
+            }
+            else
+            {
+                mDisplacement = displacement;
+            }
         }
 
 

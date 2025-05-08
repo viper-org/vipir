@@ -12,6 +12,8 @@
 
 namespace vipir
 {
+    class DIBuilder;
+
     class LIREmissionPass : public Pass
     {
     public:
@@ -26,6 +28,17 @@ namespace vipir
         LIRCodegenPass();
 
         virtual void execute(Module& module) override;
+    };
+
+    class DebugInfoEmissionPass : public Pass
+    {
+    public:
+        DebugInfoEmissionPass(DIBuilder* builder);
+
+        virtual void execute(Module& module) override;
+
+    private:
+        DIBuilder* mBuilder;
     };
 
 

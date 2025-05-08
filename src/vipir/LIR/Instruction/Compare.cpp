@@ -56,7 +56,7 @@ namespace vipir
 
         void Compare::emit(MC::Builder& builder)
         {
-            if (dynamic_cast<VirtualReg*>(mRight.get()) || dynamic_cast<PhysicalReg*>(mRight.get()))
+            if(false) //if (dynamic_cast<VirtualReg*>(mRight.get()) || dynamic_cast<PhysicalReg*>(mRight.get()))
             {
                 builder.addValue(std::make_unique<instruction::CmpInstruction>(mRight->asmOperand(), mLeft->asmOperand()));
             }

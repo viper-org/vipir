@@ -5,7 +5,13 @@
 namespace vipir
 {
     BooleanType::BooleanType()
-        : Type(0, "bool")
+        : Type(8, "bool")
     {
+        mOperandSize = codegen::OperandSize::Byte;
+    }
+
+    bool BooleanType::isBooleanType() const
+    {
+        return true;
     }
 }

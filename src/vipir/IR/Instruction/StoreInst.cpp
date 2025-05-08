@@ -3,6 +3,7 @@
 #include "vipir/IR/Instruction/StoreInst.h"
 #include "vipir/IR/Instruction/LoadInst.h"
 #include "vipir/IR/Instruction/GEPInst.h"
+#include "vipir/IR/Instruction/AllocaInst.h"
 
 #include "vipir/IR/BasicBlock.h"
 #include "vipir/IR/GlobalVar.h"
@@ -55,6 +56,45 @@ namespace vipir
         else if (dynamic_cast<GEPInst*>(mPtr))
         {
             ptr = std::make_unique<lir::Memory>(mValue->getType()->getOperandSize(), std::move(ptr), std::nullopt, nullptr, std::nullopt);
+        }
+
+        if (mValue->getType()->isStructType())
+        {
+            auto structType = static_cast<StructType*>(mValue->getType());
+            if (dynamic_cast<AllocaInst*>(mPtr))
+            {
+                ptr = std::make_unique<lir::Memory>(mValue->getType()->getOperandSize(), std::move(ptr), std::nullopt, nullptr, std::nullopt);
+            }
+            if (auto compound = dynamic_cast<lir::Compound*>(value.get()))
+            {
+                auto align = structType->getAlignment() / 8;
+                for (int i = 0; i < structType->getFields().size(); ++i)
+                {
+                    auto mem = static_cast<lir::Memory*>(ptr.get());
+                    auto ptr = mem->clone();
+                    mem = static_cast<lir::Memory*>(ptr.get());
+                    mem->addDisplacement(i * align);
+
+                    builder.addValue(std::make_unique<lir::Move>(std::move(ptr), compound->getValues()[i]->clone()));
+                }
+            }
+            else
+            {
+                for (int i = 0; i < structType->getSizeInBits() / 8; i += 8)
+                {
+                    auto mem = static_cast<lir::Memory*>(ptr.get());
+                    auto ptr = mem->clone();
+                    mem = static_cast<lir::Memory*>(ptr.get());
+                    mem->addDisplacement(i);
+                    
+                    mem = static_cast<lir::Memory*>(value.get());
+                    auto value = mem->clone();
+                    mem = static_cast<lir::Memory*>(value.get());
+                    mem->addDisplacement(i);
+
+                    builder.addValue(std::make_unique<lir::Move>(std::move(ptr), std::move(value)));
+                }
+            }
         }
 
         builder.addValue(std::make_unique<lir::Move>(std::move(ptr), std::move(value)));

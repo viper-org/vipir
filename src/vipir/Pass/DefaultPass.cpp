@@ -1,4 +1,4 @@
-// Copyright 2024 solar-mist
+// Copyright 2025 solar-mist
 
 #include "vipir/Pass/DefaultPass.h"
 
@@ -26,6 +26,17 @@ namespace vipir
     void LIRCodegenPass::execute(Module& module)
     {
         module.lirCodegen();
+    }
+    
+    DebugInfoEmissionPass::DebugInfoEmissionPass(DIBuilder* builder)
+        : Pass(PassType::DebugInfoEmission)
+        , mBuilder(builder)
+    {
+    }
+
+    void DebugInfoEmissionPass::execute(Module& module)
+    {
+        module.generateDebugInfo(mBuilder);
     }
 
 

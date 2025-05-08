@@ -26,7 +26,7 @@ namespace vipir
 {
     void CallInst::print(std::ostream& stream)
     {
-        stream << std::format("call {}, %{}", mCallee->ident(), getName(mValueId));
+        stream << std::format("%{} = call {}", getName(mValueId), mCallee->ident());
     }
 
     std::string CallInst::ident() const

@@ -3,6 +3,10 @@
 #include "vipir/IR/BasicBlock.h"
 #include "vipir/IR/Function.h"
 
+#include "vipir/IR/Instruction/BranchInst.h"
+#include "vipir/IR/Instruction/PhiInst.h"
+#include "vipir/IR/Instruction/RetInst.h"
+
 #include "vipir/Module.h"
 
 #include "vipir/LIR/Label.h"
@@ -62,6 +66,13 @@ namespace vipir
         });
     }
 
+    bool BasicBlock::hasTerminator() const
+    {
+        return std::any_of(mValueList.rbegin(), mValueList.rend(), [](const auto& value) {
+            return dynamic_cast<BranchInst*>(value.get()) || dynamic_cast<RetInst*>(value.get());
+        });
+    }
+
     std::vector<Value*>& BasicBlock::liveIn()
     {
         return mLiveIn;
@@ -87,9 +98,13 @@ namespace vipir
         return mExists;
     }
 
-    int& BasicBlock::endPosition()
+    //int& BasicBlock::endPosition()
+    //{
+    //    return mEndPosition;
+    //}
+    lir::Value*& BasicBlock::endNode()
     {
-        return mEndPosition;
+        return mEndNode;
     }
 
     void BasicBlock::print(std::ostream& stream)
@@ -136,7 +151,11 @@ namespace vipir
             builder.addValue(std::make_unique<lir::Label>(mName, false));
             for (auto& value : mValueList)
             {
-                value->emit(builder);
+                auto phi = dynamic_cast<PhiInst*>(value.get());
+                if (!phi)
+                    value->emit(builder);
+                else
+                    phi->setEmittedValue();
             }
         }
     }

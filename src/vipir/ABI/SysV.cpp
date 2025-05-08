@@ -39,6 +39,11 @@ namespace vipir
             return { 3, 12, 13, 14, 15 };
         }
 
+        int SysVCall::getMaxStructSize() const
+        {
+            return 128; // 16 bytes
+        }
+
         ArgumentPassingOrder SysVCall::getArgumentPassingOrder() const
         {
             return ArgumentPassingOrder::RightToLeft; // Parameters to functions are passed in the registers rdi, rsi, rdx, rcx, r8, r9, and further values are passed on the stack in reverse order. - some website

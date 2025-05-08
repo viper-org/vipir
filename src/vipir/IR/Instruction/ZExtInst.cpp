@@ -15,7 +15,7 @@ namespace vipir
 {
     void ZExtInst::print(std::ostream& stream)
     {
-        stream << std::format("zext {} -> {} %{}", mValue->ident(), mType->getName(), getName(mValueId));
+        stream << std::format("%{} = zext {} -> {}", getName(mValueId), mValue->ident(), mType->getName());
     }
 
     std::string ZExtInst::ident() const
@@ -35,6 +35,7 @@ namespace vipir
     
     void ZExtInst::emit(lir::Builder& builder)
     {
+        mValue->lateEmit(builder);
         lir::OperandPtr value = mValue->getEmittedValue();
         lir::OperandPtr vreg = std::make_unique<lir::VirtualReg>(mVReg, mType->getOperandSize());
 
@@ -44,6 +45,13 @@ namespace vipir
         }
         else
         {
+            if (mValue->getType()->isBooleanType())
+            {
+                lir::OperandPtr vreg2 = std::make_unique<lir::VirtualReg>(mVReg, mValue->getType()->getOperandSize());
+                builder.addValue(std::make_unique<lir::Move>(vreg2->clone(), std::move(value)));
+                value = std::move(vreg2);
+            }
+            
             builder.addValue(std::make_unique<lir::MoveZX>(vreg->clone(), std::move(value)));
 
             mEmittedValue = std::move(vreg);
@@ -57,8 +65,12 @@ namespace vipir
         , mValueId(mModule.getNextValueId())
     {
         assert(destType->isIntegerType());
-        assert(mValue->getType()->isIntegerType());
-        assert(mValue->getType()->getSizeInBits() < destType->getSizeInBits());
+        assert(mValue->getType()->isIntegerType() || mValue->getType()->isBooleanType());
+        
+        if (mValue->getType()->isIntegerType())
+        {
+            assert(mValue->getType()->getSizeInBits() < destType->getSizeInBits());
+        }
 
         mType = destType;
     }

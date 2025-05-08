@@ -26,6 +26,8 @@ namespace vipir
         
         std::unique_ptr<instruction::Operand> clone() override;
 
+        std::string toString() override;
+
     private:
         CmpOperator mOperator;
     };

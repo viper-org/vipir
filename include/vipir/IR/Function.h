@@ -14,6 +14,8 @@
 #include "vipir/IR/Argument.h"
 #include "vipir/IR/BasicBlock.h"
 
+#include "vipir/DI/DIVariable.h"
+
 #include "vipir/Type/FunctionType.h"
 
 #include <memory>
@@ -24,24 +26,21 @@ namespace vipir
 
     class Function : public Global
     {
-        friend class Module;
+    friend class Module;
+    friend class IRBuilder;
+    friend class DIBuilder;
+    friend class opt::RegAlloc;
+    friend class opt::DeadCodeEliminator;
+    friend class opt::AliasAnalyzer;
+    friend class opt::DominatorAnalyzer;
+    friend class opt::Mem2Reg;
 
-        friend class IRBuilder;
-
-        friend class opt::RegAlloc;
-
-        friend class opt::DeadCodeEliminator;
-
-        friend class opt::AliasAnalyzer;
-
-        friend class opt::DominatorAnalyzer;
-
-        friend class opt::Mem2Reg;
-
-        using BasicBlockPtr = std::unique_ptr<BasicBlock>;
+    using BasicBlockPtr = std::unique_ptr<BasicBlock>;
     public:
         static Function* Create(FunctionType* type, Module& module, std::string_view name, bool pure, const abi::CallingConvention* callingConvention);
-        static Function* Create(FunctionType* type, Module& module, std::string_view name, bool pure); // can't use another parameter in a default parameter
+        static Function* Create(FunctionType* type, Module& module, std::string_view name, bool pure);
+        
+        void replaceAllUsesWith(Value* old, Value* newValue);
 
         const abi::CallingConvention* getCallingConvention() const;
         FunctionType* getFunctionType() const;
@@ -51,6 +50,7 @@ namespace vipir
 
         void insertBasicBlock(BasicBlock* basicBlock);
         int getNumBasicBlocks();
+        std::vector<BasicBlockPtr>& getBasicBlocks();
         void setEmittedValue();
         bool isPure() const;
 
@@ -59,8 +59,12 @@ namespace vipir
 
         void doConstantFold() override;
 
+        void setDebugEndLocation(int endLine, int endCol);
+
     protected:
         void emit(lir::Builder& builder) override;
+
+        void orderBasicBlocks();
 
         std::vector<AllocaInst*> getAllocaList();
 
@@ -84,6 +88,11 @@ namespace vipir
         bool mHasCallNodes;
 
         bool mIsPure;
+
+        std::vector<std::unique_ptr<DIVariable> > mDebugVariables;
+
+        int mEndLine;
+        int mEndCol;
 
         void setCalleeSaved();
     };

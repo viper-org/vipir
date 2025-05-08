@@ -2,7 +2,11 @@
 
 #include "vipir/IR/IRBuilder.h"
 #include "vipir/IR/BasicBlock.h"
+#include "vipir/IR/Constant/ConstantStruct.h"
 #include "vipir/IR/Function.h"
+
+#include "vipir/IR/Debug/EmitDebugInfo.h"
+#include "vipir/IR/Debug/QueryAddress.h"
 
 #include "vipir/IR/Instruction/RetInst.h"
 #include "vipir/IR/Instruction/AllocaInst.h"
@@ -88,9 +92,9 @@ namespace vipir
         return load;
     }
 
-    AddrInst* IRBuilder::CreateAddrOf(Value* ptr)
+    AddrInst* IRBuilder::CreateAddrOf(Value* ptr, DIVariable* debugVar)
     {
-        AddrInst* addr = new AddrInst(mInsertPoint, ptr);
+        AddrInst* addr = new AddrInst(mInsertPoint, ptr, debugVar);
 
         mInsertPoint->insertValue(mInsertAfter, addr);
 
@@ -310,7 +314,7 @@ namespace vipir
         Value* insertAfter = mInsertAfter;
         std::vector<Value*> stores;
 
-        for (int i = 0; i < function->getCallingConvention()->getParameterRegisterCount(); ++i)
+        for (int i = 0; i < function->getCallingConvention()->getParameterRegisterCount() && i < function->mArguments.size(); ++i)
         {
             StoreParamInst* store = new StoreParamInst(mInsertPoint, index++, parameters[i], !alignedStack, function->getCallingConvention());
             stores.push_back(store);
@@ -432,5 +436,33 @@ namespace vipir
         mInsertPoint->insertValue(mInsertAfter, constantBool);
 
         return constantBool;
+    }
+    
+    ConstantStruct* IRBuilder::CreateConstantStruct(Type* type, std::vector<Value*> values)
+    {
+        ConstantStruct* constant = new ConstantStruct(mInsertPoint->getModule(), type, std::move(values));
+
+        mInsertPoint->insertValue(mInsertAfter, constant);
+
+        return constant;
+    }
+
+
+    EmitDebugInfo* IRBuilder::CreateDebugInfo(int line, int col)
+    {
+        EmitDebugInfo* info = new EmitDebugInfo(mInsertPoint->getModule(), line, col);
+
+        mInsertPoint->insertValue(mInsertAfter, info);
+
+        return info;
+    }
+
+    QueryAddress* IRBuilder::CreateQueryAddress()
+    {
+        QueryAddress* query = new QueryAddress(mInsertPoint->getModule());
+
+        mInsertPoint->insertValue(mInsertAfter, query);
+
+        return query;
     }
 }

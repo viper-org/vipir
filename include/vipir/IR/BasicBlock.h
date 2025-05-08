@@ -37,12 +37,14 @@ namespace vipir
         void insertValue(Value* insertAfter, Value* value);
         void eraseValue(Value* value);
 
+        bool hasTerminator() const;
+
         std::vector<Value*>& liveIn();
         std::vector<BasicBlock*>& successors();
         std::vector<BasicBlock*>& predecessors();
         BasicBlock*& loopEnd();
         bool exists();
-        int& endPosition();
+        lir::Value*& endNode();
 
         void print(std::ostream& stream) override;
         std::string ident() const override;
@@ -79,7 +81,7 @@ namespace vipir
 
         bool mExists;
 
-        int mEndPosition { -1 }; // for phi nodes
+        lir::Value* mEndNode{ nullptr }; // for phi nodes
     };
 }
 

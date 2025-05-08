@@ -20,7 +20,7 @@ namespace vipir
     public:
         Instruction(Module& module, BasicBlock* parent) : Value(module), mParent(parent) { }
 
-        void eraseFromParent();
+        virtual void eraseFromParent();
 
         enum BinaryOperators
         {

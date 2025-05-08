@@ -17,7 +17,7 @@ namespace vipir
 {
     void IntToPtrInst::print(std::ostream& stream)
     {
-        stream << std::format("inttoptr {} -> {} %{}", mValue->ident(), mType->getName(), getName(mValueId));
+        stream << std::format("%{} = inttoptr {} -> {}", getName(mValueId), mValue->ident(), mType->getName());
     }
 
     std::string IntToPtrInst::ident() const

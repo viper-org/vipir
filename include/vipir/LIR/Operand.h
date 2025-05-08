@@ -21,6 +21,7 @@ namespace vipir
         class Peephole;
         class PeepholeV2;
     }
+    class DIBuilder;
 
     namespace lir
     {
@@ -84,11 +85,12 @@ namespace vipir
 
         class VirtualReg : public Operand
         {
+        friend class vipir::DIBuilder;
         friend class opt::Peephole;
         friend class opt::PeepholeV2;
         friend class PhysicalReg;
         public:
-            VirtualReg(opt::VReg* reg, codegen::OperandSize size);
+            VirtualReg(opt::VReg* reg, codegen::OperandSize size, bool pointer = false);
 
             std::string ident() const override;
             instruction::OperandPtr asmOperand() override;
@@ -97,9 +99,12 @@ namespace vipir
             bool isMemory() override;
             codegen::OperandSize size() override;
 
+            bool& pointer();
+
         private:
             opt::VReg* mVreg;
             codegen::OperandSize mSize;
+            bool mPointer;
         };
 
         class Lbl : public Operand
@@ -113,6 +118,8 @@ namespace vipir
             OperandPtr clone() override;
             bool operator==(OperandPtr& other) override;
             codegen::OperandSize size() override;
+
+            std::string getName();
 
         private:
             std::string mName;
@@ -160,6 +167,7 @@ namespace vipir
             codegen::OperandSize size() override;
 
             OperandPtr base();
+            void addDisplacement(int displacement);
 
         private:
             codegen::OperandSize mSize;

@@ -18,4 +18,9 @@ namespace vipir
     {
         return std::make_unique<CmpOperand>(mOperator);
     }
+
+    std::string CmpOperand::toString()
+    {
+        return "Stray CMP operand found";
+    }
 }

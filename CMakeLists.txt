@@ -14,6 +14,7 @@ set(SOURCES
 
     "src/vipir/Pass/Pass.cpp"
     "src/vipir/Pass/DefaultPass.cpp"
+    "src/vipir/Pass/IRInfoPass.cpp"
 
     "src/vipir/IR/Function.cpp"
     "src/vipir/IR/Argument.cpp"
@@ -47,6 +48,9 @@ set(SOURCES
     "src/vipir/IR/Instruction/IntToPtrInst.cpp"
     "src/vipir/IR/Instruction/PtrToIntInst.cpp"
     "src/vipir/IR/Instruction/PhiInst.cpp"
+
+    "src/vipir/IR/Debug/EmitDebugInfo.cpp"
+    "src/vipir/IR/Debug/QueryAddress.cpp"
 
     "src/vipir/Type/Type.cpp"
     "src/vipir/Type/IntegerType.cpp"
@@ -84,6 +88,10 @@ set(SOURCES
     "src/vipir/LIR/Instruction/EnterFunc.cpp"
 
     "src/vipir/ABI/SysV.cpp"
+
+    "src/vipir/DI/DIBuilder.cpp"
+    "src/vipir/DI/DIVariable.cpp"
+    "src/vipir/DI/DIType.cpp"
 )
 
 set(HEADERS
@@ -91,6 +99,7 @@ set(HEADERS
 
     "include/vipir/Pass/Pass.h"
     "include/vipir/Pass/DefaultPass.h"
+    "include/vipir/Pass/IRInfoPass.h"
 
     "include/vipir/IR/Value.h"
     "include/vipir/IR/Global.h"
@@ -126,6 +135,9 @@ set(HEADERS
     "include/vipir/IR/Instruction/IntToPtrInst.h"
     "include/vipir/IR/Instruction/PtrToIntInst.h"
     "include/vipir/IR/Instruction/PhiInst.h"
+
+    "include/vipir/IR/Debug/EmitDebugInfo.h"
+    "include/vipir/IR/Debug/QueryAddress.h"
 
     "include/vipir/Type/Type.h"
     "include/vipir/Type/IntegerType.h"
@@ -166,6 +178,10 @@ set(HEADERS
     "include/vipir/ABI/ABI.h"
     "include/vipir/ABI/CallingConvention.h"
     "include/vipir/ABI/SysV.h"
+
+    "include/vipir/DI/DIBuilder.h"
+    "include/vipir/DI/DIVariable.h"
+    "include/vipir/DI/DIType.h"
 )
 
 add_library(vipir ${SOURCES} ${HEADERS})
@@ -181,3 +197,5 @@ target_link_libraries(vipir PUBLIC vasm-framework-vasm-framework)
 add_executable(vipir-example example/example.cpp)
 target_compile_features(vipir-example PUBLIC cxx_std_20)
 target_link_libraries(vipir-example PUBLIC vipir)
+add_compile_options("-fsanitize=address,undefined")
+add_link_options("-fsanitize=address,undefined")

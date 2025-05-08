@@ -111,6 +111,14 @@ namespace vipir
 
     void Module::print(std::ostream& stream) const
     {
+        for (const GlobalPtr& global : mGlobals)
+        {
+            if (auto func = dynamic_cast<Function*>(global.get()))
+            {
+                func->orderBasicBlocks();
+            }
+        }
+
         stream << std::format("file \"{}\"", mName);
 
         for (const GlobalPtr& global : mGlobals)
@@ -143,6 +151,14 @@ namespace vipir
 
     void Module::lirEmission()
     {
+        for (const GlobalPtr& global : mGlobals)
+        {
+            if (auto func = dynamic_cast<Function*>(global.get()))
+            {
+                func->orderBasicBlocks();
+            }
+        }
+
         opt::RegAlloc regalloc;
         for (const GlobalPtr& global : mGlobals)
         {
@@ -181,20 +197,24 @@ namespace vipir
 
     void Module::lirCodegen()
     {
-        MC::Builder mcBuilder;
         for (auto& value : mBuilder.getValues())
         {
-            value->emit(mcBuilder);
+            value->emit(mInstructionBuilder);
         }
 
-        codegen::OpcodeBuilder opcodeBuilder = codegen::OpcodeBuilder(mOutputFormat.get(), mName);
+        mOpcodeBuilder = codegen::OpcodeBuilder(mOutputFormat.get(), mName);
 
-        for (const auto& value : mcBuilder.getValues())
+        for (const auto& value : mInstructionBuilder.getValues())
         {
-            value->emit(opcodeBuilder, opcodeBuilder.getSection());
+            value->emit(mOpcodeBuilder, mOpcodeBuilder.getSection());
         }
 
-        opcodeBuilder.patchForwardLabels();
+        mOpcodeBuilder.patchForwardLabels();
+    }
+
+    void Module::generateDebugInfo(DIBuilder* builder)
+    {
+        builder->generateDwarf(*this, mInstructionBuilder, mOpcodeBuilder);
     }
 
     void Module::emit(std::ostream& stream)

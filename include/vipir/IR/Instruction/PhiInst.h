@@ -15,6 +15,8 @@ namespace vipir
     class PhiInst : public Instruction
     {
     friend class IRBuilder;
+    friend class BasicBlock;
+    friend class Function;
     friend class opt::RegAlloc;
     friend class opt::Mem2Reg;
     public:
@@ -23,11 +25,13 @@ namespace vipir
         void doConstantFold() override;
 
         std::vector<std::reference_wrapper<Value*> > getOperands() override;
+        void eraseFromParent() override;
 
         void addIncoming(Value* value, BasicBlock* basicBlock);
 
     protected:
         void emit(lir::Builder& builder) override;
+        void setEmittedValue();
         std::string ident() const override;
 
     private:

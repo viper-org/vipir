@@ -82,7 +82,7 @@ namespace vipir
                 operatorName = "cmp ge";
                 break;
         }
-        stream << std::format("{} %{}, {}, {}", operatorName, getName(mValueId), mLeft->ident(), mRight->ident());
+        stream << std::format("%{} = {} {}, {}", getName(mValueId), operatorName, mLeft->ident(), mRight->ident());
     }
 
     std::string BinaryInst::ident() const
@@ -221,6 +221,32 @@ namespace vipir
             mEmittedValue = std::move(vreg);
         };
         
+
+        auto createCompare = [&builder, this](lir::CMP::Operator op){
+            mLeft->lateEmit(builder);
+            mRight->lateEmit(builder);
+            auto left = mLeft->getEmittedValue();
+            auto right = mRight->getEmittedValue();
+            if (mIsConstantFolded)
+            {
+                mEmittedValue = std::make_unique<lir::Immediate>(mConstantFoldedValue);
+                return;
+            }
+            if (dynamic_cast<lir::Immediate*>(left.get()))
+            {
+                // Flip the operator as the instruction order will be flipped
+                // eg 1 < x == x > 1
+                if (op == lir::CMP::Operator::LT)      op = lir::CMP::Operator::GT;
+                else if (op == lir::CMP::Operator::GT) op = lir::CMP::Operator::LT;
+                else if (op == lir::CMP::Operator::LE) op = lir::CMP::Operator::GE;
+                else if (op == lir::CMP::Operator::GE) op = lir::CMP::Operator::LE;
+                std::swap(left, right);
+            }
+            builder.addValue(std::make_unique<lir::Compare>(std::move(left), op, std::move(right)));
+            // TODO: Ensure that flags is not updated between creation and use of this value
+            mEmittedValue = std::make_unique<lir::CMP>(op);
+        };
+        
         switch (mOperator)
         {
             case Instruction::ADD:
@@ -253,30 +279,7 @@ namespace vipir
             case Instruction::BWXOR:
                 createArithmetic(lir::BinaryArithmetic::Operator::BWXor);
                 break;
-
-            default:
-                break;
-        }
-    }
-
-    void BinaryInst::lateEmit(lir::Builder& builder)
-    {
-        auto createCompare = [&builder, this](lir::CMP::Operator op){
-            mLeft->lateEmit(builder);
-            mRight->lateEmit(builder);
-            auto left = mLeft->getEmittedValue();
-            auto right = mRight->getEmittedValue();
-            if (mIsConstantFolded)
-            {
-                mEmittedValue = std::make_unique<lir::Immediate>(mConstantFoldedValue);
-                return;
-            }
-            builder.addValue(std::make_unique<lir::Compare>(std::move(left), op, std::move(right)));
-            mEmittedValue = std::make_unique<lir::CMP>(op);
-        };
-
-        switch (mOperator)
-        {
+            
             case Instruction::EQ:
                 createCompare(lir::CMP::Operator::EQ);
                 break;
@@ -299,6 +302,10 @@ namespace vipir
             default:
                 break;
         }
+    }
+
+    void BinaryInst::lateEmit(lir::Builder& builder)
+    {
     }
 
     BinaryInst::BinaryInst(BasicBlock* parent, Value* left, Instruction::BinaryOperators op, Value* right)

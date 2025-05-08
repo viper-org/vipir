@@ -20,11 +20,15 @@ namespace vipir
         LIREmission,
         LIRCodegen,
 
+        DebugInfoEmission,
+
         DeadCodeElimination,
         PeepholeOptimization,
         ConstantFolding,
         AliasAnalysis,
-        Mem2Reg
+        Mem2Reg,
+
+        CFGEmission
     };
 
     class Pass

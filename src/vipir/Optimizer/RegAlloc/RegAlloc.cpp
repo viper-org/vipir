@@ -5,6 +5,7 @@
 
 #include "vipir/IR/Instruction/AllocaInst.h"
 #include "vipir/IR/Instruction/PhiInst.h"
+#include "vipir/Type/StructType.h"
 
 #include <algorithm>
 #include <map>
@@ -94,61 +95,83 @@ namespace vipir
                 });
             };
 
-            setArguments(function, abi, activeValues, virtualRegs);
+            auto arguments = setArguments(function, abi, activeValues, virtualRegs);
+            for (auto argument : arguments)
+            {
+                argument->mMoveTo = getNextFreeVReg(false, argument->mDisallowedVRegs, -1);
+            }
+
             std::sort(activeValues.begin(), activeValues.end(), [](Value* a, Value* b) {
                 return a->mInterval.second < b->mInterval.second;
             });
 
+            //std::vector<Value*> values;
+            struct Compare
+            {
+                bool operator()(Value* a, Value* b) const
+                {
+                    return a->mInterval.first < b->mInterval.first;
+                }
+            };
+            std::multiset<Value*, Compare> values;
             for (auto& basicBlock: function->mBasicBlockList)
             {
-                for (auto& value: basicBlock->mValueList)
+                for (auto& value : basicBlock->mValueList)
                 {
-                    ExpireOldIntervals(value->mId);
-                    auto smashes = value->getRegisterSmashes();
-                    if (!value->mRegisterSmashesDone && !smashes.empty())
+                    if (dynamic_cast<PhiInst*>(value.get()))
                     {
-                        value->mRegisterSmashesDone = true;
-                        std::vector<VReg*> destroyedRegisters;
-                        for (auto smash: smashes)
-                        {
-                            auto it = std::find_if(function->mVirtualRegs.begin(), function->mVirtualRegs.end(), [smash](const auto& vreg) {
-                                return vreg->mPhysicalRegister == smash;
-                            });
-
-                            if (it != function->mVirtualRegs.end())
-                                destroyedRegisters.push_back(it->get());
-                        }
-
-                        // Set the disallowed registers for each active value
-                        for (auto value: activeValues)
-                        {
-                            value->mRegisterSmashesDone = false; // Since register configuration changes, we need to recompute smashes
-                            std::copy(destroyedRegisters.begin(), destroyedRegisters.end(), std::back_inserter(value->mDisallowedVRegs));
-                        }
-
-                        // Allow every virtual reg to be used again
-                        std::map<int, VReg*> virtualRegs;
-                        for (auto& vreg: function->mVirtualRegs)
-                        {
-                            vreg->mUses = 0;
-                            virtualRegs[vreg->getId()] = vreg.get();
-                        }
-                        doRegalloc(function, virtualRegs, virtualRegs.size(), abi);
-                        return;
+                        auto guy = 5;
                     }
-                    if (value->requiresVReg())
+                    values.insert(value.get());
+                }
+            }
+            for (auto value: values)
+            {
+                ExpireOldIntervals(value->mId);
+                auto smashes = value->getRegisterSmashes();
+                if (!value->mRegisterSmashesDone && !smashes.empty())
+                {
+                    value->mRegisterSmashesDone = true;
+                    std::vector<VReg*> destroyedRegisters;
+                    for (auto smash: smashes)
                     {
-                        bool requireMemory = false;
-                        if (auto alloca = dynamic_cast<AllocaInst*>(value.get()))
-                        {
-                            if (alloca->mForceMemoryCount > 0) requireMemory = true;
-                        }
-                        activeValues.push_back(value.get());
-                        std::sort(activeValues.begin(), activeValues.end(), [](Value* a, Value* b) {
-                            return a->mInterval.second < b->mInterval.second;
+                        auto it = std::find_if(function->mVirtualRegs.begin(), function->mVirtualRegs.end(), [smash](const auto& vreg) {
+                            return vreg->mPhysicalRegister == smash;
                         });
-                        value->mVReg = getNextFreeVReg(requireMemory, value->mDisallowedVRegs, value->mPreferredRegisterID);
+
+                        if (it != function->mVirtualRegs.end())
+                            destroyedRegisters.push_back(it->get());
                     }
+
+                    // Set the disallowed registers for each active value
+                    for (auto value: activeValues)
+                    {
+                        value->mRegisterSmashesDone = false; // Since register configuration changes, we need to recompute smashes
+                        std::copy(destroyedRegisters.begin(), destroyedRegisters.end(), std::back_inserter(value->mDisallowedVRegs));
+                    }
+
+                    // Allow every virtual reg to be used again
+                    std::map<int, VReg*> virtualRegs;
+                    for (auto& vreg: function->mVirtualRegs)
+                    {
+                        vreg->mUses = 0;
+                        virtualRegs[vreg->getId()] = vreg.get();
+                    }
+                    doRegalloc(function, virtualRegs, virtualRegs.size(), abi);
+                    return;
+                }
+                if (value->requiresVReg())
+                {
+                    bool requireMemory = false;
+                    if (auto alloca = dynamic_cast<AllocaInst*>(value))
+                    {
+                        if (alloca->mForceMemoryCount > 0) requireMemory = true;
+                    }
+                    activeValues.push_back(value);
+                    std::sort(activeValues.begin(), activeValues.end(), [](Value* a, Value* b) {
+                        return a->mInterval.second < b->mInterval.second;
+                    });
+                    value->mVReg = getNextFreeVReg(requireMemory, value->mDisallowedVRegs, value->mPreferredRegisterID);
                 }
             }
         }
@@ -158,12 +181,18 @@ namespace vipir
         {
             int index = 0;
 
+            for (auto& argument : function->mArguments)
+            {
+                argument->mInterval.first = 0;
+            }
+
             for (auto& basicBlock: function->mBasicBlockList)
             {
                 basicBlock->mInterval.first = index;
                 for (auto& value: basicBlock->mValueList)
                 {
                     value->mInterval.first = index;
+                    //value->mInterval.second = index+1;
                     value->mId = index;
                     index++;
                 }
@@ -189,6 +218,7 @@ namespace vipir
                         {
                             live.push_back(incomingIt->first);
                         }
+                        //live.push_back(phi);
                     }
                 }
 
@@ -201,12 +231,12 @@ namespace vipir
                 for (auto valueIt = bb->mValueList.rbegin(); valueIt != bb->mValueList.rend(); ++valueIt)
                 {
                     auto& value = *valueIt;
-                    if (dynamic_cast<PhiInst*>(value.get())) continue;
 
                     for (auto operandR: value->getOperands())
                     {
                         auto operand = operandR.get();
-                        operand->mInterval.second = std::max(operand->mInterval.second, value->mInterval.first);
+                        operand->mInterval.first = std::min(operand->mInterval.first, bb->mInterval.first);
+                        operand->mInterval.second = std::max(operand->mInterval.second, value->mId);
                         live.push_back(operand);
                     }
                     value->mInterval.first = value->mId;
@@ -285,35 +315,75 @@ namespace vipir
             function->mTotalStackOffset = (offset + 15) & ~15; // Align to 16 bytes
         }
 
-        void RegAlloc::setArguments(Function* function, abi::ABI* abi, std::vector<Value*>& activeValues, std::map<int, VReg*>& virtualRegs)
+        std::vector<Argument*> RegAlloc::setArguments(Function* function, abi::ABI* abi, std::vector<Value*>& activeValues, std::map<int, VReg*>& virtualRegs)
         {
-            int argumentIndex = 0;
-
             const abi::CallingConvention* callingConvention = function->getCallingConvention();
 
+            std::vector<Argument*> todo;
+
+            for (auto it = function->mArguments.begin(); it != function->mArguments.end(); ++it)
+            {
+                auto& arg = *it;
+                if (arg->getType()->isStructType())
+                {
+                    auto structType = static_cast<StructType*>(arg->getType());
+                    if (structType->getSizeInBits() <= callingConvention->getMaxStructSize())
+                    {
+
+                    }
+                }
+            }
+
+            int argumentIndex = 0;
+            
+            std::vector<Argument*> memArgs;
+            
             auto iterations = std::min(callingConvention->getParameterRegisterCount(), static_cast<int>(function->mArguments.size()));
             for (int i = 0; i < iterations; ++i)
             {
+                if (function->mArguments[i]->getType()->isStructType())
+                {
+                    auto structType = static_cast<StructType*>(function->mArguments[i]->getType());
+                    if (structType->getSizeInBits() <= callingConvention->getMaxStructSize())
+                    {
+                        memArgs.push_back(function->mArguments[i].get());
+                        continue;
+                    }
+                }
+                
                 auto it = std::find_if(virtualRegs.begin(), virtualRegs.end(), [argumentIndex, function](const auto& vreg) {
                     return vreg.second->mPhysicalRegister == function->getCallingConvention()->getParameterRegister(argumentIndex);
                 });
                 ++argumentIndex;
+                auto& disallowed = function->mArguments[i]->mDisallowedVRegs;
+                if (std::find(disallowed.begin(), disallowed.end(), it->second) != disallowed.end())
+                {
+                    todo.push_back(function->mArguments[i].get());
+                }
+
                 function->mArguments[i]->mVReg = it->second;
                 virtualRegs.erase(it);
                 activeValues.push_back(function->mArguments[i].get());
             }
-
-            if (function->mArguments.size() > callingConvention->getParameterRegisterCount())
+            
+            for (auto it = function->mArguments.begin() + callingConvention->getParameterRegisterCount(); it < function->mArguments.end(); ++it)
+            {
+                memArgs.push_back(it->get());
+            }
+            
+            if (!memArgs.empty())
             {
                 if (callingConvention->getArgumentPassingOrder() == abi::ArgumentPassingOrder::RightToLeft)
                 {
-                    addStackParams(function->mArguments.rbegin(), function->mArguments.rend() - callingConvention->getParameterRegisterCount(), function, abi, activeValues);
+                    addStackParams(memArgs.rbegin(), memArgs.rend(), function, abi, activeValues);
                 }
                 else if (callingConvention->getArgumentPassingOrder() == abi::ArgumentPassingOrder::LeftToRight)
                 {
-                    addStackParams(function->mArguments.begin() + callingConvention->getParameterRegisterCount(), function->mArguments.end(), function, abi, activeValues);
+                    addStackParams(memArgs.begin(), memArgs.end(), function, abi, activeValues);
                 }
             }
+
+            return todo;
         }
     }
 }

@@ -12,16 +12,41 @@ namespace vipir
 {
     namespace lir
     {
+        class EmitSourceInfo : public Value
+        {
+        public:
+            EmitSourceInfo(int line, int col);
+
+            virtual void print(std::ostream& stream) const override;
+            virtual void emit(MC::Builder& builder) override;
+
+        private:
+            int mLine;
+            int mCol;
+        };
+
+        class QueryAddress : public Value
+        {
+        public:
+            QueryAddress(uint64_t* location);
+
+            virtual void print(std::ostream& stream) const override;
+            virtual void emit(MC::Builder& builder) override;
+
+        private:
+            uint64_t* mLocation;
+        };
+
         using ValuePtr = std::unique_ptr<Value>;
         class Builder
         {
         public:
             void addValue(ValuePtr value);
-            void insertValue(ValuePtr value, int position);
+            void insertValue(ValuePtr value, Value* after);
             void setSection(SectionType sect);
 
+            lir::Value* getLastNode();
             int getPosition();
-            int getInsertsBefore(int position);
 
             std::vector<ValuePtr>& getValues();
 

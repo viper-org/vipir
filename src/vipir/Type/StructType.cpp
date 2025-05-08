@@ -15,7 +15,7 @@ namespace vipir
         : Type(0, "struct { ")
         , mFields(std::move(fields))
     {
-        mOperandSize = codegen::OperandSize::None;
+        mOperandSize = codegen::OperandSize::Quad;
         std::size_t maxAlignment = 0;
         for (auto field : mFields)
         {

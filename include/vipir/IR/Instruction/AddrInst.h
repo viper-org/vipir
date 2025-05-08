@@ -12,6 +12,8 @@
 
 namespace vipir
 {
+    class DIVariable;
+    
     class AddrInst : public Instruction
     {
     friend class IRBuilder;
@@ -27,15 +29,18 @@ namespace vipir
         void cleanup() override;
 
         Value* getPointer();
+        DIVariable* getDebugVariable();
 
     protected:
         void emit(lir::Builder& builder) override;
 
     private:
-        AddrInst(BasicBlock* parent, Value* ptr);
+        AddrInst(BasicBlock* parent, Value* ptr, DIVariable* debugVar);
 
         Value* mPtr;
         int mValueId;
+
+        DIVariable* mDebugVar;
     };
 }
 

@@ -1,9 +1,11 @@
 // Copyright 2024 solar-mist
 
 #include "vipir/IR/Function.h"
-#include "vipir/IR/Instruction/AllocaInst.h"
 
 #include "vipir/Module.h"
+
+#include "vipir/IR/Instruction/PhiInst.h"
+#include "vipir/IR/Instruction/AllocaInst.h"
 
 #include "vipir/LIR/Label.h"
 #include "vipir/LIR/Instruction/EnterFunc.h"
@@ -22,6 +24,7 @@
 #include <algorithm>
 #include <deque>
 #include <format>
+#include <stack>
 
 namespace vipir
 {
@@ -37,6 +40,28 @@ namespace vipir
     Function* Function::Create(FunctionType* type, Module& module, std::string_view name, bool pure)
     {
         return Function::Create(type, module, name, pure, module.abi()->getDefaultCallingConvention());
+    }
+    
+    void Function::replaceAllUsesWith(Value* old, Value* newValue)
+    {
+        std::vector<Value*> done;
+        for (auto& bb : mBasicBlockList)
+        {
+            for (auto& value : bb->mValueList)
+            {
+                //if (std::find(done.begin(), done.end(), value.get()) == done.end())
+                {
+                    done.push_back(value.get());
+                    for (auto operand : value->getOperands())
+                    {
+                        if (operand == old)
+                        {
+                            operand.get() = newValue;
+                        }
+                    }
+                }
+            }
+        }
     }
 
     const abi::CallingConvention* Function::getCallingConvention() const
@@ -76,9 +101,24 @@ namespace vipir
         return mBasicBlockList.size();
     }
 
+    std::vector<std::unique_ptr<BasicBlock> >& Function::getBasicBlocks()
+    {
+        return mBasicBlockList;
+    }
+
     void Function::print(std::ostream& stream)
     {
-        stream << std::format("\n\nfunction @{}() -> {} ", mName, getFunctionType()->getReturnType()->getName());
+        stream << std::format("\n\nfunction @{}(", mName);
+        if (!mArguments.empty())
+        {
+            for (int i = 0; i < mArguments.size()-1; ++i)
+            {
+                stream << std::format("{} {}, ", mArguments[i]->mType->getName(), mArguments[i]->ident());
+            }
+            stream << std::format("{} {}", mArguments.back()->mType->getName(), mArguments.back()->ident());
+        }
+        stream << std::format(") -> {} ", getFunctionType()->getReturnType()->getName());
+
         if (!mBasicBlockList.empty())
         {
             stream << "{\n";
@@ -103,6 +143,12 @@ namespace vipir
         }
     }
 
+    void Function::setDebugEndLocation(int endLine, int endCol)
+    {
+        mEndLine = endLine;
+        mEndCol = endCol;
+    }
+
     void Function::setEmittedValue()
     {
         bool plt = mBasicBlockList.empty();
@@ -124,8 +170,13 @@ namespace vipir
             builder.addValue(std::make_unique<lir::ExternLabel>(mName));
             return;
         }
-
+        
         builder.addValue(std::make_unique<lir::Label>(mName, true));
+
+        if (mLine)
+        {
+            builder.addValue(std::make_unique<lir::EmitSourceInfo>(mLine, mCol));
+        }
 
         builder.addValue(std::make_unique<lir::EnterFunc>(mTotalStackOffset, mCalleeSaved));
         mEnterFuncNode = builder.getValues().back().get();
@@ -146,6 +197,14 @@ namespace vipir
         {
             basicBlock->emit(newBuilder);
         }
+        for (auto& basicBlock: mBasicBlockList)
+        {
+            for (auto phi : basicBlock->getPhis())
+            {
+                phi->emit(newBuilder);
+            }
+        }
+
 
         for (auto& value: newBuilder.getValues())
         {
@@ -159,6 +218,50 @@ namespace vipir
             }
         }
         std::move(newBuilder.getValues().begin(), newBuilder.getValues().end(), std::back_inserter(builder.getValues()));
+
+        if (mEndLine)
+        {
+            builder.addValue(std::make_unique<lir::EmitSourceInfo>(mEndLine, mEndCol));
+        }
+    }
+
+    static void postorder(BasicBlock* head, std::vector<BasicBlock*>& visited, std::stack<BasicBlock*>& stack)
+    {
+        if (std::find(visited.begin(), visited.end(), head) != visited.end()) return;
+        visited.push_back(head);
+        for (auto succ : head->successors())
+        {
+            postorder(succ, visited, stack);
+        }
+        stack.push(head);
+    }
+
+    void Function::orderBasicBlocks()
+    {
+        if (mBasicBlockList.empty()) return;
+        std::vector<BasicBlock*> visited;
+        std::stack<BasicBlock*> stack;
+        postorder(mBasicBlockList[0].get(), visited, stack);
+
+        std::vector<BasicBlock*> blocks;
+        for (auto& bb : mBasicBlockList)
+        {
+            blocks.push_back(bb.release());
+        }
+        mBasicBlockList.clear();
+        while (!stack.empty())
+        {
+            auto bb = stack.top();
+            stack.pop();
+            mBasicBlockList.push_back(BasicBlockPtr(bb));
+            std::erase(blocks, bb);
+        }
+        // The basicblocks need to still exist, just not be in the function anymore 
+        for (auto bb : blocks)
+        {
+            bb->mExists = false;
+            mBasicBlockList.push_back(BasicBlockPtr(bb));
+        }
     }
 
     std::vector<AllocaInst*> Function::getAllocaList()
@@ -210,16 +313,23 @@ namespace vipir
             mTotalStackOffset += 8;
         }
 
+        bool usesStackArgs = false;
+        for (auto& arg : mArguments)
+        {
+            usesStackArgs |= arg->mVReg->onStack();
+        }
+
         lir::EnterFunc* node = static_cast<lir::EnterFunc*>(mEnterFuncNode);
         node->setStackSize(mTotalStackOffset);
         node->setCalleeSaved(mCalleeSaved);
-        node->setSaveFramePointer(mHasCallNodes);
+        node->setSaveFramePointer(mHasCallNodes || mTotalStackOffset || usesStackArgs);
         for (auto node: mRetNodes)
         {
             lir::Ret* ret = static_cast<lir::Ret*>(node);
             ret->setLeave(mTotalStackOffset > 0);
+            ret->setStackSize(mTotalStackOffset);
             ret->setCalleeSaved(mCalleeSaved);
-            ret->setSaveFramePointer(mHasCallNodes);
+            ret->setSaveFramePointer(mHasCallNodes || mTotalStackOffset || usesStackArgs);
         }
     }
 }

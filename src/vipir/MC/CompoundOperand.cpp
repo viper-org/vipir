@@ -24,4 +24,17 @@ namespace vipir
         }
         return std::make_unique<CompoundOperand>(std::move(values));
     }
+
+    std::string CompoundOperand::toString()
+    {
+        std::string ret = "{";
+
+        for (auto it = mValues.begin(); it != mValues.end() - 1; ++it)
+        {
+            ret += (*it)->toString() + ", ";
+        }
+        ret.erase(ret.end() - 2, ret.end());
+
+        return ret + "}";
+    }
 }

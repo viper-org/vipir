@@ -35,7 +35,14 @@ namespace vipir
     class PtrToIntInst;
     class PhiInst;
 
+    class EmitDebugInfo;
+    class QueryAddress;
+
     class ConstantBool;
+    class ConstantStruct;
+
+
+    class DIVariable;
 
     class IRBuilder
     {
@@ -45,6 +52,7 @@ namespace vipir
         void setInsertPoint(BasicBlock* newInsertPoint);
         BasicBlock* getInsertPoint();
 
+        void insertAtFront();
         void insertAfter(Value* value);
 
 
@@ -56,7 +64,7 @@ namespace vipir
 
         StoreInst* CreateStore(Value* ptr, Value* value);
         LoadInst* CreateLoad(Value* ptr);
-        AddrInst* CreateAddrOf(Value* ptr);
+        AddrInst* CreateAddrOf(Value* ptr, DIVariable* debugVar = nullptr);
         GEPInst* CreateGEP(Value* ptr, Value* offset);
         GEPInst* CreateStructGEP(Value* ptr, int index);
 
@@ -103,6 +111,11 @@ namespace vipir
 
 
         ConstantBool* CreateConstantBool(bool value);
+        ConstantStruct* CreateConstantStruct(Type* type, std::vector<Value*> values);
+
+
+        EmitDebugInfo* CreateDebugInfo(int line, int col);
+        QueryAddress*  CreateQueryAddress();
 
     private:
         BasicBlock* mInsertPoint;
