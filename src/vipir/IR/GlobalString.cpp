@@ -49,7 +49,7 @@ namespace vipir
         mEmittedValue = std::make_unique<lir::Lbl>(std::to_string(mValueId), false);
 
         builder.addValue(std::make_unique<lir::Label>(std::to_string(mValueId), false));
-        builder.addValue(std::make_unique<lir::GlobalString>(mValue + '\0'));
+        builder.addValue(std::make_unique<lir::GlobalString>(mValue));
     }
 
     GlobalString::GlobalString(Module& module, std::string value)

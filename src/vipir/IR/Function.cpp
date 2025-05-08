@@ -313,17 +313,23 @@ namespace vipir
             mTotalStackOffset += 8;
         }
 
+        bool usesStackArgs = false;
+        for (auto& arg : mArguments)
+        {
+            usesStackArgs |= arg->mVReg->onStack();
+        }
+
         lir::EnterFunc* node = static_cast<lir::EnterFunc*>(mEnterFuncNode);
         node->setStackSize(mTotalStackOffset);
         node->setCalleeSaved(mCalleeSaved);
-        node->setSaveFramePointer(mHasCallNodes || mTotalStackOffset);
+        node->setSaveFramePointer(mHasCallNodes || mTotalStackOffset || usesStackArgs);
         for (auto node: mRetNodes)
         {
             lir::Ret* ret = static_cast<lir::Ret*>(node);
             ret->setLeave(mTotalStackOffset > 0);
             ret->setStackSize(mTotalStackOffset);
             ret->setCalleeSaved(mCalleeSaved);
-            ret->setSaveFramePointer(mHasCallNodes || mTotalStackOffset);
+            ret->setSaveFramePointer(mHasCallNodes || mTotalStackOffset || usesStackArgs);
         }
     }
 }

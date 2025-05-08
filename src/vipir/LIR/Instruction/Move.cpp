@@ -181,6 +181,7 @@ namespace vipir
                 if (*mLeft == mRight) return;
 
                 builder.addValue(std::make_unique<instruction::MovInstruction>(std::move(left), mRight->asmOperand(), mRight->size()));
+                return;
             }
 
             builder.addValue(std::make_unique<instruction::MovZXInstruction>(std::move(left), mRight->asmOperand(), mLeft->size()));

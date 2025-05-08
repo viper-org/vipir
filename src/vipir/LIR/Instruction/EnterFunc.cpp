@@ -33,12 +33,9 @@ namespace vipir
         {
             if (mSaveFramePointer)
             {
-                if (mStackSize)
-                {
-                    builder.addValue(std::make_unique<instruction::PushInstruction>(instruction::Register::Get("rbp")));
-                    builder.addValue(std::make_unique<instruction::MovInstruction>(instruction::Register::Get("rbp"), instruction::Register::Get("rsp")));
-                }
-                else
+                builder.addValue(std::make_unique<instruction::PushInstruction>(instruction::Register::Get("rbp")));
+                builder.addValue(std::make_unique<instruction::MovInstruction>(instruction::Register::Get("rbp"), instruction::Register::Get("rsp")));
+                if (!mStackSize)
                 {
                     instruction::OperandPtr rsp = instruction::Register::Get("rsp");
                     instruction::OperandPtr stackOffset = std::make_unique<instruction::Immediate>(8);

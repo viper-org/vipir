@@ -45,16 +45,7 @@ namespace vipir
             }
             if (mSaveFramePointer)
             {
-                if (mStackSize)
-                {
-                    builder.addValue(std::make_unique<instruction::LeaveInstruction>());
-                }
-                else
-                {
-                    instruction::OperandPtr rsp = instruction::Register::Get("rsp");
-                    instruction::OperandPtr stackOffset = std::make_unique<instruction::Immediate>(8);
-                    builder.addValue(std::make_unique<instruction::AddInstruction>(std::move(rsp), std::move(stackOffset)));
-                }
+                builder.addValue(std::make_unique<instruction::LeaveInstruction>());
             }
 
             /*if (!mCalleeSaved.empty())

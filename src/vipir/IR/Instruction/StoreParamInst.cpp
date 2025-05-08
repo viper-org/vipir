@@ -1,6 +1,8 @@
 // Copyright 2024 solar-mist
 
 #include "vipir/IR/Instruction/StoreParamInst.h"
+#include "vipir/IR/Instruction/LoadInst.h"
+#include "vipir/IR/Instruction/AllocaInst.h"
 
 #include "vipir/IR/BasicBlock.h"
 
@@ -58,6 +60,30 @@ namespace vipir
         {
             lir::OperandPtr alignment = std::make_unique<lir::Immediate>(8);
             builder.addValue(std::make_unique<lir::BinaryArithmetic>(stack->clone(), lir::BinaryArithmetic::Operator::Sub, std::move(alignment)));
+        }
+
+        if (mValue->getType()->isStructType())
+        {
+            auto load = dynamic_cast<LoadInst*>(mValue);
+            assert(load != nullptr);
+
+            auto loadPointer = load->getPointer();
+            auto ptr = loadPointer->getEmittedValue();
+            if (dynamic_cast<AllocaInst*>(loadPointer))
+            {
+                ptr = std::make_unique<lir::Memory>(mValue->getType()->getOperandSize(), std::move(ptr), std::nullopt, nullptr, std::nullopt);
+            }
+            
+            // Push in reverse order so the struct is laid out correctly for the callee
+            for (int i = mValue->getType()->getSizeInBits() / 8 - 8; i >= 0; i -= 8)
+            {
+                auto mem = static_cast<lir::Memory*>(ptr.get());
+                auto ptr = mem->clone();
+                mem = static_cast<lir::Memory*>(ptr.get());
+                mem->addDisplacement(i);
+                builder.addValue(std::make_unique<lir::Push>(std::move(ptr)));
+            }
+            return;
         }
 
         if (regID != -1)
