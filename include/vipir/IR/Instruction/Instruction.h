@@ -16,9 +16,11 @@ namespace vipir
 
     class Instruction : public Value
     {
-    friend class Module;
+        friend class Module;
+
     public:
-        Instruction(Module& module, BasicBlock* parent) : Value(module), mParent(parent) { }
+        Instruction(Module& module, BasicBlock* parent) : Value(module)
+                , mParent(parent) { }
 
         virtual void eraseFromParent();
 

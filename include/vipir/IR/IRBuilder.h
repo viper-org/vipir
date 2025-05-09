@@ -15,30 +15,51 @@
 namespace vipir
 {
     class BasicBlock;
+
     class Function;
 
     class RetInst;
+
     class AllocaInst;
+
     class StoreInst;
+
     class LoadInst;
+
     class AddrInst;
+
     class GEPInst;
+
     class BinaryInst;
+
     class UnaryInst;
+
     class BranchInst;
+
     class CallInst;
+
     class PtrCastInst;
+
+    class SelectInst;
+
     class SExtInst;
+
     class ZExtInst;
+
     class TruncInst;
+
     class IntToPtrInst;
+
     class PtrToIntInst;
+
     class PhiInst;
 
     class EmitDebugInfo;
+
     class QueryAddress;
 
     class ConstantBool;
+
     class ConstantStruct;
 
 
@@ -88,6 +109,9 @@ namespace vipir
         BinaryInst* CreateCmpLE(Value* left, Value* right);
         BinaryInst* CreateCmpGE(Value* left, Value* right);
 
+        SelectInst* CreateLogicalAnd(Value* cond1, Value* cond2);
+        SelectInst* CreateLogicalOr(Value* cond1, Value* cond2);
+
 
         UnaryInst* CreateNeg(Value* operand);
         UnaryInst* CreateNot(Value* operand);
@@ -95,6 +119,9 @@ namespace vipir
 
         BranchInst* CreateBr(BasicBlock* destination);
         BranchInst* CreateCondBr(Value* condition, BasicBlock* trueBranch, BasicBlock* falseBranch);
+
+
+        SelectInst* CreateSelect(Value* condition, Value* trueValue, Value* falseValue);
 
 
         CallInst* CreateCall(Function* function, std::vector<Value*> parameters);
@@ -115,7 +142,7 @@ namespace vipir
 
 
         EmitDebugInfo* CreateDebugInfo(int line, int col);
-        QueryAddress*  CreateQueryAddress();
+        QueryAddress* CreateQueryAddress();
 
     private:
         BasicBlock* mInsertPoint;
