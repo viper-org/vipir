@@ -20,6 +20,7 @@
 #include "vipir/IR/Instruction/CallInst.h"
 #include "vipir/IR/Instruction/StoreParamInst.h"
 #include "vipir/IR/Instruction/PtrCastInst.h"
+#include "vipir/IR/Instruction/SelectInst.h"
 #include "vipir/IR/Instruction/SExtInst.h"
 #include "vipir/IR/Instruction/ZExtInst.h"
 #include "vipir/IR/Instruction/TruncInst.h"
@@ -255,6 +256,16 @@ namespace vipir
         return ge;
     }
 
+    SelectInst* IRBuilder::CreateLogicalAnd(Value* cond1, Value* cond2)
+    {
+        return CreateSelect(cond1, cond2, CreateConstantBool(false));
+    }
+
+    SelectInst* IRBuilder::CreateLogicalOr(Value* cond1, Value* cond2)
+    {
+        return CreateSelect(cond1, CreateConstantBool(true), cond2);
+    }
+
 
     BranchInst* IRBuilder::CreateBr(BasicBlock* destination)
     {
@@ -272,6 +283,15 @@ namespace vipir
         mInsertPoint->insertValue(mInsertAfter, branch);
 
         return branch;
+    }
+
+    SelectInst* IRBuilder::CreateSelect(Value* condition, Value* trueValue, Value* falseValue)
+    {
+        SelectInst* select = new SelectInst(mInsertPoint, condition, trueValue, falseValue);
+
+        mInsertPoint->insertValue(mInsertAfter, select);
+
+        return select;
     }
 
 
@@ -437,7 +457,7 @@ namespace vipir
 
         return constantBool;
     }
-    
+
     ConstantStruct* IRBuilder::CreateConstantStruct(Type* type, std::vector<Value*> values)
     {
         ConstantStruct* constant = new ConstantStruct(mInsertPoint->getModule(), type, std::move(values));
