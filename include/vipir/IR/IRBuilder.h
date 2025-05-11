@@ -34,6 +34,7 @@ namespace vipir
     class IntToPtrInst;
     class PtrToIntInst;
     class PhiInst;
+    class SelectInst;
 
     class EmitDebugInfo;
     class QueryAddress;
@@ -108,6 +109,10 @@ namespace vipir
         PtrToIntInst* CreatePtrToInt(Value* value, Type* destType);
 
         PhiInst* CreatePhi(Type* type);
+
+        SelectInst* CreateSelect(Value* condition, Value* trueValue, Value* falseValue);
+        SelectInst* CreateLogicalAnd(Value* left, Value* right);
+        SelectInst* CreateLogicalOr(Value* left, Value* right);
 
 
         ConstantBool* CreateConstantBool(bool value);

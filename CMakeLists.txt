@@ -48,6 +48,7 @@ set(SOURCES
     "src/vipir/IR/Instruction/IntToPtrInst.cpp"
     "src/vipir/IR/Instruction/PtrToIntInst.cpp"
     "src/vipir/IR/Instruction/PhiInst.cpp"
+    "src/vipir/IR/Instruction/SelectInst.cpp"
 
     "src/vipir/IR/Debug/EmitDebugInfo.cpp"
     "src/vipir/IR/Debug/QueryAddress.cpp"
@@ -135,6 +136,7 @@ set(HEADERS
     "include/vipir/IR/Instruction/IntToPtrInst.h"
     "include/vipir/IR/Instruction/PtrToIntInst.h"
     "include/vipir/IR/Instruction/PhiInst.h"
+    "include/vipir/IR/Instruction/SelectInst.h"
 
     "include/vipir/IR/Debug/EmitDebugInfo.h"
     "include/vipir/IR/Debug/QueryAddress.h"

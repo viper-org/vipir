@@ -26,11 +26,10 @@
 #include "vipir/IR/Instruction/IntToPtrInst.h"
 #include "vipir/IR/Instruction/PtrToIntInst.h"
 #include "vipir/IR/Instruction/PhiInst.h"
+#include "vipir/IR/Instruction/SelectInst.h"
 
 #include "vipir/IR/Constant/ConstantInt.h"
 #include "vipir/IR/Constant/ConstantBool.h"
-
-#include "vipir/Module.h"
 
 namespace vipir
 {
@@ -426,6 +425,33 @@ namespace vipir
         mInsertPoint->insertValue(mInsertAfter, phi);
 
         return phi;
+    }
+
+    SelectInst* IRBuilder::CreateSelect(Value* condition, Value* trueValue, Value* falseValue)
+    {
+        SelectInst* select = new SelectInst(mInsertPoint, condition, trueValue, falseValue);
+
+        mInsertPoint->insertValue(mInsertAfter, select);
+
+        return select;
+    }
+
+    SelectInst* IRBuilder::CreateLogicalAnd(Value* left, Value* right)
+    {
+        SelectInst* andInst = new SelectInst(mInsertPoint, left, right, CreateConstantBool(false));
+
+        mInsertPoint->insertValue(mInsertAfter, andInst);
+
+        return andInst;
+    }
+
+    SelectInst* IRBuilder::CreateLogicalOr(Value* left, Value* right)
+    {
+        SelectInst* orInst = new SelectInst(mInsertPoint, left, CreateConstantBool(true), right);
+
+        mInsertPoint->insertValue(mInsertAfter, orInst);
+
+        return orInst;
     }
 
 
