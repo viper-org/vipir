@@ -83,16 +83,21 @@ namespace vipir
              || dynamic_cast<instruction::Relative*>(left.get()) && dynamic_cast<instruction::Memory*>(right.get()))
             {
                 instruction::OperandPtr reg = std::make_unique<instruction::Register>(11, mRight->size());
-                builder.addValue(std::make_unique<instruction::MovInstruction>(reg->clone(), std::move(right)));
-                right = std::move(reg);
-            }
-            if (auto vreg = dynamic_cast<VirtualReg*>(mRight.get()))
-            {
-                if (vreg->pointer())
+                if (mRight->isPointer())
                 {
-                    builder.addValue(std::make_unique<instruction::LeaInstruction>(std::move(left), std::move(right), mLeft->size()));
-                    return;
+                    builder.addValue(std::make_unique<instruction::LeaInstruction>(reg->clone(), std::move(right)));
+                    right = std::move(reg);
                 }
+                else
+                {
+                    builder.addValue(std::make_unique<instruction::MovInstruction>(reg->clone(), std::move(right)));
+                    right = std::move(reg);
+                }
+            }
+            else if (mRight->isPointer())
+            {
+                builder.addValue(std::make_unique<instruction::LeaInstruction>(std::move(left), std::move(right), mLeft->size()));
+                return;
             }
             builder.addValue(std::make_unique<instruction::MovInstruction>(std::move(left), std::move(right), mLeft->size()));
         }

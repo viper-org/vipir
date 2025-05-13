@@ -42,6 +42,7 @@ namespace vipir
             virtual bool operator==(OperandPtr& other) = 0;
 
             virtual bool isMemory() { return false; }
+            virtual bool isPointer() { return false; }
             virtual codegen::OperandSize size() = 0;
         };
 
@@ -97,6 +98,7 @@ namespace vipir
             OperandPtr clone() override;
             bool operator==(OperandPtr& other) override;
             bool isMemory() override;
+            bool isPointer() override;
             codegen::OperandSize size() override;
 
             bool& pointer();
@@ -157,17 +159,19 @@ namespace vipir
         friend class opt::Peephole;
         friend class opt::PeepholeV2;
         public:
-            Memory(codegen::OperandSize size, OperandPtr base, std::optional<int> displacement, OperandPtr index, std::optional<int> scale);
+            Memory(codegen::OperandSize size, OperandPtr base, std::optional<int> displacement, OperandPtr index, std::optional<int> scale, bool pointer = false);
 
             std::string ident() const override;
             instruction::OperandPtr asmOperand() override;
             OperandPtr clone() override;
             bool operator==(OperandPtr& other) override;
             bool isMemory() override;
+            bool isPointer() override;
             codegen::OperandSize size() override;
 
             OperandPtr base();
             void addDisplacement(int displacement);
+            bool& pointer();
 
         private:
             codegen::OperandSize mSize;
@@ -175,6 +179,7 @@ namespace vipir
             std::optional<int> mDisplacement;
             OperandPtr mIndex;
             std::optional<int> mScale;
+            bool mPointer;
         };
 
         class Compound : public Operand

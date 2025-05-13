@@ -85,7 +85,7 @@ namespace vipir
 
             offset = nullptr;
             scale = 0;
-            lir::OperandPtr mem = std::make_unique<lir::Memory>(mType->getOperandSize(), std::move(ptr), displacement, std::move(offset), scale);
+            lir::OperandPtr mem = std::make_unique<lir::Memory>(mType->getOperandSize(), std::move(ptr), displacement, std::move(offset), scale, true);
             mEmittedValue = std::move(mem);
             return;
         }
@@ -104,7 +104,7 @@ namespace vipir
 
         codegen::OperandSize size = static_cast<PointerType*>(mType)->getBaseType()->getOperandSize();
         
-        lir::OperandPtr mem = std::make_unique<lir::Memory>(mType->getOperandSize(), std::move(ptr), displacement, std::move(offset), scale);
+        lir::OperandPtr mem = std::make_unique<lir::Memory>(mType->getOperandSize(), std::move(ptr), displacement, std::move(offset), scale, true);
         mEmittedValue = std::move(mem);
         return;
         builder.addValue(std::make_unique<lir::LoadAddress>(vreg->clone(), std::move(mem)));

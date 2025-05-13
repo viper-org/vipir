@@ -139,6 +139,11 @@ namespace vipir
             return mVreg->onStack();
         }
 
+        bool VirtualReg::isPointer()
+        {
+            return mPointer;
+        }
+
         codegen::OperandSize VirtualReg::size()
         {
             return mSize;
@@ -246,12 +251,13 @@ namespace vipir
         }
 
 
-        Memory::Memory(codegen::OperandSize size, OperandPtr base, std::optional<int> displacement, OperandPtr index, std::optional<int> scale)
+        Memory::Memory(codegen::OperandSize size, OperandPtr base, std::optional<int> displacement, OperandPtr index, std::optional<int> scale, bool pointer)
             : mSize(size)
             , mBase(std::move(base))
             , mDisplacement(displacement)
             , mIndex(std::move(index))
             , mScale(scale)
+            , mPointer(pointer)
         {
         }
 
@@ -337,7 +343,7 @@ namespace vipir
         {
             lir::OperandPtr index;
             if (mIndex) index = mIndex->clone();
-            return std::make_unique<Memory>(mSize, mBase->clone(), mDisplacement, std::move(index), mScale);
+            return std::make_unique<Memory>(mSize, mBase->clone(), mDisplacement, std::move(index), mScale, mPointer);
         }
 
         bool Memory::operator==(OperandPtr& other)
@@ -351,6 +357,11 @@ namespace vipir
         bool Memory::isMemory()
         {
             return true;
+        }
+
+        bool Memory::isPointer()
+        {
+            return mPointer;
         }
 
         codegen::OperandSize Memory::size()
