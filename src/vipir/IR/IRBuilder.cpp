@@ -321,6 +321,11 @@ namespace vipir
                 alignedStack = true;
             mInsertPoint->insertValue(insertAfter, store);
             insertAfter = store;
+
+            if (parameters[i]->getType()->isStructType())
+            {
+                --index;
+            }
         }
 
         if (parameters.size() > function->getCallingConvention()->getParameterRegisterCount())
