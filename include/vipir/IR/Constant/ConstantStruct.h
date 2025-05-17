@@ -23,6 +23,8 @@ namespace vipir
 
         void print(std::ostream& stream) override;
         std::string ident() const override;
+        
+        std::vector<std::reference_wrapper<Value*> > getOperands() override;
 
         void doConstantFold() override;
 

@@ -86,6 +86,7 @@ namespace vipir
         opt::VReg* mVReg{0};
         bool mRequiresVReg{true};
         std::vector<opt::VReg*> mDisallowedVRegs;
+        std::vector<int> mDisallowedRegIds;
         bool mRegisterSmashesDone;
         int mPreferredRegisterID{ -1 };
 

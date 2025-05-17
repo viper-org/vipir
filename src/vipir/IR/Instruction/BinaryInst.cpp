@@ -345,5 +345,9 @@ namespace vipir
                 break;
             }
         }
+        if (mOperator == SDIV || mOperator == UDIV || mOperator == UMUL)
+        {
+            mDisallowedRegIds.push_back(0);
+        }
     }
 }

@@ -33,6 +33,16 @@ namespace vipir
         return ret + "}";
     }
 
+    std::vector<std::reference_wrapper<Value*> > ConstantStruct::getOperands()
+    {
+        std::vector<std::reference_wrapper<Value*> > ret;
+        for (auto& value : mValues)
+        {
+            ret.push_back(value);
+        }
+        return ret;
+    }
+
     void ConstantStruct::doConstantFold()
     {
     }

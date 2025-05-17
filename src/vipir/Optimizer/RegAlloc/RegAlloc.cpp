@@ -4,6 +4,7 @@
 #include "vipir/Optimizer/RegAlloc/RegAlloc.h"
 
 #include "vipir/IR/Instruction/AllocaInst.h"
+#include "vipir/IR/Instruction/BinaryInst.h"
 #include "vipir/IR/Instruction/PhiInst.h"
 #include "vipir/Type/StructType.h"
 
@@ -167,11 +168,24 @@ namespace vipir
                     {
                         if (alloca->mForceMemoryCount > 0) requireMemory = true;
                     }
+                    if (dynamic_cast<BinaryInst*>(value))
+                    {
+                        auto x = 3;
+                    }
                     activeValues.push_back(value);
                     std::sort(activeValues.begin(), activeValues.end(), [](Value* a, Value* b) {
                         return a->mInterval.second < b->mInterval.second;
                     });
-                    value->mVReg = getNextFreeVReg(requireMemory, value->mDisallowedVRegs, value->mPreferredRegisterID);
+                    auto disallowed = value->mDisallowedVRegs;
+                    for (auto id : value->mDisallowedRegIds)
+                    {
+                        auto it = std::find_if(function->mVirtualRegs.begin(), function->mVirtualRegs.end(), [id](const auto& vreg) {
+                            return vreg->getPhysicalRegister() == id;
+                        });
+                        if (it != function->mVirtualRegs.end())
+                            disallowed.push_back(it->get());
+                    }
+                    value->mVReg = getNextFreeVReg(requireMemory, disallowed, value->mPreferredRegisterID);
                 }
             }
         }
