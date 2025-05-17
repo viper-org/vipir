@@ -70,5 +70,6 @@ namespace vipir
     {
         mType = type;
         assert(mType->isStructType());
+        mRequiresVReg = false;
     }
 }

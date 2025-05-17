@@ -6,6 +6,9 @@
 #include "vipir/IR/Instruction/AllocaInst.h"
 #include "vipir/IR/Instruction/BinaryInst.h"
 #include "vipir/IR/Instruction/PhiInst.h"
+
+#include "vipir/IR/Constant/ConstantStruct.h"
+
 #include "vipir/Type/StructType.h"
 
 #include <algorithm>
@@ -53,7 +56,7 @@ namespace vipir
                 if (requireMemory)
                 {
                     auto it = std::find_if(virtualRegs.begin(), virtualRegs.end(), [](const auto& vreg) {
-                        return vreg.second->mOnStack;
+                        return vreg.second->mOnStack && !vreg.second->mArgument;
                     });
                     if (it == virtualRegs.end()) return createStackVReg();
                     ++it->second->mUses;
@@ -245,6 +248,16 @@ namespace vipir
                 for (auto valueIt = bb->mValueList.rbegin(); valueIt != bb->mValueList.rend(); ++valueIt)
                 {
                     auto& value = *valueIt;
+
+                    if (dynamic_cast<ConstantStruct*>(value.get()))
+                    {
+                        for (auto operandR: value->getOperands())
+                        {
+                            auto operand = operandR.get();
+                            operand->mInterval.first = std::min(operand->mInterval.first, bb->mInterval.first);
+                            operand->mInterval.second = std::max(operand->mInterval.second, value->mInterval.second);
+                        }
+                    }
 
                     for (auto operandR: value->getOperands())
                     {

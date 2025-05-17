@@ -48,7 +48,7 @@ namespace vipir
                     vreg->mOnStack = true;
                     vreg->mArgument = true;
                     vreg->mStackOffset = stackOffset;
-                    stackOffset -= 8;
+                    stackOffset -= argument->mType->getSizeInBits() / 8;
 
                     argument->mVReg = vreg;
                     activeValues.push_back(argument);

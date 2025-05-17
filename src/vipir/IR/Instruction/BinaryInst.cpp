@@ -348,6 +348,7 @@ namespace vipir
         if (mOperator == SDIV || mOperator == UDIV || mOperator == UMUL)
         {
             mDisallowedRegIds.push_back(0);
+            mDisallowedRegIds.push_back(2);
         }
     }
 }
