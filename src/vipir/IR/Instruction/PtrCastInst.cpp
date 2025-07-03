@@ -35,9 +35,17 @@ namespace vipir
 
     void PtrCastInst::emit(lir::Builder& builder)
     {
-        lir::OperandPtr vreg = std::make_unique<lir::VirtualReg>(mVReg, mType->getOperandSize());
-        builder.addValue(std::make_unique<lir::Move>(vreg->clone(), mPtr->getEmittedValue()));
-        mEmittedValue = std::move(vreg);
+        auto ptr = mPtr->getEmittedValue();
+        if (!dynamic_cast<lir::VirtualReg*>(ptr.get()) && !dynamic_cast<lir::Immediate*>(ptr.get()))
+        {
+            mEmittedValue = std::move(ptr);
+        }
+        else
+        {
+            lir::OperandPtr vreg = std::make_unique<lir::VirtualReg>(mVReg, mType->getOperandSize());
+            builder.addValue(std::make_unique<lir::Move>(vreg->clone(), mPtr->getEmittedValue()));
+            mEmittedValue = std::move(vreg);
+        }
     }
 
 
