@@ -89,7 +89,7 @@ namespace vipir
                 auto frame = *it;
                 if (frame.find(var) != frame.end()) return frame[var];
             }
-            __builtin_unreachable();
+            throw nullptr;
         }
         
         void Mem2Reg::decideValuesStartFrom(Function* function, BasicBlock* basicBlock, std::set<BasicBlock*> visited,

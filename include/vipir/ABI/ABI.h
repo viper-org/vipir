@@ -21,6 +21,7 @@ namespace vipir
 
             virtual int getStackOffsetRegister() const = 0;
             virtual int getStackArgumentRegister() const = 0;
+            virtual int getReservedStackSize() const = 0;
 
             virtual std::vector<int> getGeneralPurposeRegisters() const = 0;
         };

@@ -32,10 +32,10 @@
 #include "vipir/Type/Type.h"
 
 #include "vipir/ABI/SysV.h"
+#include "vipir/ABI/WinABI.h"
 
 #include "vipir/DI/DIVariable.h"
 
-#include <dwarf.h>
 #include <iostream>
 #include <fstream>
 #include <filesystem>
@@ -97,6 +97,40 @@ public:
 int main()
 {
     vipir::Module mod("test.tst");
+    mod.setABI<vipir::abi::WinABI>();
+
+    vipir::IRBuilder builder;
+
+    auto i32Type = vipir::Type::GetIntegerType(32);
+    auto voidType = vipir::Type::GetVoidType();
+    auto charType = vipir::Type::GetIntegerType(8);
+	auto stringType = vipir::Type::GetPointerType(charType);
+
+    auto putsFunc = vipir::Function::Create(vipir::FunctionType::Create(voidType, { stringType }), mod, "puts", false);
+    auto getcharFUnc = vipir::Function::Create(vipir::FunctionType::Create(voidType, {  }), mod, "getchar", false);
+	auto func = vipir::Function::Create(vipir::FunctionType::Create(voidType, { i32Type }), mod, "main", false);
+
+
+    auto entrybb = vipir::BasicBlock::Create("", func);
+
+    auto arg = vipir::ConstantInt::Get(mod, 12, i32Type);
+    auto message = vipir::GlobalString::Create(mod, std::string("1234567890\0", 11));
+
+    builder.setInsertPoint(entrybb);
+    builder.CreateCall(getcharFUnc, {});
+    auto arg2 = builder.CreateAddrOf(message);
+    builder.CreateCall(putsFunc, {arg2});
+    builder.CreateRet(nullptr);
+
+	mod.setOutputFormat(vipir::OutputFormat::PE);
+
+    std::ofstream x("test.obj");
+    mod.emit(x);
+}
+
+int oldmain()
+{
+    vipir::Module mod("test.tst");
     mod.setABI<vipir::abi::SysV>();
     
     vipir::DIBuilder diBuilder;
@@ -141,6 +175,8 @@ int main()
 
     //builder.setInsertPoint(entrybb2);
     //auto ret2 = builder.CreateRet(nullptr);
+
+	constexpr int DW_ATE_signed = 0x05;
     
     auto intDbgType = diBuilder.createBasicType("int", vipir::Type::GetIntegerType(32), DW_ATE_signed);
     auto intPtr = diBuilder.createPointerType(intDbgType);
@@ -168,4 +204,5 @@ int main()
     mod.printLIR(std::cout);
 
     //mod.emit(std::cout);
+    return 0;
 }

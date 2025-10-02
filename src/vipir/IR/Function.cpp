@@ -319,6 +319,12 @@ namespace vipir
             usesStackArgs |= arg->mVReg->onStack();
         }
 
+        if (mHasCallNodes || mTotalStackOffset || usesStackArgs)
+        {
+            if (mTotalStackOffset == 0) mTotalStackOffset = 8; // For alignment
+            mTotalStackOffset += mModule.abi()->getReservedStackSize();
+        }
+
         lir::EnterFunc* node = static_cast<lir::EnterFunc*>(mEnterFuncNode);
         node->setStackSize(mTotalStackOffset);
         node->setCalleeSaved(mCalleeSaved);

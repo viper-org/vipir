@@ -89,6 +89,7 @@ set(SOURCES
     "src/vipir/LIR/Instruction/EnterFunc.cpp"
 
     "src/vipir/ABI/SysV.cpp"
+    "src/vipir/ABI/WinABI.cpp"
 
     "src/vipir/DI/DIBuilder.cpp"
     "src/vipir/DI/DIVariable.cpp"
@@ -180,6 +181,7 @@ set(HEADERS
     "include/vipir/ABI/ABI.h"
     "include/vipir/ABI/CallingConvention.h"
     "include/vipir/ABI/SysV.h"
+    "include/vipir/ABI/WinABI.h"
 
     "include/vipir/DI/DIBuilder.h"
     "include/vipir/DI/DIVariable.h"

@@ -74,6 +74,11 @@ namespace vipir
             return 4; // rsp
         }
 
+        int SysV::getReservedStackSize() const
+        {
+            return 0;
+        }
+
         std::vector<int> SysV::getGeneralPurposeRegisters() const
         {
             // No '11' because this is used in case of mov mem, mem

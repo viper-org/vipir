@@ -1,8 +1,8 @@
-// Copyright 2024 solar-mist
+// Copyright 2025 solar-mist
 
 
-#ifndef VIPIR_ABI_SYSV_H
-#define VIPIR_ABI_SYSV_H 1
+#ifndef VIPIR_ABI_WINABI_H
+#define VIPIR_ABI_WINABI_H 1
 
 #include "vipir/ABI/ABI.h"
 
@@ -10,7 +10,7 @@ namespace vipir
 {
     namespace abi
     {
-        class SysVCall : public CallingConvention
+        class FastCall : public CallingConvention
         {
         public:
             int getReturnRegister() const override;
@@ -29,7 +29,7 @@ namespace vipir
             std::string decorateName(std::string_view name, FunctionType* type) const override;
         };
 
-        class SysV : public ABI
+        class WinABI : public ABI
         {
         public:
             const CallingConvention* getDefaultCallingConvention() const override;
@@ -41,9 +41,9 @@ namespace vipir
             std::vector<int> getGeneralPurposeRegisters() const override;
 
         private:
-            SysVCall mCallingConvention;
+            FastCall mCallingConvention;
         };
     }
 }
 
-#endif // VIPIR_ABI_SYSV_H
+#endif // VIPIR_ABI_WINABI_H

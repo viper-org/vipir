@@ -10,6 +10,8 @@
 
 #include "vipir/Pass/Pass.h"
 
+#include <string>
+
 namespace vipir
 {
     class CFGEmissionPass : public Pass

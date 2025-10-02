@@ -393,9 +393,12 @@ namespace vipir
                 activeValues.push_back(function->mArguments[i].get());
             }
             
-            for (auto it = function->mArguments.begin() + callingConvention->getParameterRegisterCount(); it < function->mArguments.end(); ++it)
+            if (function->mArguments.size() > callingConvention->getParameterRegisterCount())
             {
-                memArgs.push_back(it->get());
+                for (auto it = function->mArguments.begin() + callingConvention->getParameterRegisterCount(); it < function->mArguments.end(); ++it)
+                {
+                    memArgs.push_back(it->get());
+                }
             }
             
             if (!memArgs.empty())
