@@ -216,6 +216,20 @@ namespace vipir
 
         void Push::emit(MC::Builder& builder)
         {
+            if (auto imm = dynamic_cast<Immediate*>(mOperand.get()))
+            {
+                if (imm->size() == codegen::OperandSize::Quad)
+                {
+                    auto reg = std::make_unique<instruction::Register>(11, codegen::OperandSize::Quad);
+                    builder.addValue(std::make_unique<instruction::MovInstruction>(
+                        reg->clone(),
+                        imm->asmOperand(),
+						codegen::OperandSize::Quad)
+                    );
+					builder.addValue(std::make_unique<instruction::PushInstruction>(reg->clone(), codegen::OperandSize::Quad));
+                    return;
+                }
+            }
             builder.addValue(std::make_unique<instruction::PushInstruction>(mOperand->asmOperand(), mOperand->size()));
         }
 
