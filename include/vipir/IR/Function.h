@@ -86,7 +86,7 @@ namespace vipir
         lir::Value* mEnterFuncNode;
         std::vector<lir::Value*> mRetNodes;
         bool mHasCallNodes;
-        int mMaxCallParams;
+        int mMaxCallParams{ 0 };
 
         bool mIsPure;
 
