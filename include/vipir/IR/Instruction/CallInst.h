@@ -31,6 +31,8 @@ namespace vipir
 
         bool isCritical() override;
 
+        int getArgumentCount() const;
+
     protected:
         void emit(lir::Builder& builder) override;
 

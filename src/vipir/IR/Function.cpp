@@ -164,6 +164,17 @@ namespace vipir
 
     void Function::emit(lir::Builder& builder)
     {
+        for (auto& basicBlock : mBasicBlockList)
+        {
+            for (auto& value : basicBlock->mValueList)
+            {
+                if (auto call = dynamic_cast<CallInst*>(value.get()))
+                {
+                    if (call->getArgumentCount() > mMaxCallParams) mMaxCallParams = call->getArgumentCount();
+                }
+            }
+        }
+
         builder.setSection(lir::SectionType::Code);
 
         if (mBasicBlockList.empty())
@@ -273,10 +284,6 @@ namespace vipir
             for (auto& value : basicBlock->mValueList)
             {
                 if (auto alloca = dynamic_cast<AllocaInst*>(value.get())) ret.push_back(alloca);
-                if (auto call = dynamic_cast<CallInst*>(value.get()))
-                {
-					if (call->getOperands().size() - 1 > mMaxCallParams) mMaxCallParams = call->getOperands().size() - 1;
-                }
             }
         }
         return ret;

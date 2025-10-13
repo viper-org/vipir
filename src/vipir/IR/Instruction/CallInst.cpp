@@ -60,6 +60,11 @@ namespace vipir
         return !mCalleePure;
     }
 
+    int CallInst::getArgumentCount() const
+    {
+		return mParameters.size();
+    }
+
     void CallInst::emit(lir::Builder& builder)
     {
         mCallee->lateEmit(builder);
