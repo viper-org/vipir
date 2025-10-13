@@ -57,14 +57,6 @@ namespace vipir
         lir::OperandPtr ptr;
         lir::OperandPtr value = mValue->getEmittedValue();
 
-        // align the stack if it is made unaligned by the passing of parameters
-        lir::OperandPtr stack = std::make_unique<lir::PhysicalReg>(mModule.abi()->getStackArgumentRegister(), codegen::OperandSize::Quad);
-        if (mAlignStack)
-        {
-            lir::OperandPtr alignment = std::make_unique<lir::Immediate>(8);
-            builder.addValue(std::make_unique<lir::BinaryArithmetic>(stack->clone(), lir::BinaryArithmetic::Operator::Sub, std::move(alignment)));
-        }
-
         if (mType->isStructType())
         {
             auto constant = dynamic_cast<ConstantStruct*>(mValue);
@@ -117,12 +109,11 @@ namespace vipir
         }
     }
 
-    StoreParamInst::StoreParamInst(BasicBlock* parent, int paramIndex, Value* value, bool alignStack, const abi::CallingConvention* callingConvention)
+    StoreParamInst::StoreParamInst(BasicBlock* parent, int paramIndex, Value* value, const abi::CallingConvention* callingConvention)
             : Instruction(parent->getModule(), parent)
             , mCallingConvention(callingConvention)
             , mParamIndex(paramIndex)
             , mValue(value)
-            , mAlignStack(alignStack)
     {
         if (mValue->getType()->isStructType())
         {

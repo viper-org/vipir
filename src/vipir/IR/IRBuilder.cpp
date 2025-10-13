@@ -296,29 +296,14 @@ namespace vipir
     CallInst* IRBuilder::CreateCall(Function* function, std::vector<Value*> parameters)
     {
         int index = 0;
-        bool alignedStack = true;
-        int stackRestore = 0;
-
-        if (function->getCallingConvention()->getStackCleaner() == abi::StackCleaner::Caller)
-        {
-            if (parameters.size() >= function->getCallingConvention()->getParameterRegisterCount())
-            {
-                stackRestore = 8 * (parameters.size() - function->getCallingConvention()->getParameterRegisterCount());
-                stackRestore = (stackRestore + 15) & ~15; // align to 16 bytes
-                if ((parameters.size() - function->getCallingConvention()->getParameterRegisterCount()) % 2 != 0) // misaligned stack
-                    alignedStack = false;
-            }
-        }
 
         Value* insertAfter = mInsertAfter;
         std::vector<Value*> stores;
 
         for (int i = 0; i < function->getCallingConvention()->getParameterRegisterCount() && i < function->mArguments.size(); ++i)
         {
-            StoreParamInst* store = new StoreParamInst(mInsertPoint, index++, parameters[i], !alignedStack, function->getCallingConvention());
+            StoreParamInst* store = new StoreParamInst(mInsertPoint, index++, parameters[i], function->getCallingConvention());
             stores.push_back(store);
-            if (!alignedStack)
-                alignedStack = true;
             mInsertPoint->insertValue(insertAfter, store);
             insertAfter = store;
 
@@ -334,10 +319,8 @@ namespace vipir
             {
                 for (auto it = parameters.rbegin(); it < parameters.rend() - function->getCallingConvention()->getParameterRegisterCount(); ++it)
                 {
-                    StoreParamInst* store = new StoreParamInst(mInsertPoint, index++, *it, !alignedStack, function->getCallingConvention());
+                    StoreParamInst* store = new StoreParamInst(mInsertPoint, index++, *it, function->getCallingConvention());
                     stores.push_back(store);
-                    if (!alignedStack)
-                        alignedStack = true;
                     mInsertPoint->insertValue(insertAfter, store);
                     insertAfter = store;
                 }
@@ -346,17 +329,15 @@ namespace vipir
             {
                 for (auto it = parameters.begin() + function->getCallingConvention()->getParameterRegisterCount(); it < parameters.end(); ++it)
                 {
-                    StoreParamInst* store = new StoreParamInst(mInsertPoint, index++, *it, !alignedStack, function->getCallingConvention());
+                    StoreParamInst* store = new StoreParamInst(mInsertPoint, index++, *it, function->getCallingConvention());
                     stores.push_back(store);
-                    if (!alignedStack)
-                        alignedStack = true;
                     mInsertPoint->insertValue(insertAfter, store);
                     insertAfter = store;
                 }
             }
         }
 
-        CallInst* call = new CallInst(mInsertPoint, function, stores, stackRestore, function->getCallingConvention());
+        CallInst* call = new CallInst(mInsertPoint, function, stores, function->getCallingConvention());
 
         for (auto store: stores)
         {

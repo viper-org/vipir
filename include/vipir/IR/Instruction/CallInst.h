@@ -35,13 +35,12 @@ namespace vipir
         void emit(lir::Builder& builder) override;
 
     private:
-        CallInst(BasicBlock* parent, Value* callee, std::vector<Value*> parameters, int stackRestore, const abi::CallingConvention* callingConvention);
+        CallInst(BasicBlock* parent, Value* callee, std::vector<Value*> parameters, const abi::CallingConvention* callingConvention);
 
         const abi::CallingConvention* mCallingConvention;
         Value* mCallee;
         bool mCalleePure;
         std::vector<Value*> mParameters;
-        int mStackRestore;
         int mValueId;
     };
 }

@@ -33,12 +33,11 @@ namespace vipir
         std::string ident() const override;
 
     private:
-        StoreParamInst(BasicBlock* parent, int paramIndex, Value* value, bool alignStack, const abi::CallingConvention* callingConvention);
+        StoreParamInst(BasicBlock* parent, int paramIndex, Value* value, const abi::CallingConvention* callingConvention);
 
         const abi::CallingConvention* mCallingConvention;
         int mParamIndex;
         Value* mValue;
-        bool mAlignStack;
 
         Value* mCall;
     };
