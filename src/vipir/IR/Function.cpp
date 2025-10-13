@@ -6,6 +6,7 @@
 
 #include "vipir/IR/Instruction/PhiInst.h"
 #include "vipir/IR/Instruction/AllocaInst.h"
+#include "vipir/IR/Instruction/CallInst.h"
 
 #include "vipir/LIR/Label.h"
 #include "vipir/LIR/Instruction/EnterFunc.h"
@@ -215,8 +216,6 @@ namespace vipir
             if (auto call = dynamic_cast<lir::Call*>(value.get()))
             {
                 mHasCallNodes = true;
-                auto params = call->getInputOperands().size();
-                if (params > mMaxCallParams) mMaxCallParams = params;
             }
         }
         std::move(newBuilder.getValues().begin(), newBuilder.getValues().end(), std::back_inserter(builder.getValues()));
@@ -274,6 +273,10 @@ namespace vipir
             for (auto& value : basicBlock->mValueList)
             {
                 if (auto alloca = dynamic_cast<AllocaInst*>(value.get())) ret.push_back(alloca);
+                if (auto call = dynamic_cast<CallInst*>(value.get()))
+                {
+					if (call->getOperands().size() - 1 > mMaxCallParams) mMaxCallParams = call->getOperands().size() - 1;
+                }
             }
         }
         return ret;
