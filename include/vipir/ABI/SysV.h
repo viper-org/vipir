@@ -17,6 +17,7 @@ namespace vipir
 
             int getParameterRegister(int index) const override;
             int getParameterRegisterCount() const override;
+            bool reserveRegisterParameterStack() const override { return false; }
 
             std::vector<int> getCallerSavedRegisters() const override;
             std::vector<int> getCalleeSavedRegisters() const override;
@@ -36,7 +37,7 @@ namespace vipir
 
             int getStackOffsetRegister() const override;
             int getStackArgumentRegister() const override;
-            int getReservedStackSize() const override;
+            int getStackAlign() const override;
 
             std::vector<int> getGeneralPurposeRegisters() const override;
 

@@ -182,6 +182,25 @@ namespace vipir
             bool mPointer;
         };
 
+        class StackSlot : public Operand
+        {
+        friend class opt::Peephole;
+        friend class opt::PeepholeV2;
+        public:
+            StackSlot(int offset);
+
+            std::string ident() const override;
+            instruction::OperandPtr asmOperand() override;
+            OperandPtr clone() override;
+            bool operator==(OperandPtr& other) override;
+            codegen::OperandSize size() override;
+
+            int getOffset() const;
+
+        private:
+            int mOffset;
+        };
+
         class Compound : public Operand
         {
         friend class opt::Peephole;

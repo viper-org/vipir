@@ -4,11 +4,13 @@
 #include "vipir/IR/Constant/ConstantStruct.h"
 #include "vipir/IR/Instruction/LoadInst.h"
 #include "vipir/IR/Instruction/AllocaInst.h"
+#include "vipir/IR/Instruction/AddrInst.h"
 
 #include "vipir/IR/BasicBlock.h"
+#include "vipir/IR/Function.h"
 
-#include "vipir/IR/Instruction/AddrInst.h"
 #include "vipir/LIR/Instruction/LoadAddress.h"
+
 #include "vipir/Module.h"
 
 #include "vipir/LIR/Instruction/Move.h"
@@ -94,6 +96,7 @@ namespace vipir
                 mem = static_cast<lir::Memory*>(ptr.get());
                 mem->addDisplacement(i);
                 builder.addValue(std::make_unique<lir::Push>(std::move(ptr)));
+                // TODO(IMPORTANT): Make this use mov instead of push
             }
             return;
         }
@@ -105,8 +108,12 @@ namespace vipir
         }
         else
         {
-            int offset = 1 * 8;
-            builder.addValue(std::make_unique<lir::Push>(std::move(value)));
+            int offset = (mParamIndex - 1) * 8;
+            if (mParent->getParent()->getCallingConvention()->reserveRegisterParameterStack())
+            {
+				offset += mCallingConvention->getParameterRegisterCount() * 8;
+            }
+            builder.addValue(std::make_unique<lir::Move>(std::make_unique<lir::StackSlot>(offset), std::move(value)));
         }
     }
 

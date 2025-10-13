@@ -387,6 +387,48 @@ namespace vipir
         }
 
 
+        StackSlot::StackSlot(int offset)
+            : mOffset(offset)
+        {
+        }
+
+        std::string StackSlot::ident() const
+        {
+            return std::format("STACK[{}]", mOffset);
+		}
+
+        instruction::OperandPtr StackSlot::asmOperand()
+        {
+            instruction::RegisterPtr base = std::make_unique<instruction::Register>(4, codegen::OperandSize::Quad);
+            return std::make_unique<instruction::Memory>(std::move(base), mOffset, nullptr, std::nullopt);
+		}
+
+        OperandPtr StackSlot::clone()
+        {
+            return std::make_unique<StackSlot>(mOffset);
+        }
+
+        bool StackSlot::operator==(OperandPtr& other)
+        {
+            if (auto stack = dynamic_cast<StackSlot*>(other.get()))
+            {
+                if (stack->mOffset == mOffset) return true;
+            }
+            // Maybe check against memory operands here?
+            // Probably unlikely to come up though..
+        }
+
+        codegen::OperandSize StackSlot::size()
+        {
+            return codegen::OperandSize::Quad;
+		}
+
+        int StackSlot::getOffset() const
+        {
+            return mOffset;
+        }
+
+
         Compound::Compound(std::vector<OperandPtr> values)
             : mValues(std::move(values))
         {

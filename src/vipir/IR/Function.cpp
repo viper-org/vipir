@@ -215,6 +215,8 @@ namespace vipir
             if (auto call = dynamic_cast<lir::Call*>(value.get()))
             {
                 mHasCallNodes = true;
+                auto params = call->getInputOperands().size();
+                if (params > mMaxCallParams) mMaxCallParams = params;
             }
         }
         std::move(newBuilder.getValues().begin(), newBuilder.getValues().end(), std::back_inserter(builder.getValues()));
@@ -322,7 +324,12 @@ namespace vipir
         if (mHasCallNodes || mTotalStackOffset || usesStackArgs)
         {
             if (mTotalStackOffset == 0) mTotalStackOffset = 8; // For alignment
-            mTotalStackOffset += mModule.abi()->getReservedStackSize();
+            mTotalStackOffset += mModule.abi()->getStackAlign();
+            if (mMaxCallParams > mCallingConvention->getParameterRegisterCount())
+            {
+                int stackParams = mMaxCallParams - mCallingConvention->getParameterRegisterCount();
+                mTotalStackOffset += stackParams * 8;
+			}
         }
 
         lir::EnterFunc* node = static_cast<lir::EnterFunc*>(mEnterFuncNode);

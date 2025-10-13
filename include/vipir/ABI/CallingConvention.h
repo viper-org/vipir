@@ -33,6 +33,7 @@ namespace vipir
 
             virtual int getParameterRegister(int index) const = 0;
             virtual int getParameterRegisterCount() const = 0;
+            virtual bool reserveRegisterParameterStack() const = 0;
             
             // Maximum size of a struct that can be passed in registers
             virtual int getMaxStructSize() const = 0;

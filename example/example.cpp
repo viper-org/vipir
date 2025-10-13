@@ -63,6 +63,11 @@ public:
         return 3;
     }
 
+    bool reserveRegisterParameterStack() const override
+    {
+        return false;
+	}
+
     int getMaxStructSize() const override
     {
         return 128; // 16 bytes

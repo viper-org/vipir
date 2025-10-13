@@ -74,7 +74,7 @@ namespace vipir
             return 4; // rsp
         }
 
-        int SysV::getReservedStackSize() const
+        int SysV::getStackAlign() const
         {
             return 0;
         }

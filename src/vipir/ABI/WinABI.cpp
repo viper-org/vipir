@@ -73,9 +73,9 @@ namespace vipir
             return 4; // rsp
         }
 
-        int WinABI::getReservedStackSize() const
+        int WinABI::getStackAlign() const
         {
-            return 0x28;
+            return 8;
         }
 
         std::vector<int> WinABI::getGeneralPurposeRegisters() const
