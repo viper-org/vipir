@@ -45,10 +45,12 @@ namespace vipir
 
     void GlobalString::emit(lir::Builder& builder)
     {
-        builder.setSection(lir::SectionType::Data);
-        mEmittedValue = std::make_unique<lir::Lbl>(std::to_string(mValueId), false);
+        auto name = "S" + std::to_string(mValueId);
 
-        builder.addValue(std::make_unique<lir::Label>(std::to_string(mValueId), false));
+        builder.setSection(lir::SectionType::Data);
+        mEmittedValue = std::make_unique<lir::Lbl>(name, false);
+
+        builder.addValue(std::make_unique<lir::Label>(name, false));
         builder.addValue(std::make_unique<lir::GlobalString>(mValue));
     }
 

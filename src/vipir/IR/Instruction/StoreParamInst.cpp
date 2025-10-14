@@ -100,10 +100,10 @@ namespace vipir
         }
         else
         {
-            int offset = (mParamIndex - 1) * 8;
-            if (mParent->getParent()->getCallingConvention()->reserveRegisterParameterStack())
+            int offset = mParamIndex * 8;
+            if (!mParent->getParent()->getCallingConvention()->reserveRegisterParameterStack())
             {
-				offset += mCallingConvention->getParameterRegisterCount() * 8;
+				offset -= mCallingConvention->getParameterRegisterCount() * 8;
             }
             builder.addValue(std::make_unique<lir::Move>(std::make_unique<lir::StackSlot>(offset), std::move(value)));
         }

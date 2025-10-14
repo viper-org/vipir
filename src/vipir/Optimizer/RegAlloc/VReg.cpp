@@ -15,6 +15,7 @@ namespace vipir
             , mUses(0)
             , mPhysicalRegister(phys)
             , mOnStack(false)
+            , mArgument(false)
             , mSize(0)
         {
         }
@@ -25,6 +26,7 @@ namespace vipir
             , mPhysicalRegister(phys)
             , mStackOffset(offset)
             , mOnStack(true)
+            , mArgument(false)
             , mSize(0)
         {
         }
