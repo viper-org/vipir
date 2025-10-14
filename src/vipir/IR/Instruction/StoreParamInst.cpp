@@ -79,7 +79,7 @@ namespace vipir
             {
                 ptr = std::make_unique<lir::Memory>(mType->getOperandSize(), std::move(ptr), std::nullopt, nullptr, std::nullopt);
             }
-            
+
             // Push in reverse order so the struct is laid out correctly for the callee
             for (int i = mType->getSizeInBits() / 8 - 8; i >= 0; i -= 8)
             {
@@ -110,10 +110,10 @@ namespace vipir
     }
 
     StoreParamInst::StoreParamInst(BasicBlock* parent, int paramIndex, Value* value, const abi::CallingConvention* callingConvention)
-            : Instruction(parent->getModule(), parent)
-            , mCallingConvention(callingConvention)
-            , mParamIndex(paramIndex)
-            , mValue(value)
+        : Instruction(parent->getModule(), parent)
+        , mCallingConvention(callingConvention)
+        , mParamIndex(paramIndex)
+        , mValue(value)
     {
         if (mValue->getType()->isStructType())
         {
