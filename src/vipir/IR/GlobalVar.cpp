@@ -47,7 +47,7 @@ namespace vipir
 
         builder.setSection(lir::SectionType::Data);
 
-        mEmittedValue = std::make_unique<lir::Lbl>(std::to_string(mValueId), false);
+        mEmittedValue = std::make_unique<lir::Lbl>(std::to_string(mValueId), false, mType->getOperandSize());
         builder.addValue(std::make_unique<lir::Label>(std::to_string(mValueId), false));
 
         lir::OperandPtr init = mInitialValue->getEmittedValue();

@@ -113,7 +113,7 @@ namespace vipir
         {
         friend class opt::PeepholeV2;
         public:
-            Lbl(std::string name, bool plt);
+            Lbl(std::string name, bool plt, codegen::OperandSize size = codegen::OperandSize::None);
 
             std::string ident() const override;
             instruction::OperandPtr asmOperand() override;
@@ -126,6 +126,7 @@ namespace vipir
         private:
             std::string mName;
             bool mPlt;
+            codegen::OperandSize mSize;
         };
 
         class CMP : public Operand

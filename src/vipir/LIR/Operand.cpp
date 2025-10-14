@@ -155,9 +155,10 @@ namespace vipir
         }
 
 
-        Lbl::Lbl(std::string name, bool plt)
+        Lbl::Lbl(std::string name, bool plt, codegen::OperandSize size)
             : mName(std::move(name))
             , mPlt(plt)
+            , mSize(size)
         {
         }
 
@@ -173,7 +174,7 @@ namespace vipir
 
         OperandPtr Lbl::clone()
         {
-            return std::make_unique<Lbl>(mName, mPlt);
+            return std::make_unique<Lbl>(mName, mPlt, mSize);
         }
 
         bool Lbl::operator==(OperandPtr& other)
@@ -186,7 +187,7 @@ namespace vipir
 
         codegen::OperandSize Lbl::size()
         {
-            return codegen::OperandSize::None;
+            return mSize;
         }
 
         std::string Lbl::getName()

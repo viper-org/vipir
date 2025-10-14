@@ -322,7 +322,7 @@ namespace vipir
         }
         if (mCalleeSaved.size() % 2 != 0)
         { // Keep stack aligned to 16 bytes
-            mTotalStackOffset += 8;
+            //mTotalStackOffset += 8;
         }
 
         bool usesStackArgs = false;
@@ -338,6 +338,14 @@ namespace vipir
             int stackParams = 0;
             if (mCallingConvention->reserveRegisterParameterStack()) stackParams = std::max(mMaxCallParams, mCallingConvention->getParameterRegisterCount());
             mTotalStackOffset += stackParams * 8;
+        }
+
+        if (auto stackUsed = mTotalStackOffset + mCalleeSaved.size() * 8)
+        {
+            if ((stackUsed + 8) % 16 != mModule.abi()->getStackAlign())
+            {
+                mTotalStackOffset += 8;
+            }
         }
 
         lir::EnterFunc* node = static_cast<lir::EnterFunc*>(mEnterFuncNode);
