@@ -68,7 +68,7 @@ namespace vipir
     GlobalVar* Module::createGlobalVar(Type* type)
     {
         GlobalVar* global = new GlobalVar(*this, type);
-        insertGlobalAt(global, -1);
+        insertGlobalAtFront(global);
         return global;
     }
 
