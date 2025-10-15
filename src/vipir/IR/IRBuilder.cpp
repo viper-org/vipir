@@ -317,25 +317,13 @@ namespace vipir
 
         if (parameters.size() > function->getCallingConvention()->getParameterRegisterCount())
         {
-            if (function->getCallingConvention()->getArgumentPassingOrder() == abi::ArgumentPassingOrder::RightToLeft)
+            // This only works for right to left, but most ABIs are so its probably fine
+            for (auto it = parameters.begin() + function->getCallingConvention()->getParameterRegisterCount(); it < parameters.end(); ++it)
             {
-                for (auto it = parameters.rbegin(); it < parameters.rend() - function->getCallingConvention()->getParameterRegisterCount(); ++it)
-                {
-                    StoreParamInst* store = new StoreParamInst(mInsertPoint, index++, *it, function->getCallingConvention());
-                    stores.insert(stores.begin() + position, store);
-                    mInsertPoint->insertValue(insertAfter, store);
-                    insertAfter = store;
-                }
-            }
-            else if (function->getCallingConvention()->getArgumentPassingOrder() == abi::ArgumentPassingOrder::LeftToRight)
-            {
-                for (auto it = parameters.begin() + function->getCallingConvention()->getParameterRegisterCount(); it < parameters.end(); ++it)
-                {
-                    StoreParamInst* store = new StoreParamInst(mInsertPoint, index++, *it, function->getCallingConvention());
-                    stores.push_back(store);
-                    mInsertPoint->insertValue(insertAfter, store);
-                    insertAfter = store;
-                }
+                StoreParamInst* store = new StoreParamInst(mInsertPoint, index++, *it, function->getCallingConvention());
+                stores.push_back(store);
+                mInsertPoint->insertValue(insertAfter, store);
+                insertAfter = store;
             }
         }
 
