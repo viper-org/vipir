@@ -313,6 +313,8 @@ namespace vipir
             }
         }
 
+        int position = stores.size();
+
         if (parameters.size() > function->getCallingConvention()->getParameterRegisterCount())
         {
             if (function->getCallingConvention()->getArgumentPassingOrder() == abi::ArgumentPassingOrder::RightToLeft)
@@ -320,7 +322,7 @@ namespace vipir
                 for (auto it = parameters.rbegin(); it < parameters.rend() - function->getCallingConvention()->getParameterRegisterCount(); ++it)
                 {
                     StoreParamInst* store = new StoreParamInst(mInsertPoint, index++, *it, function->getCallingConvention());
-                    stores.push_back(store);
+                    stores.insert(stores.begin() + position, store);
                     mInsertPoint->insertValue(insertAfter, store);
                     insertAfter = store;
                 }
