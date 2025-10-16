@@ -34,7 +34,6 @@ namespace vipir
             if (mSaveFramePointer)
             {
                 builder.addValue(std::make_unique<instruction::PushInstruction>(instruction::Register::Get("rbp")));
-                builder.addValue(std::make_unique<instruction::MovInstruction>(instruction::Register::Get("rbp"), instruction::Register::Get("rsp")));
                 if (!mStackSize)
                 {
                     instruction::OperandPtr rsp = instruction::Register::Get("rsp");
@@ -43,17 +42,22 @@ namespace vipir
                 }
             }
 
+            for (auto calleeSaved : mCalleeSaved)
+            {
+                instruction::OperandPtr reg = std::make_unique<instruction::Register>(calleeSaved, codegen::OperandSize::Quad);
+                builder.addValue(std::make_unique<instruction::PushInstruction>(std::move(reg)));
+            }
+
+            if (mSaveFramePointer)
+            {
+                builder.addValue(std::make_unique<instruction::MovInstruction>(instruction::Register::Get("rbp"), instruction::Register::Get("rsp")));
+            }
+
             if (mStackSize)
             {
                 instruction::OperandPtr reg = instruction::Register::Get("rsp");
                 instruction::OperandPtr stackOffset = std::make_unique<instruction::Immediate>(mStackSize);
                 builder.addValue(std::make_unique<instruction::SubInstruction>(std::move(reg), std::move(stackOffset)));
-            }
-
-            for (auto calleeSaved : mCalleeSaved)
-            {
-                instruction::OperandPtr reg = std::make_unique<instruction::Register>(calleeSaved, codegen::OperandSize::Quad);
-                builder.addValue(std::make_unique<instruction::PushInstruction>(std::move(reg)));
             }
         }
 
