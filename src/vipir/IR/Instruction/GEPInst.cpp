@@ -2,6 +2,7 @@
 
 
 #include "vipir/IR/Instruction/GEPInst.h"
+#include "vipir/IR/Instruction/AllocaInst.h"
 
 #include "vipir/IR/Argument.h"
 #include "vipir/IR/BasicBlock.h"
@@ -46,6 +47,14 @@ namespace vipir
     std::vector<std::reference_wrapper<Value*> > GEPInst::getOperands()
     {
         return {mPtr, mOffset};
+    }
+
+    AllocaInst* GEPInst::getAlloca()
+    {
+        if (auto alloca = dynamic_cast<AllocaInst*>(mPtr))
+			return alloca;
+        
+        return nullptr;
     }
 
     constexpr std::size_t AlignUp(std::size_t value, std::size_t align)

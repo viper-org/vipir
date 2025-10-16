@@ -215,6 +215,8 @@ namespace vipir
                 }
                 basicBlock->mInterval.second = index;
             }
+            function->mInterval.first = 0;
+            function->mInterval.second = index;
 
             for (auto it = function->mBasicBlockList.rbegin(); it != function->mBasicBlockList.rend(); ++it)
             {
@@ -288,6 +290,22 @@ namespace vipir
                 }
 
                 bb->liveIn() = live;
+            }
+
+            // Allocas that have their address taken must be alive for the entire function,
+            // as external functions are able to access their memory
+            for (auto& bb : function->mBasicBlockList)
+            {
+                for (auto& value : bb->mValueList)
+                {
+                    if (auto alloca = dynamic_cast<AllocaInst*>(value.get()))
+                    {
+                        if (alloca->mForceMemoryCount > 0)
+                        {
+                            alloca->mInterval.second = function->mInterval.second;
+                        }
+					}
+                }
             }
         }
 

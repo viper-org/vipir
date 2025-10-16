@@ -25,6 +25,8 @@ namespace vipir
     
         std::vector<std::reference_wrapper<Value*> > getOperands() override;
 
+        AllocaInst* getAlloca();
+
     protected:
         void emit(lir::Builder& builder) override;
 
